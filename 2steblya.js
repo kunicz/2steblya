@@ -537,7 +537,7 @@ function cartFormIncomplete() {
 }
 /* удаляем атрибут "обязательное поле" у поля cartIncomplete */
 function cartIncompleteRemoveRequired() {
-	$('[data-input-lid="1675967313188"] input').removeAttr('data-tilda-req');
+	$('.t706 [data-input-lid="1675967313188"] input').removeAttr('data-tilda-req');
 }
 /* комментарий курьеру и флористу */
 function cartComment() {
@@ -666,7 +666,6 @@ function productTovarFunctions(tovar) {
 	productSoldOut(tovar);
 	productBomjPlashka(tovar);
 	productCartDisabled(tovar);
-	productVitrinaCards(tovar);
 	productShow(tovar);
 }
 /* функции для товаров в каталоге */
@@ -679,8 +678,6 @@ function productCatalogTovarFunctions(tovar, catalog) {
 	productSoldOut(tovar, catalog);
 	productBomjPlashka(tovar, catalog);
 	productHideVitrinaDuplicate(tovar, catalog);
-	productHideVitrinaSold(tovar, catalog);
-	productVitrinaCompact(tovar, catalog);
 	productShow(tovar);
 }
 /* функции для каталога */
@@ -774,25 +771,6 @@ function productHideVitrinaDuplicate(tovar, catalog) {
 		if (getTovarId(tovar) != id) return;
 		tovar.hide();
 	});
-}
-/* скрываем с витрины проданный товар */
-function productHideVitrinaSold(tovar, catalog) {
-	if (!isVitrina(catalog)) return;
-	if (!tovar.find('.js-store-prod-sold-out').length) return;
-	tovar.hide();
-}
-/* товар на витрине компактный */
-function productVitrinaCompact(tovar, catalog) {
-	return;
-	if (!isVitrina(catalog)) return;
-	var img = tovar.find('.js-product-img');
-	tovar.find('.t-store__card__textwrapper').appendTo(img);
-	tovar.find('.t-store__card__mark-wrapper').appendTo(img);
-}
-/* выбор карточки для букетов с витрины */
-function productVitrinaCards(tovar) {
-	var ids = getVitrinaTovarsIds();
-	if (!ids.includes(getTovarId(tovar))) return;
 }
 /* цены в опциях формата */
 function productOptionsWithPrices(tovar) {
