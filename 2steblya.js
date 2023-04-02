@@ -56,6 +56,7 @@ function cartFunctions() {
 	cartInputContainersClasses();
 	cartDelivery();
 	cartZakazchikPoluchatel();
+	cartRemoveLinkFromTelegram();
 	cartFormValidationTexts();
 	cartAdresPoluchatelya();
 	cartHerZnaetPoluchatelya();
@@ -394,6 +395,13 @@ function cartFormValidationTexts() {
 		'а вдруг разбудим?'                     //delivery interval      
 	];
 	formValidationTexts($('.t706__orderform'), texts);
+}
+/* удаляем t.me из ник в телеграм */
+function cartRemoveLinkFromTelegram() {
+	$('body').on('change', '.t706 [name="messenger-zakazchika"]', function () {
+		if (!$(this).val().includes('t.me/')) return;
+		$(this).val($(this.val().replace(/^(?:https\:\/\/)*t\.me\//, ''));
+	});
 }
 /* собираем адрес получателя из многих полей, в одно */
 function cartAdresPoluchatelya() {
@@ -1042,8 +1050,6 @@ function getTovarId(tovar) {
 /* получаем текущую цену товара */
 function getTovarPrice(tovar) {
 	var price = tovar.find('[data-product-price-def]');
-	if (!price) return null;
-	price = price.text();
 	if (!price) return null;
 	return parseInt(price.replace(/[^\d]/g, ''));
 }
