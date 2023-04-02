@@ -400,7 +400,7 @@ function cartFormValidationTexts() {
 function cartRemoveLinkFromTelegram() {
 	$('body').on('change', '.t706 [name="messenger-zakazchika"]', function () {
 		if (!$(this).val().includes('t.me/')) return;
-		$(this).val($(this.val().replace(/^(?:https\:\/\/)*t\.me\//, '')));
+		$(this).val($(this).val().replace(/^(?:https\:\/\/)*t\.me\//, ''));
 	});
 }
 /* собираем адрес получателя из многих полей, в одно */
@@ -1051,7 +1051,8 @@ function getTovarId(tovar) {
 function getTovarPrice(tovar) {
 	var price = tovar.find('[data-product-price-def]');
 	if (!price) return null;
-	return parseInt(price.replace(/[^\d]/g, ''));
+	if (!price.text()) return null;
+	return parseInt(price.text().replace(/[^\d]/g, ''));
 }
 /* получаем айдишники товаров с свитрины */
 function getVitrinaTovarsIds() {
