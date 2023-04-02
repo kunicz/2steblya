@@ -400,7 +400,7 @@ function cartFormValidationTexts() {
 function cartRemoveLinkFromTelegram() {
 	$('body').on('change', '.t706 [name="messenger-zakazchika"]', function () {
 		if (!$(this).val().includes('t.me/')) return;
-		$(this).val($(this.val().replace(/^(?:https\:\/\/)*t\.me\//, ''));
+		$(this).val($(this.val().replace(/^(?:https\:\/\/)*t\.me\//, '')));
 	});
 }
 /* собираем адрес получателя из многих полей, в одно */
