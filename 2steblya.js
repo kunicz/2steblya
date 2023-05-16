@@ -439,7 +439,7 @@ function cartAdresPoluchatelya() {
 		input.on('change', function () {
 			var adresValue = '';
 			adresValue += 'г.' + (adresInputs.city.val() ? adresInputs.city.val() : 'Москва');
-			if (adresInputs.street.val()) adresValue += ', ул.' + adresInputs.street.val();
+			if (adresInputs.street.val()) adresValue += ', ул.' + adresInputs.street.val().replace(/^[Уу]л\.*/, '').trim();
 			if (adresInputs.dom.val()) adresValue += ' ' + adresInputs.dom.val();
 			if (adresInputs.korpus.val()) adresValue += 'к' + adresInputs.korpus.val();
 			if (adresInputs.stroenie.val()) adresValue += 'c' + adresInputs.stroenie.val();
@@ -695,6 +695,7 @@ function productTovarFunctions(tovar) {
 	productBlackFriday(tovar);
 	productSoldOut(tovar);
 	productBomjPlashka(tovar);
+	productButton(tovar);
 	productCartDisabled(tovar);
 	productShow(tovar);
 }
@@ -806,6 +807,7 @@ function productHideVitrinaDuplicate(tovar, catalog) {
 function productOptionsWithPrices(tovar) {
 	var options = tovar.find('[data-edition-option-id="фор мат"] select option');
 	if (options.length > 1) tovar.addClass('multiplePrices');
+	if (getTovarId(tovar) == 857613433221) tovar.addClass('multiplePrices'); //* донатошная */
 	options.each(function () {
 		var optionTitle = $(this).text();
 		var price;
@@ -858,6 +860,13 @@ function productBomjPlashka(tovar, catalog) {
 	setInterval(function () {
 		plashka.toggle(!$('.t-slds__item[data-slide-index="2"]').is('.t-slds__item_active')); //скрываем бомж плашку на слайдах с карточкой
 	}, 100);
+}
+/* кнопка "купить" */
+function productButton(tovar) {
+	/* донатошная */
+	if (getTovarId(tovar) == 857613433221) {
+		$('.js-store-prod-popup-buy-btn-txt').text('ЗАДОНАТИТЬ!');
+	}
 }
 /* скрываем товар с произвольной ценой (НИ ТАКОЙ КАК ВСЕ) */
 function productNitakoiKakVse(tovar) {
