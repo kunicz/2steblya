@@ -75,6 +75,7 @@ function cartDynamicFunctions() {
 	cartProductOptionsInOneLine();
 	cartOtsluniavit();
 	cartOnlyOneFromVitrina();
+	cartDonat();
 	cartShow();
 }
 
@@ -112,7 +113,7 @@ function cartInputContainersClasses() {
 function cartCountItems() {
 	var oldVal;
 	setInterval(function () {
-		var products = $('.t706__cartwin-products > div');
+		var products = $('.t706__product');
 		if (oldVal == products.length) return;
 		cartDynamicFunctions();
 		oldVal = products.length;
@@ -316,6 +317,26 @@ function cartDelivery() {
 /* отслюнявить */
 function cartOtsluniavit() {
 	$('.t706__cartwin-prodamount-label').text('нужно отслюнявить ');
+}
+/* донат */
+function cartDonat() {
+	$('.t706__cartwin-content').removeClass('donat');
+	var tovars = $('.t706__product');
+	if (!tovars.length) return;
+	if (tovars.length > 1) return;
+	if (getTovarInCartId(tovars.eq(0)) != 857613433221) return;
+	$('.t706__cartwin-content').addClass('donat');
+	cartIncompleteRemoveRequired();
+	if ($('[name="dostavka-date"]').val()) return;
+	var today = new Date();
+	var day = {
+		d: today.getDate() + 1,
+		m: today.getMonth() + 1,
+		y: today.getFullYear()
+	};
+	if (day['d'] < 10) day['d'] = '0' + day['d'];
+	if (day['m'] < 10) day['m'] = '0' + day['m'];
+	$('[name="dostavka-date"]').val(day['d'] + '-' + day['m'] + '-' + day['y']);
 }
 /* если заказчик - это получатель */
 function cartZakazchikPoluchatel() {
@@ -599,6 +620,7 @@ function cartSetCookies() {
 			inputs.push('#' + id + ' input');
 		});
 		$('body').on('change', inputs.join(), function () {
+			if (!$(this).val()) return;
 			var cookie = {};
 			$.each(fields, function (i, id) {
 				cookie[id] = $(inputs[i]).val();
