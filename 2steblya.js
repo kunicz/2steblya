@@ -56,7 +56,7 @@ function cartFunctions() {
 	cartInputContainersClasses();
 	cartDelivery();
 	cartZakazchikPoluchatel();
-	cartRemoveLinkFromTelegram();
+	cartTelegram();
 	cartFormValidationTexts();
 	cartAdresPoluchatelya();
 	cartHerZnaetPoluchatelya();
@@ -418,10 +418,12 @@ function cartFormValidationTexts() {
 	formValidationTexts($('.t706__orderform'), texts);
 }
 /* удаляем t.me из ник в телеграм */
-function cartRemoveLinkFromTelegram() {
+function cartTelegram() {
 	$('body').on('change', '.t706 [name="messenger-zakazchika"]', function () {
-		if (!$(this).val().includes('t.me/')) return;
-		$(this).val($(this).val().replace(/^(?:https\:\/\/)*t\.me\//, ''));
+		var val = $(this).val();
+		if (val.startsWith('@')) val = val.substring(1);
+		if (val.includes('t.me/')) val = val.replace(/^(?:https\:\/\/)*t\.me\//, '');
+		$(this).val(val);
 	});
 }
 /* собираем адрес получателя из многих полей, в одно */
@@ -933,7 +935,7 @@ function productHideEmptyText(tovar) {
 }
 /* поле: выебри карточку */
 function productVyebriKartochku(tovar) {
-	var selectOptions = ['с нашей карточкой', 'со своим текстом', 'без айдентики'];
+	var selectOptions = ['с нашей карточкой', 'со своим текстом', 'без карточки', 'без айдентики'];
 	tovar.find('.js-product-option:last select').on('change', function () {
 		var bullets = $(this).parents('.t-store').find('.t-slds__thumbsbullet');
 		if (!bullets.length) return;
@@ -950,6 +952,7 @@ function productVyebriKartochku(tovar) {
 }
 /* добавить дополнительный текст под описание товара */
 function productAddAdditionalText(tovar) {
+	if (getTovarId(tovar) == 857613433221) return; /* донатошная */
 	var div = $('<div class="js-store-prod-all-text-dop"></div>');
 	div.html('к любому букету прилагается его состав и чудо-порошок для продления жизни цветов<br>к букетам с айдентикой также прилагается карт очка и сосабельный петушок');
 	$('.js-store-prod-text').append(div);
