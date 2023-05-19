@@ -327,16 +327,25 @@ function cartDonat() {
 	if (getTovarInCartId(tovars.eq(0)) != 857613433221) return;
 	$('.t706__cartwin-content').addClass('donat');
 	cartIncompleteRemoveRequired();
-	if ($('[name="dostavka-date"]').val()) return;
-	var today = new Date();
-	var day = {
-		d: today.getDate() + 1,
-		m: today.getMonth() + 1,
-		y: today.getFullYear()
-	};
-	if (day['d'] < 10) day['d'] = '0' + day['d'];
-	if (day['m'] < 10) day['m'] = '0' + day['m'];
-	$('[name="dostavka-date"]').val(day['d'] + '-' + day['m'] + '-' + day['y']);
+	cartDonatComment();
+	cartDonatDate();
+
+	function cartDonatComment() {
+		$('#florist-comment > label').text('восторги и благодарности');
+		$('[name="florist-comment"]').attr('placeholder', 'мы готовы впитывать');
+	}
+	function cartDonatDate() {
+		if ($('[name="dostavka-date"]').val()) return;
+		var today = new Date();
+		var day = {
+			d: today.getDate() + 1,
+			m: today.getMonth() + 1,
+			y: today.getFullYear()
+		};
+		if (day['d'] < 10) day['d'] = '0' + day['d'];
+		if (day['m'] < 10) day['m'] = '0' + day['m'];
+		$('[name="dostavka-date"]').val(day['d'] + '-' + day['m'] + '-' + day['y']);
+	}
 }
 /* если заказчик - это получатель */
 function cartZakazchikPoluchatel() {
@@ -441,7 +450,7 @@ function cartAdresPoluchatelya() {
 		input.on('change', function () {
 			var adresValue = '';
 			adresValue += 'г.' + (adresInputs.city.val() ? adresInputs.city.val() : 'Москва');
-			if (adresInputs.street.val()) adresValue += ', ул.' + adresInputs.street.val().replace(/^[Уу]л\.*/, '').trim();
+			if (adresInputs.street.val()) adresValue += ', ул.' + adresInputs.street.val().replace(/^[Уу]л\.*/, '').replace(/^ица\s/, '').trim();
 			if (adresInputs.dom.val()) adresValue += ' ' + adresInputs.dom.val();
 			if (adresInputs.korpus.val()) adresValue += 'к' + adresInputs.korpus.val();
 			if (adresInputs.stroenie.val()) adresValue += 'c' + adresInputs.stroenie.val();
