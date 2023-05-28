@@ -465,7 +465,6 @@ function cartAdresPoluchatelya() {
 			if (adresInputs.podezd.val()) adresValue += ', подъезд ' + adresInputs.podezd.val();
 			if (adresInputs.etazh.val()) adresValue += ', этаж ' + adresInputs.etazh.val();
 			//if(adresInputs.domofon.val())    adresValue += ', домофон ' +adresInputs.domofon.val();
-
 			$('[name="adres-poluchatelya"]').val(adresValue);
 		});
 	});
@@ -671,7 +670,7 @@ function cartUseCookies() {
 			e.preventDefault();
 			$(this).hide();
 			$.each(fields, function (i, id) {
-				$('#' + fields[i] + ' input').val(cookieValues[i]);
+				$('#' + fields[i] + ' input').val(cookieValues[i]).change();
 			});
 		});
 	}
