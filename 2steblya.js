@@ -67,6 +67,7 @@ function cartFunctions() {
 	cartComment();
 	cartImportantFields();
 	cartRequiredFields();
+	cartYaCounterId();
 	cartSetCookies();
 	cartUseCookies();
 }
@@ -124,6 +125,7 @@ function cartDelivery() {
 	var dates = {};
 	var dateField = $('.t706 [name="dostavka-date"]');
 	var intervalField = $('.t706 [name="dostavka-interval"]');
+	var priceField = $('.t706 [name="dostavka-price"]');
 
 	dateField.prop('readonly', true);
 
@@ -132,6 +134,7 @@ function cartDelivery() {
 	datePicker();
 	deliveryInterval();
 	telegramLinkInDateFieldDescription();
+	price();
 
 	/* проверяем не наступило ли завтра (раз в минуту) */
 	function actualDate() {
@@ -312,6 +315,10 @@ function cartDelivery() {
 		var descr = $('#dostavka-date .t-input-subtitle');
 		var html = descr.text().replace('телегу', '<a href="https://t.me/dva_steblya">телегу</a>');
 		descr.html(html);
+	}
+	/* стоимость доставки */
+	function price() {
+		priceField.val(500);
 	}
 }
 /* отслюнявить */
@@ -597,6 +604,12 @@ function cartComment() {
 		text += florist.val();
 		comment.val(text);
 	}
+}
+/* янедкс метрика cliendId */
+function cartYaCounterId() {
+	setTimeout(function () {
+		$('.t706 [name="ya-client-id"]').val(yaCounter89315640.getClientID());
+	}, 3000);
 }
 /* на средних экранах иконка корзины не наезжает на меню */
 function cartIconUponHeader() {
