@@ -70,6 +70,7 @@ function cartFunctions() {
 	cartYaCounterId();
 	cartSetCookies();
 	cartUseCookies();
+	cartHideOtkudaUznal();
 }
 /* функции корзины при изменении корзины */
 function cartDynamicFunctions() {
@@ -674,6 +675,14 @@ function cartUseCookies() {
 			});
 		});
 	}
+}
+/* скрываем поле "откуда узнал", если не в первый раз */
+function cartHideOtkudaUznal() {
+	/* неоптимально, так как форму могли заполнить, но заказ не сделать
+	по уму, надо проверять в срм количество заказов */
+	var cookie = Cookies.get('zakazchik');
+	if (!cookie) return;
+	$('#otkuda-uznal-o-nas').remove();
 }
 
 /*
