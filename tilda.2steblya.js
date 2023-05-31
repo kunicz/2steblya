@@ -301,6 +301,7 @@ function cartDelivery() {
 			for (i = 1; i <= 3; i++) {
 				if (hour >= startHour + 4 * i) disableOpt(i); //за два часа до истечения интервала
 			}
+			disableOpt(1); /* всегда отключаем вариант с 8 до 12 сегодня */
 		}
 		function disableOpt(i) {
 			var opt = intervalField.children('option:nth-child(' + i + ')');
