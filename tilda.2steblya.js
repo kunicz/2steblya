@@ -56,15 +56,15 @@ function cartFunctions() {
 	cartInputContainersClasses();
 	cartDelivery();
 	cartZakazchikPoluchatel();
-	cartTelegram();
+	//cartTelegram();
 	cartFormValidationTexts();
 	cartAdresPoluchatelya();
 	cartHerZnaetPoluchatelya();
 	cartCountItems();
-	cartCheckboxBooleanValue();
+	//cartCheckboxBooleanValue();
 	cartPreventCloseOnOverlayClick();
 	cartErrorsMessageOnClick();
-	cartComment();
+	//cartComment();
 	cartImportantFields();
 	cartRequiredFields();
 	cartYaCounterId();
@@ -115,7 +115,7 @@ function cartInputContainersClasses() {
 function cartCountItems() {
 	var oldVal;
 	setInterval(function () {
-		var products = $('.t706__product');
+		var products = $('.t706__cartwin-products > div');
 		if (oldVal == products.length) return;
 		cartDynamicFunctions();
 		oldVal = products.length;
@@ -153,13 +153,13 @@ function cartDelivery() {
 	function selectedDate() {
 		setInterval(function () {
 			if (!dateField.val()) return;
-			if (dateField.val() == '__-__-____') return;
-			if (dateField.val() == (dates['selected-d'] < 10 ? '0' : '') + dates['selected-d'] + '-' + (dates['selected-m'] < 10 ? '0' : '') + dates['selected-m'] + '-' + dates['selected-yyyy']) return;
+			if (dateField.val() == '____-__-__') return;
+			if (dateField.val() == dates['selected-yyyy'] + '-' + (dates['selected-m'] < 10 ? '0' : '') + dates['selected-m'] + '-' + (dates['selected-d'] < 10 ? '0' : '') + dates['selected-d']) return;
 			var dateParts = dateField.val().split('-');
-			dates['selected-0'] = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
-			dates['selected-d'] = parseInt(dateParts[0].replace(/^0/, ''));
+			dates['selected-0'] = new Date(+dateParts[0], dateParts[1] - 1, +dateParts[2]);
+			dates['selected-d'] = parseInt(dateParts[2].replace(/^0/, ''));
 			dates['selected-m'] = parseInt(dateParts[1].replace(/^0/, ''));
-			dates['selected-yyyy'] = parseInt(dateParts[2]);
+			dates['selected-yyyy'] = parseInt(dateParts[0]);
 		}, 50);
 	}
 	/* календарь */
@@ -246,7 +246,7 @@ function cartDelivery() {
 			if (faded) zaglushka.css('opacity', .4);
 			datePicker.find('[data-picker$="-' + specialDate['m'] + '-' + specialDate['d'] + '"]').hide().after(zaglushka);
 		}
-		/* открываем продажу на сегодня для корзины с товарами из витрины */
+		/* открываем продажу на сегодня для корзины с товарами из витрины (НИТАКОЙ всегда должен быть на витрине в скрытом виде) */
 		function vitrinaTodayPurchase() {
 			var vitrinaList = getVitrinaTovarsIds();
 			if (!vitrinaList.length) return;
@@ -267,11 +267,7 @@ function cartDelivery() {
 	function deliveryInterval() {
 		/* показать/скрыть */
 		setInterval(function () {
-			if (dateField.val()) {
-				$('#dostavka-interval').show();
-			} else {
-				$('#dostavka-interval').hide();
-			}
+			$('#dostavka-interval').toggle(dateField.val() ? true : false);
 		}, 100);
 		/* если меняется дата или меняется интервал */
 		$('body').on('change', intervalField.selector + ',' + dateField.selector, function () {
@@ -301,7 +297,7 @@ function cartDelivery() {
 			for (i = 1; i <= 3; i++) {
 				if (hour >= startHour + 4 * i) disableOpt(i); //за два часа до истечения интервала
 			}
-			disableOpt(1); /* всегда отключаем вариант с 8 до 12 сегодня */
+			disableOpt(1);
 		}
 		function disableOpt(i) {
 			var opt = intervalField.children('option:nth-child(' + i + ')');
@@ -353,7 +349,7 @@ function cartDonat() {
 		};
 		if (day['d'] < 10) day['d'] = '0' + day['d'];
 		if (day['m'] < 10) day['m'] = '0' + day['m'];
-		$('[name="dostavka-date"]').val(day['d'] + '-' + day['m'] + '-' + day['y']);
+		$('[name="dostavka-date"]').val(day['y'] + '-' + day['m'] + '-' + day['d']);
 	}
 }
 /* если заказчик - это получатель */
@@ -449,32 +445,36 @@ function cartAdresPoluchatelya() {
 	var adresProps = ['city', 'street', 'dom', 'kvartira', 'korpus', 'stroenie', 'podezd', 'etazh', 'domofon'];
 	var adresInputs = {};
 	var adresSmall = [];
-	$.each(adresProps, function (i, val) {
-		adresInputs[val] = $('.t706 [name="adres-poluchatelya-' + val + '"]');
-		if (['city', 'street'].includes(val)) return;
-		adresSmall.push('#adres-poluchatelya-' + val);
-	});
-	$.each(adresInputs, function (i, input) {
-		input.addClass('adresInput');
-		input.on('change', function () {
-			var adresValue = '';
-			adresValue += 'г.' + (adresInputs.city.val() ? adresInputs.city.val() : 'Москва');
-			if (adresInputs.street.val()) adresValue += ', ул.' + adresInputs.street.val().replace(/^[Уу]л\.*/, '').replace(/^ица\s/, '').trim();
-			if (adresInputs.dom.val()) adresValue += ' ' + adresInputs.dom.val();
-			if (adresInputs.korpus.val()) adresValue += 'к' + adresInputs.korpus.val();
-			if (adresInputs.stroenie.val()) adresValue += 'c' + adresInputs.stroenie.val();
-			if (adresInputs.kvartira.val()) adresValue += ', кв.' + adresInputs.kvartira.val();
-			if (adresInputs.podezd.val()) adresValue += ', подъезд ' + adresInputs.podezd.val();
-			if (adresInputs.etazh.val()) adresValue += ', этаж ' + adresInputs.etazh.val();
-			//if(adresInputs.domofon.val())    adresValue += ', домофон ' +adresInputs.domofon.val();
-			$('[name="adres-poluchatelya"]').val(adresValue);
-		});
-	});
+	collectAdresFields();
+	//buildAdres();	
+	$(adresSmall.join(',')).wrapAll('<div id="adresDataSmall" />').wrapAll('<div />'); //разместим покомпактее
+	$('#adres-poluchatelya-street,#adresDataSmall,#courier-comment').wrapAll('<div />').wrapAll('<div id="adresData" />'); //обернем весь адрес в див 
 
-	/* разместим покомпактее */
-	$(adresSmall.join(',')).wrapAll('<div id="adresDataSmall" />').wrapAll('<div />');
-	/* обернем весь адрес в див */
-	$('#adres-poluchatelya-street,#adresDataSmall,#courier-comment').wrapAll('<div />').wrapAll('<div id="adresData" />');
+	function collectAdresFields() {
+		$.each(adresProps, function (i, val) {
+			adresInputs[val] = $('.t706 [name="adres-poluchatelya-' + val + '"]');
+			if (['city', 'street'].includes(val)) return;
+			adresSmall.push('#adres-poluchatelya-' + val);
+		});
+	}
+	function buildAdres() {
+		$.each(adresInputs, function (i, input) {
+			input.addClass('adresInput');
+			input.on('change', function () {
+				var adresValue = '';
+				adresValue += 'г.' + (adresInputs.city.val() ? adresInputs.city.val() : 'Москва');
+				if (adresInputs.street.val()) adresValue += ', ул.' + adresInputs.street.val().replace(/^[Уу]л\.*/, '').replace(/^ица\s/, '').trim();
+				if (adresInputs.dom.val()) adresValue += ' ' + adresInputs.dom.val();
+				if (adresInputs.korpus.val()) adresValue += 'к' + adresInputs.korpus.val();
+				if (adresInputs.stroenie.val()) adresValue += 'c' + adresInputs.stroenie.val();
+				if (adresInputs.kvartira.val()) adresValue += ', кв.' + adresInputs.kvartira.val();
+				if (adresInputs.podezd.val()) adresValue += ', подъезд ' + adresInputs.podezd.val();
+				if (adresInputs.etazh.val()) adresValue += ', этаж ' + adresInputs.etazh.val();
+				//if(adresInputs.domofon.val())    adresValue += ', домофон ' +adresInputs.domofon.val();
+				$('[name="adres-poluchatelya"]').val(adresValue);
+			});
+		});
+	}
 }
 /* заказчик не знает адрес (хер знает получателя) */
 function cartHerZnaetPoluchatelya() {
@@ -485,7 +485,7 @@ function cartHerZnaetPoluchatelya() {
 	}
 	herZnaet.on('change', function () {
 		$('#adresData').toggle(!$(this).is(':checked'));
-		$('.t706 [name="adres-poluchatelya"]').val('');
+		//$('.t706 [name="adres-poluchatelya"]').val('');
 		$('.t706 [name="courier-comment"]').val('').trigger('change');
 		$('.t706 .adresInput').each(function () {
 			$(this).val('');
@@ -501,6 +501,7 @@ function cartProductOptionsInOneLine() {
 			case 'накинуть косарь':
 			case 'накинуть пятихатку':
 			case 'накинуть сотен':
+			case 'эвкалипт ннада':
 				$(this).hide();
 				break;
 			case 'выебри карточку':

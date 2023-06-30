@@ -1,0 +1,204 @@
+/* reset */
+body{background:#000;}
+body a{color:#ff008c;opacity:1;}
+
+/* базовые классы */
+.t-text,.t-descr,.t-btn *,.t-submit{font-size:18px;line-height:1.5;}
+.t-name{font-size:28px;line-height:1.1;}
+.t-title{font-size:52px;line-height:1.1;text-transform:uppercase;}
+.t-btn,.t-submit{color:#000!important;background-color:#ff008c;border-radius:0;text-transform:uppercase;}
+@media screen and (max-width: 980px){
+    .t-text,.t-descr,.t-btn span{font-size:18px;}
+    .t-name{font-size:26px;}
+    .t-title{font-size:40px;}
+}
+
+/* меню */
+.tmenu-mobile{background-color:transparent!important;}
+.tmenu-mobile__container{background:#000;}
+
+/* формы */
+.t-form .t-form__errorbox-wrapper{background:none!important;}
+.t-form .t-form__errorbox-text,.t-form .t-input-error{color:#ff008c;font-size:18px;font-weight:300;}
+.t-form .t-radio__indicator,.t-form .t-checkbox__indicator{background:#fff;border-radius:5%}
+.t-form .t-radio__indicator:after, .t-form .t-checkbox__indicator:after{background:#ff008c;border-radius:0;}
+	/* errors */
+	.t-form .js-error-control-box .t-checkbox__control,
+	.t-form .js-error-control-box .t-checkboxes__wrapper,
+	.t-form .js-error-control-box .t-input:not(.t-input-phonemask),
+	.t-form .js-error-control-box .t-radio__wrapper,
+	.t-form .js-error-control-box .t-select,
+	.t-form .js-error-control-box .uploadcare-widget{border:0 none!important;}
+
+/* полтика конфиденциальности форм */
+.t678__form-bottom-text,.t706__form-bottom-text{font-size:.8em!important;opacity:.5!important;}
+.t706__form-bottom-text a{color:#fff!important;font-size:inherit!important;}
+
+/* ТОВАРЫ */
+
+    /* меню */
+        .t-store__parts-switch-btn{text-transform:uppercase;}
+		.t-store__parts-switch-btn a{color:#fff!important;}
+		[data-storepart-uid="539199854821"]:after{content:'';display:block;width:25px;height:25px;position:absolute;top:0;right:0;background-size:contain;background-image:url(https://static.tildacdn.com/tild3738-6161-4362-a230-616135653463/santaHat.png);transform:translate(13px,-8px) rotate(25deg);}/* новый год */
+        [data-storepart-uid="894609841681"]:after{content:'';display:block;width:25px;height:25px;position:absolute;top:0;right:0;background-size:contain;background-image:url(https://static.tildacdn.com/tild3735-6134-4761-a230-353138316165/flower.png);transform:translate(13px,-8px) rotate(15deg);}/*8марта*/
+	
+	/* каталог */
+        .js-product:not(.loaded){background-image:url(https://static.tildacdn.com/tild3166-6562-4664-b130-306130363266/preloader.gif);}
+		.js-product:not(.loaded) > *{background:#000;}
+
+	/* попап */
+		/* элементы управления */
+		.t-store__prod-popup__close-txt{font-size:20px;}
+		.t-popup__close-wrapper *{color:#fff;}
+		.js-store-close-text.logo{background-image:url(https://static.tildacdn.com/tild3065-3561-4565-b164-313930356635/whiteLogoTrim.png);}
+		.t-popup__close.logo .t-popup__close-wrapper{background-image:url(https://static.tildacdn.com/tild6630-3533-4861-b264-613166376532/logo-rect.png);}
+
+	/* фото */
+        /* плашки:
+		стандартная от тильды: .t-store__card__mark-wrapper
+		бомжетный: .bomjPlashka
+		карточка к букету: .t-store .t-store__card__imgwrapper > div:last-child:after
+		*/
+		.t-store__card__mark-wrapper,.bomjPlashka,.t-store .t-store__card__imgwrapper > div:last-child:after{font-size:12px;font-family:Roboto,Arial,sans-serif;text-transform:uppercase;border-radius:0;}
+		.t-store__card__mark-wrapper,.bomjPlashka{color:#000;background:#ff008c;font-weight:900;}
+		.t-store .t-store__card__imgwrapper > div:last-child:after{color:#fff;background:#000;font-weight:500;}
+		@media screen and (max-width:960px){
+			.t-store__card__mark-wrapper,.bomjPlashka,.t-store .t-store__card__imgwrapper > div:last-child:after{font-size:10px;font-weight:600;}
+		}
+
+		/* карточка */
+		.js-product .card{background:#ff008c;background-image:none!important;}
+		.js-product .card__container{padding:75px 55px 55px 55px;font-family:'Source Code Pro',Arial,sans-serif;line-height:1.2!important;}
+		.js-product .card__container *{color:#000!important;}
+		.js-product .card__container:before{background-image:url('https://static.tildacdn.com/tild6362-6133-4632-b864-646561666131/logo-rect-transparen.png');}
+		.js-product .card__container .card__buket{opacity:.7;font-size:.8em!important;}
+		.js-product .card__container .card__title{font-weight:900;font-size:1.9em!important;line-height:1!important}
+		.js-product .card__container .card__text{font-weight:500;}
+		.js-product .card__container .card__your-text{opacity:.7;font-size:.8em!important;}
+		.js-product .card__container .card__your-text p{border-bottom:1px solid rgba(0,0,0,.1);white-space:nowrap;}
+		.t-store__card__imgwrapper > div:last-child{background-color:#ff008c;}
+		@media screen and (max-width:460px){
+			.js-product .card__container{font-size:4.3vw;}
+			.js-product .card__container .card__title{font-size:26px!important;}
+		}
+
+		/*длинный текст в карточке : тамара ильинишна*/
+		[data-product-gen-uid="221040427501"] .card__text{font-size:0.7em!important;}
+
+		/*две карточки : та тьяна*/
+		[data-product-uid="891768931541"] .t-slds__item[data-slide-index="2"] *{display:none!important;}
+		[data-product-uid="891768931541"] .t-slds__item[data-slide-index="2"]{background:none;background-image:url("https://thumb.tildacdn.com/stor3636-3836-4536-b864-653862623338/-/format/webp/73885555.jpg")!important;background-size:cover;background-repeat:no-repeat;background-position:center;}
+		
+		/* буллиты */
+		.js-product:not(.noCard) .t-slds__thumbsbullet:nth-child(2){background:#ff008c;}
+		.js-product:not(.noCard) .t-slds__thumbsbullet:nth-child(2):after{content:'карт очка';text-transform:uppercase;font-weight:900;font-size:16px;line-height:.9;font-family:'Source Code Pro',Arial,sans-serif;}
+			/*две карточки : та тьяна*/
+			[data-product-uid="891768931541"] .t-slds__thumbsbullet[data-slide-bullet-for="2"]{display:none;}
+
+	/* цена */
+    .js-product.multiplePrices .t-store__card__price-value:before{font-size:14px;font-weight:300;opacity:.5;}
+	.js-store-prod-price{color:#fff!important}
+	.js-store-prod-sold-out{color:#fff;}
+		/*черная пятница*/
+			.fridayOldprice{color:#ff008c;font-size:24px;}
+			.fridayDiscont{font-size:11px;color:#fff;background:#ff008c;}
+
+	/* селекты */
+	.product__optionReadMore{border-radius:50%;background-color:#ff008c;color:#fff!important;font-family:'Ubuntu',Arial,sans-serif;font-weight:300;}
+		 /* скрыть технические селекты */		
+		[data-product-gen-uid="896292515801"] .js-product-controls-wrapper > div:nth-child(2), /*14 февраля 2023 (loveis)*/
+		[data-product-gen-uid="103878497051"] .js-product-controls-wrapper > div:nth-child(2),
+		[data-product-gen-uid="448865187471"] .js-product-controls-wrapper > div:nth-child(2),
+		[data-product-gen-uid="260954710551"] .js-product-controls-wrapper > div:nth-child(2), /* выебри карточку для доната */
+		[data-product-gen-uid="857613433221"] .js-product-option:nth-child(2)
+		{display:none;}
+	
+	/* кнопка */
+		/*soldOut*/
+        .productSoldout.t-btn{font-size:18px;}
+
+/* КОРЗИНА */
+
+    /* иконка */
+	.t706__carticon{background-color:#000;}
+	
+	/* элементы управления попапом */
+    .t706__cartwin-close{background-color:#000;}
+	.t706__product-del img, .t706__product-plusminus img{filter:invert(1);}
+    
+	/* попап */
+    .t706__cartwin{background-color:#000;}
+    .t706__cartwin-content{background-color:#000;}
+    .t706__cartwin-content *{color:#fff;font-size:18px;}
+
+		/* заголовок */
+        .t706__cartwin-heading{font-size:28px;}
+
+		/* описание товара */
+		.t706__product-title__option{font-weight:300;}
+
+		/* фото товара */
+        .t706__product .t706__product-imgdiv{background-color:#000;border-radius:0;}
+
+		/* нужно отслюнявить */
+		.t706__cartwin-prodamount-wrap *{font-size:28px!important;}
+
+		/* товар удален */
+		.t706__product-deleted__timer__counter__circle circle{stroke:#ff008c;}
+
+		/* форма */
+		.t706 .t706__orderform .t-form *{font-size:16px;}
+			/* вспомнить из куки */
+     		.t706 .cartUseCookieBtn{font-family:'Source Code Pro',Arial,sans-serif;}
+
+			/* описания полей */
+        	.t706 .t-input-subtitle{font-size:.83em!important;opacity:.5;}
+			.t706 .t-input-subtitle a{color:#fff!important;font-size:inherit!important;}
+
+			/* datepicker */
+			.t706 .t_datepicker__header{background:#ff008c;}
+			.t706 .t_datepicker__body *{color:#000;font-size:.9em!important;}
+			.t706 .t_datepicker__body thead th{background:#000;color:#fff;font-weight:600;text-transform:uppercase;}
+			.t706 .t_datepicker__label{text-decoration:none;}
+			.t706 .t_datepicker__arrow{opacity:1;}
+			.t706 .t_datepicker__arrow_prev:after{border-right-color:#fff;}
+			.t706 .t_datepicker__arrow_next:after{border-left-color:#fff;}
+			.t706 .t_datepicker__week-day{color:#000;}
+			.t706 .t_datepicker__selected-day{background:#ff008c;color:#fff}
+				/*specialDate*/
+				.t706 .t_datepicker__body .specialDate{font-size:10px;color:#000;background:#ebebeb;}
+
+			/* промокод */
+			.t706 .t-inputpromocode__btn{background:#ff008c!important;}
+			.t706 .t-inputpromocode__wrapper .t-text{color:#fff;opacity:0}
+			.t706 .t-inputpromocode__wrapper .t-text.showed{opacity:1}
+			#промокод .t-input-error{display:none}
+
+			/*cartIncomplete*/
+        	.t706 [data-input-lid="1675967313188"]{display:none!important;}
+
+			/* кнопка */
+			.t706 .t-submit span{font-size:.7em;font-weight:400;color:#000}
+		
+			/* success */
+			.t706 .js-successbox{background:#000!important;background-image:none!important;color:#000!important;}
+
+		/* formIncomplete */
+		[data-tooltip-hook="#popup:cartIncomplete"] .t-popup__block-close{background:#000;}
+
+		/* донат */
+		.t706__product a[href*="857613433221"] + .t706__product-title__option{display:none;}
+
+/* zaebca */
+.js-successbox{color:#fff!important;background-color:#000;}
+.js-successbox:before{content:'ЗАШИБОК!';font-size:52px;background-image:url(https://static.tildacdn.com/tild3336-3465-4761-b837-303532313734/zaebca.jpg);}
+
+/* полноэкранный просмотр картинок */
+.t-zoomer__container{background:#000!important;color:#fff!important;}
+.t-zoomer__close{background:#000!important;}
+.t-zoomer__close svg{fill:#fff;stroke:#fff;}
+.t-carousel__zoomer__arrow__wrapper:before{background:#000;}
+
+
+
+        

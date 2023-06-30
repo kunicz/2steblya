@@ -1,0 +1,10 @@
+/* формы */
+.t-form .t-form__errorbox-wrapper{background:none!important;}
+.t-form .t-form__errorbox-text,.t-form .t-input-error{color:#999;font-size:18px;font-weight:300;}
+.t-form .t-radio__indicator,.t-form .t-checkbox__indicator{background:#fff;border-radius:5%;border:1px solid #999}
+.t-form .t-radio__indicator:after, .t-form .t-checkbox__indicator:after{background:#999;border-radius:0;}
+
+/* попап */
+    .t706__cartwin-content{padding:50px}
+
+.js-store-prod-all-text-dop{display:none}
