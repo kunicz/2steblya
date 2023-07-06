@@ -1,0 +1,79 @@
+//.t706
+&__cartwin {
+	background-color: $primary-color;
+
+	&-close {
+		background-color: $primary-color;
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		z-index: 12 !important;
+
+		@include if('stf') {
+			&-icon {
+				filter: invert(1);
+				opacity: .2;
+			}
+		}
+	}
+
+	&-overlay {
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 2;
+	}
+
+	&-content {
+		background-color: $primary-color;
+		max-width: 750px;
+		padding: 20px;
+		position: relative;
+		z-index: 10 !important;
+		display: none;
+	}
+
+	//заголовок
+	&-top {
+		border: 0 none;
+	}
+
+	&-heading {
+		font-size: 28px;
+
+		@include max(640) {
+			text-align: center;
+		}
+	}
+
+	//итого
+	&-bottom {
+		border: 0 none;
+		padding-top: 0;
+	}
+
+	&-prodamount-wrap {
+		padding-top: 30px;
+		color: $contrprimary-color;
+		text-align: left;
+
+		@include max(640) {
+			text-align: center;
+		}
+
+		* {
+			font-size: 28px !important;
+		}
+	}
+
+	&-totalamount-wrap {
+		margin-bottom: 70px;
+
+		@include if('2steblya') {
+			display: none !important;
+		}
+	}
+}

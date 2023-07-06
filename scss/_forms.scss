@@ -1,0 +1,163 @@
+input,
+textarea,
+select {
+	border: 0 none;
+	outline: none;
+	background-color: #fff;
+
+	@include if('stf') {
+		border: 1px solid rgba($contrprimary-color, .2);
+	}
+}
+
+textarea {
+	@include max(640) {
+		padding-top: 17px;
+	}
+}
+
+.t-form {
+
+	.t-radio__indicator,
+	.t-checkbox__indicator {
+		background: $contrprimary-color;
+		border: 0 none;
+		box-sizing: content-box;
+
+		@include if('stf') {
+			background: $primary-color;
+			border: 1px solid rgba($contrprimary-color, .2);
+		}
+
+		border-radius: 5%;
+		width: 30px;
+		height: 30px;
+		margin-right: 15px;
+
+		opacity: 1;
+
+		&::after {
+			background: $secondary-color;
+			border-radius: 0;
+			width: 20px;
+			height: 20px;
+			position: absolute;
+			top: 5px;
+			left: 5px;
+			bottom: 0;
+			right: 0;
+			transform: none;
+			border: 0 none;
+			margin: 0;
+		}
+	}
+
+	.t-radio__control,
+	.t-checkbox__control {
+		padding-left: 0 !important
+	}
+
+	//errors
+	&__errorbox {
+
+		&-wrapper {
+			background: none !important;
+		}
+
+		&-middle {
+			display: none !important;
+		}
+
+		&-text {
+			color: $secondary-color;
+			font-size: $text-font-size;
+			font-weight: 300;
+		}
+	}
+
+	.js-error-control-box {
+
+		.t-checkbox__control,
+		.t-checkboxes__wrapper,
+		.t-input:not(.t-input-phonemask),
+		.t-radio__wrapper,
+		.t-select,
+		.uploadcare-widget {
+			border: 1px solid $secondary-color;
+
+			@include if('2steblya') {
+				border: 0 none !important;
+			}
+		}
+
+		.t-radio__wrapper {
+			padding: 0;
+		}
+	}
+
+	.t-input-error {
+		color: $secondary-color;
+		font-size: $text-font-size;
+		font-weight: 300;
+	}
+
+	//кнопка
+	.t-form__submit {
+		button {
+			opacity: 1 !important;
+		}
+	}
+
+	//сообщение после отправки
+	.js-successbox {
+		background-color: $primary-color;
+		color: $contrprimary-color !important;
+
+		@include if('2steblya') {
+			background-image: url(https://static.tildacdn.com/tild3336-3465-4761-b837-303532313734/zaebca.jpg);
+		}
+
+		@include if('stf') {
+			background-image: url();
+		}
+
+		background-size: 360px;
+		background-repeat: no-repeat;
+		background-position: center 100px;
+		padding: 480px 120px 120px 120px;
+		display: block;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 99999;
+		box-sizing: border-box;
+
+		& * {
+			text-align: center !important;
+		}
+
+		a {
+			color: $secondary-color !important;
+		}
+
+		&::before {
+			@include if('2steblya') {
+				content: 'ЗАШИБОК!';
+			}
+
+			@include if('stf') {
+				content: 'ФОРМА ОТПРАВЛЕНА';
+			}
+
+			text-align: center;
+			font-size: 52px;
+			line-height: 1.1;
+			font-weight:600;
+			text-transform: uppercase;
+			display: block;
+			margin-bottom:20px;
+		}
+	}
+}

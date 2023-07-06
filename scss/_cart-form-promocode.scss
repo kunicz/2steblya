@@ -1,0 +1,34 @@
+#промокод {
+	display: none;
+
+	.t-input-error {
+		display: none;
+	}
+}
+
+.t-inputpromocode {
+	&__wrapper {
+		display: flex !important;
+		gap: 20px;
+
+		&>* {
+			display: block !important;
+		}
+
+		.t-text {
+			color: $contrprimary-color;
+			opacity: 0;
+
+			&.showed {
+				opacity: 1
+			}
+		}
+	}
+
+	&__btn {
+		line-height: 56px !important;
+		color: $primary-color !important;
+		background: $secondary-color !important;
+		line-height: 56px;
+	}
+}

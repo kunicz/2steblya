@@ -1,0 +1,116 @@
+//скрываем витрину
+[class*="vitrina"] {
+	display: none;
+}
+
+.uc-vitrina {
+
+	//заголовок
+	&__title {
+		@media screen and (min-width: 961px) {
+			.t-descr {
+				display: none;
+			}
+		}
+	}
+
+	//каталог
+	&__catalog {
+		text-align: center;
+		background-repeat: no-repeat;
+		background-position: top center;
+
+		//товар
+		.t-store__grid-cont .js-product {
+			margin-bottom: 0;
+
+			.card {
+				&__container {
+					padding: 25px;
+
+					&::before {
+						display: none;
+					}
+				}
+
+				&__title {
+					font-size: 1.6em !important;
+				}
+
+				&__text,
+				&__buket {
+					font-size: .8em;
+				}
+
+				&__your-text {
+					display: none;
+				}
+			}
+
+			.t-store__card__descr {
+				display: none;
+			}
+		}
+
+		// контейнер с товарами
+		.t-store__grid-cont {
+			position: relative;
+
+			&_mobile-one-row {
+				@media screen and (max-width: 960px) {
+					justify-content: center;
+
+					.t-col {
+						max-width: 40%;
+					}
+				}
+			}
+		}
+
+		//карусель
+		.owl {
+			&-stage-outer {
+				overflow: hidden;
+			}
+
+			&-item {
+				display: inline-block;
+			}
+
+			&-nav {
+				width: 100%;
+				position: absolute;
+				top: 170px;
+
+				@media screen and (max-width:1200px) {
+					top: 140px;
+				}
+			}
+
+			&-next,
+			&-prev {
+				width: 30px;
+				height: 30px;
+				background-color: $contrprimary-color;
+				cursor: pointer;
+				border-radius: 50%;
+				position: absolute;
+				top: 0;
+				padding: 0;
+				border: 0 none;
+
+				span {
+					font-size: 22px;
+				}
+			}
+
+			&-next {
+				right: 0px;
+			}
+
+			&-prev {
+				left: 0px;
+			}
+		}
+	}
+}

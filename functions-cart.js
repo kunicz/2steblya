@@ -25,21 +25,24 @@ function cartFunctions() {
 	cartOpen();
 	cartClose();
 	cartInputContainersClasses();
+	cartPromocode();
 	cartDelivery();
+	cartZakazchikNoTelegramNick();
 	cartZakazchikPoluchatel();
 	cartFormValidationTexts();
 	cartAdresPoluchatelya();
 	cartHerZnaetPoluchatelya();
 	cartCountItems();
+	cartPlusMinusItems();
 	cartPreventCloseOnOverlayClick();
 	cartErrorsMessageOnClick();
 	cartImportantFields();
 	cartRequiredFields();
 	cartYaCounterId();
-	cartPromocode();
 	cartSetCookies();
 	cartUseCookies();
 	cartHideOtkudaUznal();
+	cartSuccess();
 }
 
 /**
@@ -50,6 +53,7 @@ function cartDynamicFunctions() {
 	cartOtsluniavit();
 	cartOnlyOneFromVitrina();
 	cartDonat();
+	cartPromocodeTovars();
 	cartShow();
 }
 
@@ -103,11 +107,20 @@ function cartInputContainersClasses() {
 function cartCountItems() {
 	var oldVal;
 	setInterval(function () {
-		var products = $('.t706__cartwin-products > div');
+		var products = $('.t706__cartwin-products > .t706__product');
 		if (oldVal == products.length) return;
 		cartDynamicFunctions();
 		oldVal = products.length;
-	}, 50);
+	}, 1);
+}
+
+/**
+ * количество штук одного товара
+ */
+function cartPlusMinusItems() {
+	$('.t706').on('click', '.t706__product-plus,.t706__product-minus', function () {
+		cartDynamicFunctions();
+	});
 }
 
 /**
@@ -254,7 +267,7 @@ function cartDelivery() {
 			var zaglushka = '';
 			zaglushka += specialDate[site]['exclude'].length ? 'только товары из праздничной коллекции и ' : '';
 			zaglushka += 'товары от ' + minPriceK;
-			zaglushka = $('<div class="specialDate" title="' + zaglushka + '">от<br>' + minPriceK + '</div>');
+			zaglushka = $('<div class="t_datepicker__specialDate" title="' + zaglushka + '">от<br>' + minPriceK + '</div>');
 			if (faded) zaglushka.css('opacity', .4);
 			datePicker.find('[data-picker$="-' + specialDate['m'] + '-' + specialDate['d'] + '"]').hide().after(zaglushka);
 		}
@@ -398,6 +411,18 @@ function cartDonat() {
 }
 
 /**
+ * если у заказчика нет телеграма
+ */
+function cartZakazchikNoTelegramNick() {
+	var input = $('[name="messenger-zakazchika"]');
+	var a = $('<div id="messenger-zakazchika-no-telegram">нет никнейма</div>');
+	a.insertBefore(input);
+	a.on('click', a.selector, function () {
+		input.val($('[name="name-zakazchika"]').val() || 'нет никнейма');
+	});
+}
+
+/**
  * если заказчик - это получатель
  */
 function cartZakazchikPoluchatel() {
@@ -465,6 +490,7 @@ function cartImportantFields() {
 	btn.on('change', 'input', function () {
 		cartIncompleteRemoveRequired(); // удаляем атрибут "обязательное поле" у поля cartIncomplete 
 		btn.nextAll().not(':last').toggle($(this).is(':checked'));
+		$('#unimportantTrigger').remove();
 	});
 }
 
@@ -492,6 +518,7 @@ function cartFormValidationTexts() {
 		'2steblya': [
 			'ну не-е-е-е...',                       	//name
 			'скинь телефончик, а?',                 	//phone
+			//'судью на мыло. но на какое?',            	//email
 			'а куда фотку букета выслать?',         	//telegram
 			'ты календарь... переверни...',         	//delivery date
 			'а вдруг разбудим?',                     	//delivery interval
@@ -609,7 +636,7 @@ function cartProductOptionsInOneLine() {
  */
 function cartPreventCloseOnOverlayClick() {
 	var e = $('.t706__cartwin');
-	var overlay = $('<div style="display:block;width:100%;height:100%;position:absolute;top:0;left:0;z-index:2"></div>');
+	var overlay = $('<div class="t706__cartwin-overlay"></div>');
 	e.append(overlay);
 	e.on('scroll', function () {
 		overlay.css('top', $(this).scrollTop() + 'px');
@@ -702,12 +729,13 @@ function cartYaCounterId() {
 		var counter;
 		switch (site) {
 			case '2steblya':
-				counter = yaCounter89315640;
+				if (typeof yaCounter89315640 !== 'undefined') counter = yaCounter89315640;
 				break;
 			case 'staytrueflowers':
-				counter = yaCounter85909890;
+				if (typeof yaCounter85909890 !== 'undefined') counter = yaCounter85909890;
 				break;
 		}
+		if (!counter) return;
 		$('.t706 [name="ya-client-id"]').val(counter.getClientID());
 	}, 3000);
 }
@@ -717,7 +745,8 @@ function cartYaCounterId() {
  */
 function cartIconUponHeader() {
 	if (site != '2steblya') return;
-	if ($(window).width() > 981 && $(window).width() < 1370) {
+	if (document.location.href.indexOf('tproduct') > -1) return;
+	if ($(window).width() > 980 && $(window).width() < 1370) {
 		var cartIcon = $('.t706__carticon');
 		var headerHeight = 110;
 		setInterval(function () {
@@ -745,16 +774,49 @@ function cartOnlyOneFromVitrina() {
 /**
  * промокод
  */
+var promocodeApplied = [];
+function cartPromocodeTovars() {
+	if (promocodeType[site] == 'all') return;
+	/**
+	 * прмокоды только на отдельные товары (promocodeType[site] == 'individual') 
+	 */
+	var exists = false;
+	var tovars = $('.t706__product');
+	tovars.each(function () {
+		if (!promocodeTovars[site].includes(getTovarInCartId($(this)))) return;
+		exists = true;
+		return false;
+	});
+	$('#promocode > div').toggle(exists);
+	if (!promocodeApplied.length) return;
+	if (promocodeApplied.length && exists) {
+		var price = $('.t706__cartwin-prodamount-wrap .t706__cartwin-prodamount-price');
+		var currentPrice = parseInt(price.text().replace(' ', ''));
+		price.text((currentPrice - promocodeApplied[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '));
+		return;
+	}
+}
 function cartPromocode() {
 	var wrapper = $('.t-inputpromocode__wrapper');
+	wrapper.parents('.t-input-group').wrap('<div id="promocode"></div>');
+
+	/**
+	 * для Стеблей при клике на кнопку заказа подменяем текст ошибки промокода
+	 */
 	$('.t-form__submit button').on('click', function () {
 		setTimeout(function () {
 			if (wrapper.find('.t-text').length) return;
 			if (wrapper.siblings('.t-input-error').length && site == '2steblya') {
+				if (!wrapper.find('input').val()) return;
 				wrapper.siblings('.t-input-error').text('применяй или удаляй').show();
 			}
 		}, 500);
 	});
+
+	/**
+	 * при клике на кнопку промокода меняем общую сумму заказа с учетом суммы промокода
+	 * для Стеблей менем текст применения промокода 
+	 */
 	$('.t706 .t-inputpromocode__btn').on('click', function () {
 		setTimeout(function () {
 			if ($('.t706 .t-inputpromocode__btn').length) return;
@@ -765,6 +827,7 @@ function cartPromocode() {
 			if (site == '2steblya') {
 				wrapper.find('.t-text').addClass('showed').html($('.t-inputpromocode__wrapper .t-text').html().replace('Ваша', 'твоя').replace('Промокод', 'промокод').replace('.', ''));
 			}
+			promocodeApplied.push(skidka);
 		}, 500);
 	});
 }
@@ -828,6 +891,24 @@ function cartHideOtkudaUznal() {
 	var cookie = Cookies.get('zakazchik');
 	if (!cookie) return;
 	$('#otkuda-uznal-o-nas').remove();
+}
+
+/**
+ * добавляем текст в js-succesbox
+ * этот текст виден только тем, у кого не сработала Юкасса
+ */
+function cartSuccess() {
+	var succesbox = $('.t706 .js-successbox');
+	var data = {
+		'2steblya': 'заказ оформлен успешно, но похоже Юкасса тупит и не хочет, штоб твои денюшки потекли к нам рекой<br><br>напиши нам в <a href="https://t.me/dva_steblya">телегу</a>, расскажи, что вот такая оказия случилась, и мы скинем тебе новую нормальную ссыклу на оплат очку',
+		'staytrueflowers': 'Ваш заказ оформлен, но мы не смогли перенаправить вас на оплату заказа в Юкассе.<br><br>Напишите нам в <a href="https://t.me/staytrueflowers">телеграм</a>, и мы вышлем вам новую рабочую ссылку на оплату.'
+	}
+	succesbox.addClass('hidden').attr('data-success-message', data[site]);
+	$('.t706 form').on('tildaform:aftersuccess', function () {
+		setTimeout(function () {
+			succesbox.removeClass('hidden');
+		}, 3000);
+	});
 }
 
 /**

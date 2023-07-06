@@ -1,0 +1,158 @@
+//.t706
+$ratio: 0px;
+
+@include if('2steblya') {
+	$ratio: 2px;
+}
+
+$form-text-size: calc($text-font-size - $ratio);
+$description-text-size: calc($form-text-size - $ratio);
+$description-text-opacity: .5;
+
+$cartIncompleteCheck: (
+	'2steblya':1675967313188,
+	'stf':'000'
+);
+
+&__orderform {
+	margin-top: 30px;
+	text-align: left;
+
+	* {
+		font-size: $form-text-size;
+	}
+
+	.t-input {
+		&-group {
+			position: relative;
+			margin-bottom: 30px;
+		}
+
+		&-subtitle {
+			font-size: $description-text-size !important;
+			opacity: $description-text-opacity;
+
+			a {
+				color: $contrprimary-color !important;
+				font-size: inherit !important;
+			}
+		}
+	}
+
+	//datepicker
+	@import 'cart-form-datepicker';
+
+	//промокод
+	@import 'cart-form-promocode';
+
+	//адрес
+	#adresDataSmall {
+		&>div {
+			display: flex;
+			justify-content: space-between;
+			flex-wrap: wrap;
+
+			&>div {
+				width: 30%;
+
+				@include max(630) {
+					width: 45%;
+				}
+			}
+		}
+
+		.t-input-title {
+			height: auto;
+		}
+	}
+
+	//вспомнить из куки
+	.cartUseCookieBtn {
+		font-family: $card-font;
+		color: $secondary-color !important;
+		position: absolute;
+		top: 0;
+		right: 0;
+		cursor: pointer;
+	}
+
+	//у заказчика нет телега
+	#messenger-zakazchika {
+		.t-input-block {
+			position: relative;
+		}
+
+		&-no-telegram {
+			@extend .cartUseCookieBtn;
+			top: 16px;
+			z-index: 2;
+			right: 20px;
+		}
+	}
+
+	//cartIncompleteCheck
+	[data-input-lid="#{map-get($cartIncompleteCheck, $site)}"] {
+		display: none !important;
+	}
+
+	//кнопка
+	.t-form__submit {
+		text-align: center;
+
+		@include max(640) {
+			padding-bottom: 0;
+		}
+
+		button {
+			display: inline-block !important;
+
+			span {
+				font-size: .7em;
+				font-weight: 400;
+				color: $primary-color;
+			}
+		}
+	}
+
+	//сообщение после отправки
+	.js-successbox {
+		@include if('2steblya') {
+			background-image: url('https://static.tildacdn.com/tild6439-3035-4936-a639-646335656438/noMoney.gif');
+
+			&::before {
+				content: 'ну, кака бычна';
+			}
+		}
+
+		@include if('stf') {
+			&::before {
+				content: 'И еще немного...';
+			}
+		}
+
+		&.hidden {
+			@include preloader;
+			color: transparent !important;
+
+			& * {
+				color: transparent !important;
+			}
+
+			&::before {
+				display: none;
+			}
+		}
+	}
+}
+
+&__form-bottom-text {
+	padding-top: 15px;
+	font-size: $description-text-size !important;
+	opacity: $description-text-opacity;
+
+	a {
+		font-size: $description-text-size;
+		color: $contrprimary-color !important;
+		opacity: 1;
+	}
+}

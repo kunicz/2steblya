@@ -1,0 +1,43 @@
+//.js-product
+.t-slds {
+
+	//кнопки навигации
+	&__arrow {
+		cursor: pointer;
+	}
+
+	//буллиты
+	&__thumbsbullet {
+		&-border {
+			border: 0 none !important;
+		}
+
+		@include if('2steblya') {
+			@at-root #{selector-replace(&,'.js-product','.js-product:not(.noCard)')} {
+				&:nth-child(2) {
+					background: $secondary-color;
+
+					&::after {
+						content: 'карт очка';
+						text-transform: uppercase;
+						font-weight: 900;
+						font-size: 16px;
+						line-height: .9;
+						font-family: 'Source Code Pro', Arial, sans-serif;
+						width: 100%;
+						text-align: center;
+						display: block;
+						position: absolute;
+						top: 50%;
+						left: 50%;
+						transform: translate(-50%, -50%);
+					}
+
+					.t-slds__bgimg {
+						visibility: hidden;
+					}
+				}
+			}
+		}
+	}
+}

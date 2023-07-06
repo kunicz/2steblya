@@ -1,0 +1,162 @@
+//.t706
+
+$donats: (
+	'2steblya':'857613433221',
+	'stf':'000'
+);
+
+&__product {
+
+	@include max(640) {
+		text-align: center !important;
+	}
+
+	* {
+		color: $contrprimary-color;
+		font-size: $text-font-size;
+		opacity: 1;
+		text-align: left;
+
+		@include max(640) {
+			text-align: center !important;
+		}
+	}
+
+	//название товара
+	&-title {
+		text-align: left;
+
+		@include if('stf') {
+			font-weight: 400;
+		}
+
+		@include max(640) {
+			padding-right: 0;
+		}
+
+		//свойства товара
+		&__option {
+			font-weight: 300;
+
+			//scu
+			&:last-child {
+				display: none;
+			}
+
+			div {
+				display: inline;
+
+				&::after {
+					content: ' ';
+				}
+			}
+		}
+	}
+
+	//фото товара
+	&-thumb {
+		@include max(640) {
+			display: inline-block;
+			width: auto;
+			padding: 0 0 20px 0;
+		}
+	}
+
+	&-imgdiv {
+		background-color: $primary-color;
+		border-radius: 0;
+
+		@include max(640) {
+			width: 150px;
+			height: 150px;
+		}
+
+		@include max(400) {
+			width: 40vw;
+			height: 40vw;
+		}
+	}
+
+	//скрываем данные о карточке для доната
+	& a[href*="#{map-get($donats,$site)}"]+&-title__option {
+		display: none;
+	}
+
+	//элементы управления
+	&-plusminus {
+		padding: 15px 20px;
+
+		@include max(640) {
+			display: block;
+			padding-right: 0;
+			padding-left: 0;
+		}
+	}
+
+	&-plus,
+	&-minus {
+		width: 25px;
+		height: 25px;
+	}
+
+	&-del {
+		display: inline;
+
+		&-wrapper {
+			text-align: right;
+			width: 30px;
+			display: table-cell;
+			padding: 15px 0;
+			vertical-align: middle;
+		}
+	}
+
+	&-del,
+	&-plusminus {
+		img {
+			@include if('2steblya') {
+				filter: invert(1);
+			}
+
+			width: 25px !important;
+			height: 25px !important;
+			display: inline;
+			position: static;
+			vertical-align: bottom;
+		}
+	}
+
+	//удален
+	&-deleted {
+		height: auto !important;
+		margin: 15px 0;
+
+		&__timer {
+			color: $contrprimary-color;
+
+			&__counter {
+				&__number {
+					color: $contrprimary-color;
+					text-align: center !important;
+				}
+
+				&__circle circle {
+					stroke: $secondary-color;
+				}
+			}
+		}
+	}
+
+	//количество
+	&-quantity {
+		padding: 0;
+		margin: 0 10px;
+		border: 0 none;
+	}
+
+	//цена
+	&-amount {
+		padding-right: 0;
+		padding-left: 0;
+	}
+}

@@ -8,7 +8,7 @@ function product() {
 			productLogoInHeader();
 			var tovar = $('.js-store-product:not(.loaded)');
 			if (!tovar) return;
-			if (!getTovarPrice(tovar)) return;
+			if (!$('.js-product-img.loaded').length) return;
 			setTimeout(function () {
 				productTovarFunctions(tovar);
 			}, 1000);
@@ -29,7 +29,6 @@ function product() {
  * функции для товаров в попапе и на отдельной странице
  */
 function productTovarFunctions(tovar) {
-	productPrices(tovar);
 	productReplaceCardImgWithText(tovar);
 	productVyebriKartochku(tovar);
 	productOptionsReadMore(tovar);
@@ -49,7 +48,7 @@ function productTovarFunctions(tovar) {
  * функции для товаров в каталоге
  */
 function productCatalogTovarFunctions(tovar, catalog) {
-	productPrices(tovar);
+	productPrices(tovar, catalog);
 	productReplaceCardImgWithText(tovar, catalog);
 	productBlackFriday(tovar);
 	productSoldOut(tovar, catalog);
@@ -198,8 +197,9 @@ function productHideVitrinaDuplicate(tovar, catalog) {
 /**
  * цена товара
  */
-function productPrices(tovar) {
+function productPrices(tovar, catalog) {
 	var options;
+	if (isVitrina(catalog)) return;
 	multipleVariantsProducts();
 	specialProducts();
 	minPriceCheck();
@@ -295,7 +295,7 @@ function productCartDisabled(tovar) {
  * бомжетность
  */
 function productBomjPlashka(tovar, catalog) {
-	if (site != 'steblya') return;
+	if (site != '2steblya') return;
 	if (getTovarPrice(tovar) > Object.keys(productPriceLevels[site])[0]) return;
 	tovar.addClass('bomj');
 	var data = {
@@ -441,7 +441,7 @@ function productAddAdditionalText(tovar) {
 		'2steblya': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов<br>к букетам с айдентикой также прилагается карт очка и сосабельный петушок',
 		'staytrueflowers': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов'
 	}
-	var div = $('<div class="js-store-prod-all-text-dop"></div>');
+	var div = $('<div class="t-store__prod-popup__text-dop"></div>');
 	div.html(data[site]);
 	$('.js-store-prod-text').append(div);
 }
@@ -597,7 +597,7 @@ function getVitrinaTovarsIds() {
  * если каталог - это витрина
  */
 function isVitrina(catalog, inFooter = false) {
-	var c = '.uc-' + (inFooter ? 'vitrinaFooter' : 'vitrinaCatalog');
+	var c = '.uc-' + (inFooter ? 'vitrinaFooter' : 'vitrina__catalog');
 	if (catalog.parents(c).length) return true;
 	return false;
 }

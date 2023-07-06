@@ -1,0 +1,32 @@
+@at-root #{selector-replace(&,'.t-store','.t-rec >')} {
+	.t-store__prod-snippet__container {
+
+		@include max(560) {
+			padding-top: 60px; //отступ для меню
+		}
+
+		.t-store__prod-popup__close-txt {
+			background-size: contain;
+			background-position: center;
+			width: 60px;
+			height: 60px;
+			overflow: hidden;
+
+			&::before {
+				content: '';
+				display: none;
+				width: 0;
+			}
+
+			&.logo {
+				@include if('2steblya') {
+					background-image: url(https://static.tildacdn.com/tild3065-3561-4565-b164-313930356635/whiteLogoTrim.png);
+				}
+
+				@include if('stf') {
+					background-image: url(https://static.tildacdn.com/tild3932-6161-4664-b130-613137393138/white.png);
+				}
+			}
+		}
+	}
+}

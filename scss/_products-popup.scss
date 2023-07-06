@@ -1,0 +1,61 @@
+//.t-store
+.t-popup {
+	background-color: $primary-color;
+
+	&__container {
+		margin-bottom: 30px;
+		background-color: $primary-color;
+
+		@include max(560) {
+			margin-top: 60px; //отступ для меню
+		}
+	}
+
+	&__close {
+		&-wrapper {
+			height: 60px;
+			border: 0 none !important;
+
+			* {
+				opacity: 1 !important;
+				color: $contrprimary-color;
+			}
+		}
+
+		&-icon {
+			@include if('stf') {
+				opacity: .2;
+			}
+
+			&_arrow {
+				@include max(560) {
+					top: 18px;
+				}
+			}
+
+			g {
+				fill: $contrprimary-color;
+			}
+		}
+	}
+
+
+}
+
+&__prod-popup__close-txt {
+
+	font-size: 20px;
+	opacity: 1;
+	color: $contrprimary-color !important;
+
+	@include if('stf') {
+		opacity: .2;
+	}
+}
+
+
+
+
+.t-store__relevants__container {
+	display: none;
+}

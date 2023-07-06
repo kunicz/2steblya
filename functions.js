@@ -1,4 +1,5 @@
 $(document).ready(function () {
+	redirectHome();
 	headerMenu();
 	externalLinks();
 	product();
@@ -6,6 +7,22 @@ $(document).ready(function () {
 	spoilers();
 	footer();
 });
+
+/**
+ * редирект на главную
+ */
+function redirectHome() {
+	var data = {
+		'2steblya': ['page28196964'],
+		'staytrueflowers': []
+	}
+	$.each(data[site], function (i, e) {
+		if (document.location.href.indexOf(e) > -1) {
+
+			document.location.href = '/';
+		}
+	});
+}
 
 /**
  * заменяем дефолтные опсания ошибок валидации на свои тексты

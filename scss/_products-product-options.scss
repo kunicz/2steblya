@@ -1,0 +1,59 @@
+//.js-product
+
+//узнать больше
+.product__optionReadMore {
+	@include if('2steblya') {
+		color: $contrprimary-color !important;
+	}
+
+	@include if('stf') {
+		color: $primary-color !important;
+		display: none !important;
+	}
+
+	border-radius: 50%;
+	background-color: $secondary-color;
+
+	font-family: $heading-font;
+	font-weight: 300;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
+	vertical-align: middle;
+	text-align: center;
+	margin: 6px 0 0 10px;
+	position: absolute;
+
+	&[href*="undef"] {
+		display: none;
+	}
+}
+
+//опции
+.t-product__option-variants {
+	@include max(980) {
+		margin: 0 auto;
+	}
+}
+
+$hide_options: '';
+
+@include if('2steblya') {
+	$hide_options: 000,
+	//донат (выебри карточку)
+	857613433221,
+	//loveis (loveis)
+	896292515801,
+	103878497051,
+	448865187471,
+	260954710551;
+}
+
+@include if('stf') {}
+
+@each $id in $hide_options {
+	&[data-product-gen-uid="#{$id}"] .js-product-option:nth-child(2) {
+		display: none;
+	}
+}

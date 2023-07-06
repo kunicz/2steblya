@@ -1,0 +1,19 @@
+@import '!mixins';
+
+body {
+	background-color: $primary-color;
+	background-image: none;
+}
+
+#allrecords {
+	visibility: visible;
+	@import 'base';
+}
+
+@import 'forms';
+@import 'menu';
+@import 'products';
+@import 'cart';
+@import 'tildaBlocks';
+@import 'imageViewer';
+@import 'vitrina';

@@ -1,0 +1,64 @@
+//.t-store
+&__card {
+	margin-bottom: 100px;
+	display: inline-block;
+	float: none;
+	vertical-align: top;
+
+	//заголовок
+	&__title {
+		@include if('stf') {
+			font-size: $text-font-size;
+		}
+	}
+
+	//артикул
+	&__sku,
+	&__prod-popup__sku {
+		display: none;
+	}
+
+	//селекты
+	&__prod-controls-wrapper {
+		display: none !important;
+	}
+
+	//цена
+	&__price,
+	&__price_old {
+		@include if('stf') {
+			font-size: $text-font-size;
+		}
+	}
+
+	&__price {
+		.multiplePrices &:not(&_old) &-value::before {
+
+			content: 'от ';
+			font-size: 14px;
+			font-weight: 300;
+			opacity: .5;
+		}
+	}
+}
+
+
+//soldOut
+&__sold-out-msg {
+	color: $secondary-color;
+	font-weight: 600;
+	text-transform: uppercase !important;
+}
+
+//кнопка
+&__btns-wrapper {
+	margin-top: 25px !important;
+
+	@media screen and (max-width:976px) {
+		justify-content: center;
+	}
+}
+
+&__btn {
+	margin: 0;
+}

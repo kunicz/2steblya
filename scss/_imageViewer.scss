@@ -1,0 +1,19 @@
+.t-zoomer {
+	&__container {
+		background: $primary-color !important;
+		color: $contrprimary-color !important;
+
+		.t-carousel__zoomer__arrow__wrapper::before {
+			display: none
+		}
+	}
+
+	&__close {
+		background: $primary-color !important;
+
+		svg {
+			fill: $contrprimary-color;
+			stroke: $contrprimary-color;
+		}
+	}
+}

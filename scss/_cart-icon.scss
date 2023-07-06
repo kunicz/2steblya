@@ -1,0 +1,30 @@
+&__carticon {
+	background-color: $primary-color;
+	z-index: 2001;
+	padding: 0;
+	top: 0;
+	right: 0;
+
+	@include min(980) {
+		padding: 20px;
+	}
+
+	&.uponHeader {
+		top: 70px;
+	}
+
+	&-wrapper {
+		transform: scale(0.64);
+		cursor: pointer;
+
+		@include min(980) {
+			transform: scale(1);
+		}
+	}
+
+	&-imgwrap {
+		box-shadow: none;
+		border-radius: 0;
+		background: none;
+	}
+}

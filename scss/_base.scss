@@ -1,0 +1,100 @@
+a {
+	color: $secondary-color;
+	opacity: 1;
+}
+
+ul {
+	@include max(980) {
+		list-style-position: inside;
+	}
+}
+
+strong,
+b {
+	@include if('2steblya') {
+		font-weight: 600;
+	}
+
+	@include if('stf') {
+		font-weight: 400;
+	}
+}
+
+.t-text,
+.t-descr,
+.t-btn,
+.t-submit {
+	font-family: $text-font;
+	font-size: $text-font-size;
+	line-height: 1.5;
+}
+
+.t-name {
+	font-family: $text-font;
+	line-height: 1.1;
+
+	@include if('2steblya') {
+		font-size: calc($text-font-size + 10px);
+	}
+
+	@include if('stf') {
+		font-size: $text-font-size;
+		font-weight: 400;
+	}
+
+	@include max(980) {
+		font-size: 26px;
+	}
+}
+
+.t-title {
+	font-family: $text-font;
+	line-height: 1.1;
+	text-transform: uppercase;
+
+	@include if('2steblya') {
+		font-size: calc($text-font-size + 34px);
+	}
+
+	@include if('stf') {
+		font-size: calc($text-font-size + 12px);
+		font-weight: 400;
+	}
+
+	@include max(980) {
+		font-size: 40px;
+	}
+}
+
+.t-btn,
+.t-submit {
+	color: $primary-color;
+	background-color: $secondary-color;
+	border-radius: 5px;
+	border: 0 none;
+	text-transform: uppercase;
+	height: 60px;
+	padding: 0 30px;
+	width: auto;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+//на мобилках
+@include max(980) {
+
+	//текст по центру
+	.t-rec,
+	h2,
+	h1,
+	.t-align_left {
+		text-align: center;
+	}
+
+	//отступы между блоками
+	.t-rec_pt_90 {
+		padding-top: 60px !important;
+	}
+}

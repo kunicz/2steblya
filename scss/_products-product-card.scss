@@ -1,0 +1,116 @@
+//.js-product
+.t-store__card__bgimg_second {
+	background-color: $secondary-color;
+	background-repeat: no-repeat;
+	background-position: center;
+
+	@include if('2steblya') {
+		background-size: contain;
+	}
+
+	@include if('stf') {
+		background-size: cover;
+	}
+}
+
+.card {
+	background-image: none !important;
+	background-color: $secondary-color;
+	box-sizing: border-box;
+	display: inline-flex !important;
+	justify-content: center;
+	align-items: center;
+
+	&__container {
+		padding: 75px 55px 55px 55px;
+		font-family: $card-font;
+		line-height: 1.2 !important;
+		width: 100%;
+		text-align: center;
+		box-sizing: border-box;
+
+		@include max(460) {
+			padding: 7vw;
+		}
+
+		* {
+			color: $primary-color !important;
+		}
+
+		//лого
+		&::before {
+			content: '';
+			display: inline-block;
+			height: 80px;
+			width: 80px;
+			background-size: contain;
+			background-position: center;
+			background-repeat: no-repeat;
+			margin-bottom: 40px;
+			margin-top: -40px;
+
+			@include if('2steblya') {
+				background-image: url('https://static.tildacdn.com/tild6362-6133-4632-b864-646561666131/logo-rect-transparen.png');
+			}
+
+			@include if('stf') {
+				background-image: url();
+			}
+
+			@include max(460) {
+				display: none;
+			}
+
+			@include minmax(960, 1220) {
+				display: none;
+			}
+		}
+	}
+
+	//этот букет называется
+	&__buket {
+		opacity: .7;
+		font-size: .8em !important;
+	}
+
+	//навзание букета
+	&__title {
+		margin-top: 20px;
+		font-weight: 900;
+		font-size: 1.9em !important;
+		line-height: 1 !important;
+
+		@include max(460) {
+			font-size: 26px !important;
+		}
+	}
+
+	//текст карточки
+	&__text {
+		margin-top: 20px;
+		font-weight: 500;
+
+		//длинный текст в карточке
+		$long_card_text_ids: 221040427501; // тамара ильинишна
+
+		@each $id in $long_card_text_ids {
+			$data: '[data-product-gen-uid="#{$id}"]';
+
+			@at-root #{selector-replace(&,'.js-product','.js-product'+$data)} {
+				font-size: 0.7em !important;
+			}
+		}
+	}
+
+	//ваш текст
+	&__your-text {
+		margin-top: 40px;
+		opacity: .7;
+		font-size: .8em !important;
+
+		p {
+			border-bottom: 1px solid rgba($primary-color, .1);
+			white-space: nowrap;
+		}
+	}
+}

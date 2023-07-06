@@ -1,0 +1,32 @@
+[data-tooltip-hook="#popup:cartIncomplete"] {
+	.t-popup {
+		&__container {
+			top: 53px;
+			transform: none !important;
+			margin: 0 auto 50px auto !important;
+
+			.t-btn {
+				margin: 20px 10px 0 10px !important;
+			}
+
+			.t-img {
+				max-width: 360px;
+				height: auto;
+				margin: 0 auto;
+			}
+		}
+
+		&__close {
+			background: $primary-color;
+			top: 0;
+			right: 0;
+			width: auto;
+			height: auto;
+
+			&-wrapper {
+				height: auto;
+				padding: 15px;
+			}
+		}
+	}
+}

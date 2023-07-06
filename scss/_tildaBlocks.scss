@@ -1,0 +1,247 @@
+//Изображение
+.t107 {
+	img {
+		width: 360px;
+		height: 360px;
+	}
+}
+
+//Прямая речь
+.t013 {
+
+	&__autor-descr {
+		font-size: .83em !important;
+		opacity: .5;
+	}
+
+	@include max(960) {
+		&__centeredsection {
+			margin-bottom: 0;
+		}
+
+		&__autor-title {
+			font-size: 26px;
+		}
+	}
+}
+
+//Изображения в три колонки
+.t214 {
+	&__textwrapper {
+		display: none;
+	}
+
+	&__col {
+		margin-bottom: 0 !important;
+	}
+
+	&__blockimg {
+		margin-bottom: 0;
+	}
+
+	&__scroll-icon-wrapper {
+		display: none !important;
+	}
+
+	@include max(960) {
+		& .t-row {
+			display: flex;
+			justify-content: space-between;
+		}
+
+		&__col {
+			float: left;
+			width: 30%;
+			height: 0;
+			padding: 0 0 30% 0;
+			margin: 0 15px;
+			position: relative;
+
+			:nth-child(2) {
+				margin: 0;
+			}
+		}
+
+		&__blockimg {
+			width: 100%;
+			height: 0;
+			padding-bottom: 100%;
+		}
+	}
+}
+
+//Колонки с цифрами в кружочках
+.t502 {
+
+	&__circle {
+		font-size: 0 !important;
+		line-height: 0 !important;
+		border-radius: 0;
+		background: transparent;
+		color: transparent !important;
+
+		&::before {
+			content: '';
+			display: block;
+			width: 100%;
+			padding-top: 100%;
+			border-radius: 50%;
+			background-position: center;
+			background-size: contain;
+			background-repeat: no-repeat;
+		}
+	}
+
+	@include max(960) {
+
+		&__tablewrapper,
+		&__circlewrapper,
+		&__textwrapper {
+			display: block;
+		}
+
+		&__textwrapper {
+			padding-left: 0;
+			padding: 20px 0;
+		}
+
+		&__circle {
+			max-width: unset;
+			max-height: unset;
+			width: 100%;
+			height: auto;
+
+			&::before {
+				width: 80px;
+				height: 80px;
+				margin: 0 auto;
+				padding-top: 0;
+			}
+		}
+	}
+}
+
+//Текст в раскрывающихся карточках
+.t668,
+.t585 {
+	&__trigger-button {
+		cursor: pointer;
+	}
+
+	&__header {
+		border: 0 none !important;
+	}
+
+	&__border {
+		display: none;
+	}
+
+	&__title {
+		font-size: $text-font-size !important;
+		line-height: 1.5 !important;
+		font-weight: 600;
+		padding-right: 50px;
+	}
+
+	&__textwrapper {
+		padding-right: 50px;
+		text-align: center;
+	}
+
+	&__img {
+		max-width: 100px;
+		max-height: 100px;
+		margin-left: auto;
+		margin-right: auto;
+		border-radius: 50%;
+	}
+
+	&__icon &__lines svg>g {
+		stroke-width: 2px;
+	}
+
+	&__icon-hover &__lines {
+		g g {
+			stroke: $contrprimary-color;
+		}
+	}
+
+	&__icon-hover &__circle {
+		background-color: $secondary-color !important;
+	}
+
+}
+
+//Лента инстаграм
+.t802 {
+	&__container {
+		position: relative;
+
+		&::before {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 80%;
+			text-align: center;
+			display: block;
+			box-sizing: border-box;
+			font-size: 14px;
+			line-height: 1.5;
+			color: $contrprimary-color;
+			font-family: $card-font;
+			font-weight: 300;
+			padding: 0 20px;
+			opacity: .5;
+
+			@include if('2steblya') {
+				content: 'черт чета черная засосала наш запретграм\Aну чё сидишь думаешь? подрубай випиэн';
+			}
+
+			@include if('stf') {
+				content: 'Скорее всего вам необходимо включить VPN, чтобы загрузились картинки.';
+			}
+
+			@include max(500) {
+				white-space: pre;
+			}
+		}
+	}
+
+	&__col {
+		position: relative;
+		z-index: 10;
+	}
+}
+
+//Меню в виде табов
+.t976 {
+	&__list-item a {
+		overflow: visible;
+
+		&::after {
+			color: $primary-color;
+			background-color: $secondary-color;
+			font-weight: 400;
+			font-family: $text-font-size;
+			font-size: 12px;
+			border-radius: 50%;
+			display: block;
+			text-align: center;
+			width: 34px;
+			line-height: 34px;
+			position: absolute;
+			top: -14px;
+			right: -6px;
+			z-index: 99;
+		}
+	}
+}
+
+//Меню: второй уровень
+.t978 {
+	.t-name {
+		font-size: $text-font-size;
+		font-weight: 0;
+	}
+}

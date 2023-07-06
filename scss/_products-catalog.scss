@@ -1,0 +1,8 @@
+//.t-store
+@import 'products-catalog-menu';
+@import 'products-catalog-products';
+
+&__scroll-icon-wrapper,
+&__grid-separator {
+	display: none !important;
+}

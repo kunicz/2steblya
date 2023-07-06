@@ -100,5 +100,23 @@ var specialDatesList = [
 	}
 ];
 
+/**
+ * промокоды общие "all" или штучные "individual" (только на конкретный товар)
+ */
+var promocodeType = {
+	'2steblya': 'individual',
+	'staytrueflowers': 'individual'
+}
+
+/**
+ * товары по промокоду
+ */
+var promocodeTovars = {
+	'2steblya': [
+		937080165341 // икра для богацтва
+	],
+	'staytrueflowers': []
+}
+
 $(document).ready(function () {
 });

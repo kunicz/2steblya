@@ -1,0 +1,32 @@
+.tmenu {
+
+	//мобилки
+	&-mobile {
+		@include max(980) {
+			background-color: transparent !important;
+			z-index: 10000 !important;
+			position: fixed !important;
+			top: 0;
+			left: 0;
+			width: auto !important;
+
+			&__menucontent_hidden {
+				max-height: 100vh !important;
+				height: 100vh !important;
+				top: 0 !important;
+				position: fixed !important;
+			}
+
+			&__container {
+				background: $primary-color;
+				min-height: 60px !important;
+				width: 60px;
+				padding: 20px 16px !important;
+			}
+
+			&__text {
+				display: none;
+			}
+		}
+	}
+}
