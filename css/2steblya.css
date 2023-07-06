@@ -266,18 +266,18 @@ select {
   font-weight: 300;
   opacity: 0.5;
 }
+.t-store__card__btns-wrapper {
+  margin-top: 25px !important;
+}
+@media screen and (max-width: 980px) {
+  .t-store__card__btns-wrapper {
+    justify-content: center;
+  }
+}
 .t-store__sold-out-msg {
   color: #ff008c;
   font-weight: 600;
   text-transform: uppercase !important;
-}
-.t-store__btns-wrapper {
-  margin-top: 25px !important;
-}
-@media screen and (max-width: 976px) {
-  .t-store__btns-wrapper {
-    justify-content: center;
-  }
 }
 .t-store__btn {
   margin: 0;
@@ -1050,11 +1050,6 @@ select {
   padding: 15px;
 }
 
-.t107 img {
-  width: 360px;
-  height: 360px;
-}
-
 .t013__autor-descr {
   font-size: 0.83em !important;
   opacity: 0.5;
@@ -1066,6 +1061,11 @@ select {
   .t013__autor-title {
     font-size: 26px;
   }
+}
+
+.t107 img {
+  width: 360px;
+  height: 360px;
 }
 
 .t214__textwrapper {
@@ -1101,6 +1101,18 @@ select {
     height: 0;
     padding-bottom: 100%;
   }
+}
+
+.t228 {
+  background-color: #000;
+  font-weight: 600;
+}
+.t228 .t-menu__link-item {
+  color: #fff !important;
+  font-size: 18px !important;
+}
+.t228 .t-sociallinks__svg path {
+  fill: #fff;
 }
 
 .t502__circle {
@@ -1280,6 +1292,8 @@ select {
 }
 .uc-vitrina__catalog .t-store__grid-cont .js-product {
   margin-bottom: 0;
+  width: 100% !important;
+  max-width: 360px;
 }
 .uc-vitrina__catalog .t-store__grid-cont .js-product .card__container {
   padding: 25px;
@@ -1299,19 +1313,10 @@ select {
 .uc-vitrina__catalog .t-store__grid-cont .js-product .t-store__card__descr {
   display: none;
 }
-.uc-vitrina__catalog .t-store__grid-cont {
-  position: relative;
-}
-@media screen and (max-width: 960px) {
-  .uc-vitrina__catalog .t-store__grid-cont_mobile-one-row {
-    justify-content: center;
-  }
-  .uc-vitrina__catalog .t-store__grid-cont_mobile-one-row .t-col {
-    max-width: 40%;
-  }
-}
-.uc-vitrina__catalog .owl-stage-outer {
+.uc-vitrina__catalog .owl-loaded {
   overflow: hidden;
+  cursor: move;
+  max-width: unset;
 }
 .uc-vitrina__catalog .owl-item {
   display: inline-block;
@@ -1320,6 +1325,9 @@ select {
   width: 100%;
   position: absolute;
   top: 170px;
+}
+.uc-vitrina__catalog .owl-nav.disabled {
+  display: none;
 }
 @media screen and (max-width: 1200px) {
   .uc-vitrina__catalog .owl-nav {

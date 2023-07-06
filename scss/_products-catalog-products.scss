@@ -40,6 +40,15 @@
 			opacity: .5;
 		}
 	}
+
+	//кнопка
+	&__btns-wrapper {
+		margin-top: 25px !important;
+
+		@include max(980) {
+			justify-content: center;
+		}
+	}
 }
 
 
@@ -48,15 +57,6 @@
 	color: $secondary-color;
 	font-weight: 600;
 	text-transform: uppercase !important;
-}
-
-//кнопка
-&__btns-wrapper {
-	margin-top: 25px !important;
-
-	@media screen and (max-width:976px) {
-		justify-content: center;
-	}
 }
 
 &__btn {

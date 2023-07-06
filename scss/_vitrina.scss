@@ -21,56 +21,47 @@
 		background-position: top center;
 
 		//товар
-		.t-store__grid-cont .js-product {
-			margin-bottom: 0;
+		.t-store__grid-cont {
+			.js-product {
+				margin-bottom: 0;
+				width: 100% !important;
+				max-width: 360px;
 
-			.card {
-				&__container {
-					padding: 25px;
+				.card {
+					&__container {
+						padding: 25px;
 
-					&::before {
+						&::before {
+							display: none;
+						}
+					}
+
+					&__title {
+						font-size: 1.6em !important;
+					}
+
+					&__text,
+					&__buket {
+						font-size: .8em;
+					}
+
+					&__your-text {
 						display: none;
 					}
 				}
 
-				&__title {
-					font-size: 1.6em !important;
-				}
-
-				&__text,
-				&__buket {
-					font-size: .8em;
-				}
-
-				&__your-text {
+				.t-store__card__descr {
 					display: none;
-				}
-			}
-
-			.t-store__card__descr {
-				display: none;
-			}
-		}
-
-		// контейнер с товарами
-		.t-store__grid-cont {
-			position: relative;
-
-			&_mobile-one-row {
-				@media screen and (max-width: 960px) {
-					justify-content: center;
-
-					.t-col {
-						max-width: 40%;
-					}
 				}
 			}
 		}
 
 		//карусель
 		.owl {
-			&-stage-outer {
+			&-loaded {
 				overflow: hidden;
+				cursor: move;
+				max-width: unset;
 			}
 
 			&-item {
@@ -78,6 +69,10 @@
 			}
 
 			&-nav {
+				&.disabled {
+					display: none;
+				}
+
 				width: 100%;
 				position: absolute;
 				top: 170px;
@@ -112,5 +107,6 @@
 				left: 0px;
 			}
 		}
+
 	}
 }
