@@ -35,3 +35,38 @@
 		background-image: url('https://static.tildacdn.com/tild3532-3861-4264-b965-303066346262/preloader.gif') !important;
 	}
 }
+
+@mixin navButton($prev, $next) {
+	width: 30px !important;
+	height: 30px !important;
+	background-color: $contrprimary-color;
+	cursor: pointer;
+	border-radius: 50%;
+	padding: 0;
+	border: 0 none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	& * {
+		width: 0;
+		height: 0;
+		position: absolute;
+		top: -9999px;
+	}
+
+	&::before {
+		font-family: $text-font;
+		font-size: 17px;
+	}
+
+	@at-root {
+		#{$prev}::before {
+			content: '<';
+		}
+
+		#{$next}::before {
+			content: '>';
+		}
+	}
+}

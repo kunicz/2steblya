@@ -20,10 +20,17 @@
 		background-repeat: no-repeat;
 		background-position: top center;
 
+		.t-store {
+			padding: 0 30px;
+		}
+
 		//товар
 		.t-store__grid-cont {
+			padding: 0 !important;
+
 			.js-product {
-				margin-bottom: 0;
+				margin: 0 !important;
+				padding: 0 !important;
 				width: 100% !important;
 				max-width: 360px;
 
@@ -59,9 +66,8 @@
 		//карусель
 		.owl {
 			&-loaded {
-				overflow: hidden;
-				cursor: move;
-				max-width: unset;
+				position: relative;
+				max-width: 1000px;
 			}
 
 			&-item {
@@ -75,37 +81,31 @@
 
 				width: 100%;
 				position: absolute;
-				top: 170px;
 
-				@media screen and (max-width:1200px) {
-					top: 140px;
+				$o: &;
+
+				button {
+					&.disabled {
+						display: none;
+					}
+
+					@include navButton(#{$o}+' .owl-prev', #{$o}+' .owl-next');
+					position: absolute;
+					top: 0;
+				}
+
+				@at-root {
+					#{$o} .owl-next {
+						right: -15px;
+					}
+
+					#{$o} .owl-prev {
+						left: -15px;
+					}
 				}
 			}
 
-			&-next,
-			&-prev {
-				width: 30px;
-				height: 30px;
-				background-color: $contrprimary-color;
-				cursor: pointer;
-				border-radius: 50%;
-				position: absolute;
-				top: 0;
-				padding: 0;
-				border: 0 none;
 
-				span {
-					font-size: 22px;
-				}
-			}
-
-			&-next {
-				right: 0px;
-			}
-
-			&-prev {
-				left: 0px;
-			}
 		}
 
 	}

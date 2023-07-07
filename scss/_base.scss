@@ -20,6 +20,24 @@ b {
 	}
 }
 
+input,
+textarea,
+select {
+	border: 0 none;
+	outline: none;
+	background-color: #fff;
+
+	@include if('stf') {
+		border: 1px solid rgba($contrprimary-color, .2);
+	}
+}
+
+textarea {
+	@include max(640) {
+		padding-top: 17px;
+	}
+}
+
 .t-text,
 .t-descr,
 .t-btn,

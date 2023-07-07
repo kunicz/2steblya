@@ -2,7 +2,7 @@
 	.t-store__prod-snippet__container {
 
 		@include max(560) {
-			padding-top: 60px; //отступ для меню
+			padding-top: 60px !important; //отступ для меню
 		}
 
 		.t-store__prod-popup__close-txt {

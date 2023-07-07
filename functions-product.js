@@ -8,7 +8,7 @@ function product() {
 			productLogoInHeader();
 			var tovar = $('.js-store-product:not(.loaded)');
 			if (!tovar) return;
-			if (!$('.js-product-img.loaded').length) return;
+			if (!$('.t-slds__item-loaded').length) return;
 			setTimeout(function () {
 				productTovarFunctions(tovar);
 			}, 1000);

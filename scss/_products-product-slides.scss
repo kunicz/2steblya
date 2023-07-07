@@ -2,8 +2,12 @@
 .t-slds {
 
 	//кнопки навигации
+	&__arrow_wrapper {
+		margin: 0 7px;
+	}
+
 	&__arrow {
-		cursor: pointer;
+		@include navButton(&+'-left', &+'-right');
 	}
 
 	//буллиты
