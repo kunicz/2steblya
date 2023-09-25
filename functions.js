@@ -33,7 +33,7 @@ function formValidationTexts(form, texts = []) {
 	form.find('.t-submit').on('click', function () {
 		var data = {
 			'2steblya': 'укажи по брацки',
-			'staytrueflowers': 'Данное поле должно быть заполнено'
+			'staytrueflowers': 'данное поле должно быть заполнено'
 		}
 		var int = setInterval(function () {
 			var inputErrors = form.find('[data-tilda-req="1"]').parents('.t-input-block').find('.t-input-error');
@@ -51,7 +51,7 @@ function formValidationTexts(form, texts = []) {
 function headerMenu() {
 	var data = {
 		'2steblya': 'rec469639590',
-		'staytrueflowers': ''
+		'staytrueflowers': 'rec496423452,#rec496387058'
 	}
 	var menu = $('#' + data[site]);
 	if (!menu.length) return;
@@ -72,9 +72,10 @@ function headerMenu() {
 	 */
 	function anchorLinks() {
 		if (window.location.pathname && window.location.pathname != '/') {
-			menu.find('.t-menu__link-item').each(function () {
+			menu.find('a').each(function () {
 				var href = $(this).attr('href');
 				if (Array.from(href)[0] == '#') {
+					if (href == '#opensearch') return;
 					$(this).attr('href', '/' + href);
 				}
 			});
@@ -109,61 +110,6 @@ function externalLinks() {
 }
 
 /**
- * оптимизируем ссылки на якорь
- */
-function anchorLinks() {
-	if (site == '2steblya') return;
-	$('a[href*="#"]').on('click', function (e) {
-		var name = anchorName($(this).attr('href'));
-		if (anchorExists(name)) {
-			e.preventDefault();
-			smoothScroll(name);
-			window.location = '#' + name;
-		}
-		if (name == 'chat' && $('.t825__btn').length) { //#chat
-			e.preventDefault();
-			$('.t825__btn').trigger('click');
-		}
-		if (name == 'submenu:info' || name == 'submenu:catalog') { // #submenu
-			e.preventDefault();
-		}
-	});
-
-	/**
-	 * загрузка страницы с #
-	 */
-	if (window.location.hash) {
-		setTimeout(function () {
-			var name = anchorName(window.location.hash);
-			if (anchorExists(name)) smoothScroll(name);
-		}, 1000);
-	}
-
-	/**
-	 * имя скорной ссылки
-	 */
-	function anchorName(name) {
-		return name.split('#')[1];
-	}
-
-	/**
-	 * существует ли якорь по ссылке
-	 */
-	function anchorExists(name) {
-		return $('[name="' + name + '"]').length;
-	}
-
-	/**
-	 * плавный скролл к якорю
-	 */
-	function smoothScroll(name) {
-		$([document.documentElement, document.body]).animate({
-			scrollTop: $('a[name=' + name + ']').offset().top - 100
-		}, 1000);
-	}
-}
-
-/**
  * подвал
  */
 function footer() {
@@ -173,9 +119,13 @@ function footer() {
 	 * корректный год в подвале в копирайтах
 	 */
 	function footerCopyrightYear() {
-		if (site == '2steblya') return;
+		var startYear = {
+			'2steblya': null,
+			'staytrueflowers': 2021
+		}
+		if (!startYear[site]) return;
 		var f = $('.uc-footerCopyright [field="text"]');
 		var currentYear = new Date().getFullYear();
-		f.text(f.text().replace('2021', '2021-' + currentYear));
+		f.text(f.text().replace(startYear[site], startYear[site] + '-' + currentYear));
 	}
 }
