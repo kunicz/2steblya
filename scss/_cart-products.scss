@@ -28,6 +28,10 @@ $donats: (
 
 		@include if('stf') {
 			font-weight: 400;
+
+			& a {
+				font-size: calc($text-font-size + 2px);
+			}
 		}
 
 		@include max(640) {
@@ -122,7 +126,7 @@ $donats: (
 			height: 25px !important;
 			display: inline;
 			position: static;
-			vertical-align: bottom;
+			vertical-align: text-bottom;
 		}
 	}
 
@@ -138,6 +142,10 @@ $donats: (
 				&__number {
 					color: $contrprimary-color;
 					text-align: center !important;
+
+					@include if('stf') {
+						font-weight: 100;
+					}
 				}
 
 				&__circle circle {

@@ -58,6 +58,7 @@
 	&::before {
 		font-family: $text-font;
 		font-size: 17px;
+		color: $primary-color;
 	}
 
 	@at-root {
@@ -69,4 +70,29 @@
 			content: '>';
 		}
 	}
+}
+
+@mixin btn {
+	@include if('2steblya') {
+		color: $primary-color !important;
+		background-color: $secondary-color !important;
+		border: 0 none !important;
+	}
+
+	@include if('stf') {
+		color: $contrprimary-color !important;
+		background-color: $primary-color !important;
+		border: 1px solid rgba($contrprimary-color, .2) !important;
+		font-weight: 100 !important;
+	}
+
+	border-radius: 5px !important;
+	text-transform: uppercase;
+	height: 60px;
+	padding: 0 30px;
+	width: auto;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }

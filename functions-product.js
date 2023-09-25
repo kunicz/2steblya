@@ -40,6 +40,7 @@ function productTovarFunctions(tovar) {
 	productSoldOut(tovar);
 	productBomjPlashka(tovar);
 	productButton(tovar);
+	productOnPhoto(tovar);
 	productCartDisabled(tovar);
 	productShow(tovar);
 }
@@ -54,7 +55,7 @@ function productCatalogTovarFunctions(tovar, catalog) {
 	productSoldOut(tovar, catalog);
 	productBomjPlashka(tovar, catalog);
 	productHideVitrinaDuplicate(tovar, catalog);
-	producTotHide(tovar);
+	productsTotHide(tovar);
 	productShow(tovar);
 }
 
@@ -123,9 +124,9 @@ function productCatalogMenu(catalog) {
 	setTimeout(function () {
 		var catalogMenuItems = catalog.find('.js-store-parts-switcher');
 		if (!catalogMenuItems.length) return;
-		addLinks();
+		//addLinks();
 		//renameAll();
-		linkOnClick();
+		//linkOnClick();
 
 		/**
 		 * делаем кликабельные ссылки
@@ -199,8 +200,8 @@ function productHideVitrinaDuplicate(tovar, catalog) {
  */
 function productPrices(tovar, catalog) {
 	var options;
-	if (isVitrina(catalog)) return;
 	multipleVariantsProducts();
+	if (isVitrina(catalog)) return;
 	specialProducts();
 	minPriceCheck();
 	//priceInOption();
@@ -320,10 +321,33 @@ function productButton(tovar) {
 }
 
 /**
+ * характеристика "на фото" реально на фото
+ */
+function productOnPhoto(tovar) {
+	if (site == '2steblya') return;
+	var charcs = tovar.find('.js-store-prod-charcs');
+	if (!charcs.length) return;
+	var photoBlock = tovar.find('.t-slds__item:not([data-slide-index="2"])');
+	if (!photoBlock.length) return;
+	var photoCharc;
+	charcs.each(function () {
+		if (!(new RegExp('на фото')).test($(this).text())) return;
+		photoCharc = $(this);
+		return false;
+	});
+	if (photoCharc) photoCharc.addClass('photoPlashka').appendTo(photoBlock);
+}
+
+/**
  * скрываем товары, которые должны быть скрыты
  */
-function producTotHide(tovar) {
-	if (site == '2steblya' && getTovarId(tovar) == 105671635591) { // нитакой как все
+function productsTotHide(tovar) {
+	var data = {
+		// нитакой как все, индпошив
+		'2steblya': [105671635591, 618173603491],
+		'staytrueflowers': [400814140661, 796318578141]
+	}
+	if (data[site].includes(getTovarId(tovar))) {
 		tovar.prev('.t-clear').addBack().hide();
 	}
 }
@@ -332,7 +356,6 @@ function producTotHide(tovar) {
  * заменяем картинку "наша карточка" на текстовый аналог
  */
 function productReplaceCardImgWithText(tovar, catalog) {
-	if (site != '2steblya') return;
 	if (!isCardToBeReplaced(tovar)) {
 		removeOption();
 		removeSelect(catalog);
@@ -348,8 +371,8 @@ function productReplaceCardImgWithText(tovar, catalog) {
 		'<p class="card__buket">этот букет называется</p>',
 		'<div class="card__title">' + getTovarTitle(tovar) + '</div>',
 		'<div class="card__text">' + getTovarCardText(tovar) + '</div>',
-		'<div class="card__your-text">' + data[site] + '</div>'
 	]
+	if (site == '2steblya') cardParts.push('<div class="card__your-text">' + data[site] + '</div>');
 	cardContent.append(cardParts.join(''));
 	card.addClass('card').html(cardContent);
 	if (!catalog) {
@@ -439,7 +462,7 @@ function productAddAdditionalText(tovar) {
 	if (noTextProducts[site].includes(getTovarId(tovar))) return;
 	var data = {
 		'2steblya': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов<br>к букетам с айдентикой также прилагается карт очка и сосабельный петушок',
-		'staytrueflowers': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов'
+		'staytrueflowers': 'к каждому букету прилагается карточка с его названием, состав, порошок для продления жизни цветов. и леденец для настроения :-)<br><br>ВАЖНО: про <a href="/substitute" target="_blank">замены в букетах</a>'
 	}
 	var div = $('<div class="t-store__prod-popup__text-dop"></div>');
 	div.html(data[site]);
@@ -477,8 +500,8 @@ function productOptionsReadMore(tovar) {
 			'выебри карточку': '/card'
 		},
 		'staytrueflowers': {
-			'Размер': '/format',
-			'выберите карточку': '/card'
+			'формат': '/format',
+			'карточка': '/card'
 		}
 	}
 	tovar.find('.t-product__option-select').each(function () {
@@ -549,11 +572,11 @@ function productSoldOut(tovar, catalog) {
 }
 
 /**
- * получаем текст карточки из селекта "выебри карточку"
+ * получаем текст карточки из селекта "текст карточки"
  */
 function getTovarCardText(tovar) {
 	var val = tovar.find('.js-product-option:last').find('select').val();
-	return val.split('*br*').join('<br>');
+	return val ? val.split('*br*').join('<br>') : '';
 }
 
 /**

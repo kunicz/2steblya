@@ -17,9 +17,11 @@
 			border: 0 none !important;
 			background-color: $primary-color;
 
-			* {
-				opacity: 1 !important;
-				color: $contrprimary-color;
+			@include if('2steblya') {
+				* {
+					opacity: 1 !important;
+					color: $contrprimary-color;
+				}
 			}
 
 			svg path {

@@ -52,6 +52,7 @@ function cartDynamicFunctions() {
 	cartProductOptionsInOneLine();
 	cartOtsluniavit();
 	cartOnlyOneFromVitrina();
+
 	cartDonat();
 	cartPromocodeTovars();
 	cartShow();
@@ -190,6 +191,7 @@ function cartDelivery() {
 			selectedDay();
 			specialDates();
 			vitrinaTodayPurchase();
+			vitrinaOnlyTwoDays();
 			dateField.attr('disabled', true);
 			executed = true;
 		}, 50);
@@ -290,6 +292,33 @@ function cartDelivery() {
 			if (dates['today'].getHours() >= 22) return;
 			$('.t706 .t_datepicker__today').removeClass('t_datepicker__day-cell--disabled');
 		}
+		/**
+		 * витрина только на сегодня и завтра
+		 */
+		function vitrinaOnlyTwoDays() {
+			var vitrinaList = getVitrinaTovarsIds();
+			if (!vitrinaList.length) return;
+			var allow = true;
+			var tovars = $('.t706__product');
+			if (!tovars.length) return;
+			tovars.each(function () {
+				if (vitrinaList.includes(getTovarInCartId($(this)))) return;
+				allow = false;
+				return false;
+			});
+			tovars.each(function () {
+				if (![400814140661, 105671635591].includes(getTovarInCartId($(this)))) return;
+				allow = false;
+				return false;
+			});
+			if (!allow) return;
+			var data = {
+				'2steblya': 'с ветрины только щас или завтро',
+				'staytrueflowers': 'с витрины только на сегодня или на завтра'
+			};
+			$('.t706 .t_datepicker__day-cell').addClass('t_datepicker__day-cell--disabled');
+			$('.t706 .t_datepicker__today').add($('.t706 .t_datepicker__today').next()).removeClass('t_datepicker__day-cell--disabled').attr('title', data[site]);
+		}
 	}
 
 	/**
@@ -327,8 +356,9 @@ function cartDelivery() {
 			var tovars = $('.t706__product');
 			var startHour = 6;
 			tovars.each(function () {
+				var tovar = $(this);
 				$.each(allowedTodayProducts, function (i, product) {
-					if (product[0] != getTovarInCartId($(this))) return true;
+					if (product[0] != getTovarInCartId(tovar)) return true;
 					startHour -= product[1];
 					return false;
 				});
@@ -612,7 +642,6 @@ function cartHerZnaetPoluchatelya() {
  * опции товаров в одну строку
  */
 function cartProductOptionsInOneLine() {
-	if (site != '2steblya') return;
 	var props = $('.t706__product-title__option div');
 	props.each(function () {
 		var text = $(this).text().split(/\s*:\s*/);
@@ -621,10 +650,14 @@ function cartProductOptionsInOneLine() {
 			case 'накинуть пятихатку':
 			case 'накинуть сотен':
 			case 'эвкалипт ннада':
+			case 'добавить 1000':
+			case 'добавить 500':
+			case 'добавить 100':
 				$(this).hide();
 				break;
 			case 'выебри карточку':
-				text[1] = text[1].replace('со своим', 'с твоим');
+			case 'карточка':
+				text[1] = text[1].replace('со своим', 'с вашим');
 				break;
 		}
 		$(this).text(text[1]);
@@ -900,7 +933,7 @@ function cartHideOtkudaUznal() {
 function cartSuccess() {
 	var succesbox = $('.t706 .js-successbox');
 	var data = {
-		'2steblya': 'заказ оформлен успешно, но похоже Юкасса тупит и не хочет, штоб твои денюшки потекли к нам рекой<br><br>напиши нам в <a href="https://t.me/dva_steblya">телегу</a>, расскажи, что вот такая оказия случилась, и мы скинем тебе новую нормальную ссыклу на оплат очку',
+		'2steblya': 'заказ оформлен успешно, но похоже Юкасса тупит и не хочет, штоб твои денюжки потекли к нам рекой<br><br>напиши нам в <a href="https://t.me/dva_steblya">телегу</a>, расскажи, что вот такая оказия случилась, и мы скинем тебе новую нормальную ссыклу на оплат очку',
 		'staytrueflowers': 'Ваш заказ оформлен, но мы не смогли перенаправить вас на оплату заказа в Юкассе.<br><br>Напишите нам в <a href="https://t.me/staytrueflowers">телеграм</a>, и мы вышлем вам новую рабочую ссылку на оплату.'
 	}
 	succesbox.addClass('hidden').attr('data-success-message', data[site]);

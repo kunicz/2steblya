@@ -6,3 +6,28 @@
 &__grid-separator {
 	display: none !important;
 }
+
+&__empty-part-msg {
+	&-wrapper {
+		border: 0 none;
+		color: $contrprimary-color;
+		padding: 0;
+	}
+
+	@include if('2steblya') {
+		background-image: url(https://static.tildacdn.com/tild3735-6265-4864-b363-376135393737/laurie.gif);
+		background-size: 40%;
+		background-position: center 50px;
+		background-repeat: no-repeat;
+		vertical-align: top;
+		min-height: 300px;
+
+		@media screen and (max-width:960px) {
+			background-size: 80%;
+		}
+
+		@media screen and (max-width:400px) {
+			background-size: 100%;
+		}
+	}
+}

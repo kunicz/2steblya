@@ -44,6 +44,10 @@
 	&-heading {
 		font-size: 28px;
 
+		@include if('stf') {
+			font-weight: 100 !important;
+		}
+
 		@include max(640) {
 			text-align: center;
 		}
@@ -60,6 +64,11 @@
 		color: $contrprimary-color;
 		text-align: left;
 
+		@include if('stf') {
+			font-weight: 400;
+			text-transform: lowercase;
+		}
+
 		@include max(640) {
 			text-align: center;
 		}
@@ -71,9 +80,6 @@
 
 	&-totalamount-wrap {
 		margin-bottom: 70px;
-
-		@include if('2steblya') {
-			display: none !important;
-		}
+		display: none !important;
 	}
 }

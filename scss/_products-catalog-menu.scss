@@ -51,3 +51,120 @@ $menu_costumized: (
 		}
 	}
 }
+
+&__filter {
+	&__controls-wrapper {
+		text-align: center;
+		display: block !important;
+	}
+
+	&__search-mob-btn {
+		display: none !important;
+		margin: 0;
+		opacity: 1 !important;
+		@include btn;
+
+		svg {
+			display: none
+		}
+
+		&::after {
+			white-space: nowrap;
+			font-weight: 700;
+			line-height: 60px;
+			content: 'поиск и сортировка';
+
+			@include if('2steblya') {
+				content: 'поиск и сортир овка'
+			}
+		}
+	}
+
+	&__opts-mob-btn {
+		display: none !important;
+	}
+
+	&__options {
+		display: none;
+	}
+
+	&__search-and-sort {
+		display: block !important;
+		margin: 0;
+
+		&>div {
+			display: block !important;
+			width: auto;
+			max-width: 350px;
+			margin: 0 auto;
+
+			&:first-child {
+				margin-bottom: 20px;
+			}
+		}
+
+		@media screen and (min-width:961px) {
+			&>div {
+				&:first-child {
+					float: left;
+					margin: 0;
+				}
+
+				&:last-child {
+					float: right;
+				}
+			}
+
+			&::after {
+				content: '';
+				display: block;
+				clear: both;
+			}
+		}
+	}
+
+	&__sort {
+		&>div {
+			display: block;
+			width: auto;
+			margin: 0;
+		}
+	}
+
+	&__search {
+		input {
+			width: 100% !important;
+		}
+	}
+
+	&__chosen-bar {
+		text-align: left;
+		display: block !important;
+
+		@media screen and (max-width:960px) {
+			text-align: center;
+		}
+	}
+
+	&__chosen-val {
+		margin: 0 10px 10px 0 !important;
+		border-radius: 5px !important;
+		text-transform: lowercase;
+		background-image: url(https://static.tildacdn.com/tild3461-3062-4536-a634-333134363361/smallCross.png);
+		background-position: 20px center;
+		background-repeat: no-repeat;
+		padding: 6px 20px 9px 40px !important;
+
+		&::after {
+			display: none;
+		}
+
+		@media screen and (max-width:960px) {
+			margin: 0 5px 10px 5px !important;
+		}
+	}
+
+	&__prods-number {
+		display: none;
+	}
+}

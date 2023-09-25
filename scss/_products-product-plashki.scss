@@ -32,18 +32,27 @@
 	}
 }
 
-@include if('2steblya') {
+//карточка к букету
+.t-store__card__bgimg_second::after {
+	@include plashka(0, auto, auto, 0, $contrprimary-color, $primary-color, 300);
 
-	//карточка к букету
-	.t-store__card__bgimg_second::after {
-		@include plashka(0, auto, auto, 0, $contrprimary-color, $primary-color, 300);
-		content: 'карточка к букету';
+	@include if('stf') {
+		font-size: $text-font-size - 6px;
+		font-weight: 400;
 	}
+
+	content: 'карточка к букету';
 }
+
 
 //бомжетный
 .bomjPlashka {
 	@include plashka(0, 0, auto, auto, $primary-color, $secondary-color, 900);
+}
+
+//на фото
+.photoPlashka {
+	@include plashka(0, auto, auto, 0, $primary-color, $secondary-color, 900);
 }
 
 &:not(.bomj) .bomjPlashka {

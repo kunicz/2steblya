@@ -1,3 +1,10 @@
+//простой текст
+.t004 {
+	@include if('stf') {
+		text-align: left !important;
+	}
+}
+
 //Прямая речь
 .t013 {
 
@@ -162,7 +169,14 @@
 
 	&__textwrapper {
 		padding-right: 50px;
-		text-align: center;
+
+		@include if('2steblya') {
+			text-align: center;
+		}
+
+		@include if('stf') {
+			text-align: left;
+		}
 	}
 
 	&__img {
@@ -179,7 +193,13 @@
 
 	&__icon-hover &__lines {
 		g g {
-			stroke: $contrprimary-color;
+			@include if('2steblya') {
+				stroke: $contrprimary-color;
+			}
+
+			@include if('stf') {
+				stroke: $primary-color;
+			}
 		}
 	}
 
@@ -229,12 +249,49 @@
 		position: relative;
 		z-index: 10;
 	}
+
+	&__imgwrapper_empty {
+		background: none
+	}
+}
+
+//Виджет с мессенджерами
+.t825 {
+	&__btn_wrapper {
+		box-shadow: none;
+	}
+}
+
+//Поток: Сетка для новостей или блога
+.t897 {
+	.t-menu__link-item {
+		@include btn;
+
+		&.t-active {
+			background-color: $secondary-color !important;
+			border-color: $secondary-color !important;
+
+			* {
+				color: $primary-color !important;
+				opacity: 1;
+			}
+		}
+	}
+
+	.t-feed__col-grid__wrapper {
+		height: auto !important;
+	}
+
+	.t-section__topwrapper {
+		display: none;
+	}
 }
 
 //Меню в виде табов
 .t976 {
 	&__list-item a {
 		overflow: visible;
+		@include btn;
 
 		&::after {
 			color: $primary-color;
@@ -260,5 +317,168 @@
 	.t-name {
 		font-size: $text-font-size;
 		font-weight: 0;
+	}
+}
+
+//поиск
+.t985 .t-search-widget {
+	&__blockinput {
+		border: 0 none !important;
+		background-color: $contrprimary-color;
+	}
+
+	&__header {
+		background-color: $primary-color;
+	}
+
+	&__close-icon path {
+		stroke: $contrprimary-color;
+	}
+
+	&__clear-icon {
+		margin-left: 10px;
+
+		@include if('2steblya') {
+			background: none;
+			opacity: .5;
+
+			& path {
+				stroke: $contrprimary-color;
+			}
+		}
+	}
+
+	&__resultwrapper {
+		text-align: left;
+	}
+
+	&__query-result {
+		margin: 40px 0;
+	}
+
+	&__result {
+		margin-bottom: 40px;
+		border: 0 none !important;
+
+		&_product-img {
+			border: 0 none;
+		}
+	}
+
+	&__popup {
+		background-color: $primary-color;
+	}
+
+	&__result_product-price {
+		font-weight: 100;
+	}
+
+	&__pagination-active {
+		background-color: $secondary-color;
+	}
+
+	&__pagination-next,
+	&__pagination-prev {
+		path {
+			stroke: $contrprimary-color;
+		}
+	}
+}
+
+//Избранное
+.t1002 {
+	&__addBtn {
+		margin-left: 10px;
+
+		&_active {
+			svg path {
+				stroke: $secondary-color;
+				fill: $secondary-color
+			}
+		}
+	}
+
+	&__bubble {
+		border-radius: 5px;
+
+		@include if('2steblya') {
+			background-color: $secondary-color;
+		}
+
+		@include if('stf') {
+			background-color: $contrprimary-color;
+		}
+
+		& * {
+			color: $primary-color;
+		}
+
+		&-text {
+			font-family: $text-font;
+			font-size: $text-font-size;
+		}
+	}
+
+	&__wishlistwin-heading {
+		text-transform: lowercase;
+		font-weight: 100 !important;
+		opacity: .5;
+	}
+
+	&__close {
+		opacity: .2;
+	}
+
+	&__product {
+		align-items: start;
+
+		&-link {
+			font-weight: 400;
+			font-size: calc($text-font-size + 2px);
+			line-height: 1.1;
+			text-transform: uppercase;
+		}
+
+		&-imgdiv {
+			border: 0 none;
+			border-radius: 0;
+		}
+
+		&-title__option {
+			font-size: $text-font-size;
+			font-weight: 100;
+
+			&>div:last-child {
+				display: none;
+			}
+
+			&::first-letter {
+				text-transform: lowercase;
+			}
+
+			&:last-child {
+				display: none;
+			}
+		}
+	}
+
+	&__product-del {
+		margin-left: 15px;
+	}
+}
+
+//Бегущая строка
+.t1003 {
+	.t-text {
+
+		@include if('2steblya') {
+			font-weight: 600;
+			color: $secondary-color;
+		}
+
+		@include if('stf') {
+			font-weight: 400;
+			color: $secondary-color;
+		}
 	}
 }

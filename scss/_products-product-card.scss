@@ -34,27 +34,36 @@
 		}
 
 		* {
-			color: $primary-color !important;
+			@include if('2steblya') {
+				color: $primary-color !important;
+			}
+
+			@include if('stf') {
+				color: $contrprimary-color !important;
+			}
 		}
 
 		//лого
 		&::before {
 			content: '';
 			display: inline-block;
-			height: 80px;
-			width: 80px;
 			background-size: contain;
 			background-position: center;
 			background-repeat: no-repeat;
-			margin-bottom: 40px;
 			margin-top: -40px;
 
 			@include if('2steblya') {
+				margin-bottom: 40px;
+				height: 80px;
+				width: 80px;
 				background-image: url('https://static.tildacdn.com/tild6362-6133-4632-b864-646561666131/logo-rect-transparen.png');
 			}
 
 			@include if('stf') {
-				background-image: url();
+				margin-bottom: 25px;
+				height: 50px;
+				width: 50px;
+				background-image: url('https://static.tildacdn.com/tild3930-3231-4561-b736-613836663633/black.png');
 			}
 
 			@include max(460) {
@@ -76,9 +85,17 @@
 	//навзание букета
 	&__title {
 		margin-top: 20px;
-		font-weight: 900;
-		font-size: 1.9em !important;
 		line-height: 1 !important;
+
+		@include if('2steblya') {
+			font-weight: 900;
+			font-size: 1.9em !important;
+		}
+
+		@include if('stf') {
+			font-weight: 600;
+			font-size: 1.3em !important;
+		}
 
 		@include max(460) {
 			font-size: 26px !important;
@@ -91,7 +108,13 @@
 		font-weight: 500;
 
 		//длинный текст в карточке
-		$long_card_text_ids: 221040427501; // тамара ильинишна
+		$long_card_text_ids: 221040427501,
+		233731803531,
+		528542038451,
+		833291444381,
+		602273240301,
+		810453377781,
+		163944901201; // тамара ильинишна
 
 		@each $id in $long_card_text_ids {
 			$data: '[data-product-gen-uid="#{$id}"]';

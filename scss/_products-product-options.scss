@@ -8,7 +8,6 @@
 
 	@include if('stf') {
 		color: $primary-color !important;
-		display: none !important;
 	}
 
 	border-radius: 50%;

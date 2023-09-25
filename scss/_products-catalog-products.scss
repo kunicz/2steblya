@@ -5,10 +5,20 @@
 	float: none;
 	vertical-align: top;
 
+	//карточка
+	.card__container {
+		@media screen and (max-width:960px) {
+			& {
+				display: none;
+			}
+		}
+	}
+
 	//заголовок
 	&__title {
 		@include if('stf') {
-			font-size: $text-font-size;
+			font-size: calc($text-font-size + 2px) !important;
+			font-weight: 400;
 		}
 	}
 
@@ -28,6 +38,7 @@
 	&__price_old {
 		@include if('stf') {
 			font-size: $text-font-size;
+			font-weight: 100 !important;
 		}
 	}
 
@@ -35,9 +46,12 @@
 		.multiplePrices &:not(&_old) &-value::before {
 
 			content: 'от ';
-			font-size: 14px;
 			font-weight: 300;
 			opacity: .5;
+
+			@include if('2steblya') {
+				font-size: 14px;
+			}
 		}
 	}
 

@@ -7,9 +7,11 @@
 
 	//заголовок
 	&__title {
-		@media screen and (min-width: 961px) {
-			.t-descr {
-				display: none;
+		@include if('2steblya') {
+			@media screen and (min-width: 961px) {
+				.t-descr {
+					display: none;
+				}
 			}
 		}
 	}
@@ -90,6 +92,12 @@
 					}
 
 					@include navButton(#{$o}+' .owl-prev', #{$o}+' .owl-next');
+
+					@include if('stf') {
+						width: 45px !important;
+						height: 45px !important;
+					}
+
 					position: absolute;
 					top: 0;
 				}
