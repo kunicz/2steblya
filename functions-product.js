@@ -53,6 +53,7 @@ function productCatalogTovarFunctions(tovar, catalog) {
 	productReplaceCardImgWithText(tovar, catalog);
 	productBlackFriday(tovar);
 	productSoldOut(tovar, catalog);
+	productPlashka(tovar);
 	productBomjPlashka(tovar, catalog);
 	productHideVitrinaDuplicate(tovar, catalog);
 	productsTotHide(tovar);
@@ -292,6 +293,13 @@ function productCartDisabled(tovar) {
 	tovar.find('.js-store-buttons-wrapper').remove();
 }
 
+/** 
+ * переносим плашку в первый слайд
+ */
+function productPlashka(tovar) {
+	tovar.find('.t-store__card__mark-wrapper').appendTo(tovar.find('.t-store__card__bgimg'));
+}
+
 /**
  * бомжетность
  */
@@ -478,7 +486,15 @@ function productCharcs(tovar) {
 		let [first, ...rest] = $(this).text().split(/:\s/);
 		rest = rest.join(': ');
 		$(this).html('<b>' + first + '</b> ' + rest);
+		productRemoveCharcs($(this));
 	});
+}
+function productRemoveCharcs(charcBlock) {
+	var techCharcs = {
+		'2steblya': ['гамма', 'цвет', 'состав'],
+		'staytrueflowers': []
+	}
+	if (techCharcs[site].includes(charcBlock.children('b').text())) charcBlock.remove();
 }
 
 /**
@@ -623,4 +639,32 @@ function isVitrina(catalog, inFooter = false) {
 	var c = '.uc-' + (inFooter ? 'vitrinaFooter' : 'vitrina__catalog');
 	if (catalog.parents(c).length) return true;
 	return false;
+}
+
+/**
+ * убираем сепаратары из карусели
+ */
+function owlRemoveSeparators(catalog) {
+	catalog.find('.t-store__grid-separator').remove();
+}
+
+/**
+ * кнопки навигации в карусели
+ */
+function owlNavButtons(catalog) {
+	var navButtons = catalog.find('.owl-nav:not(.disabled)');
+	if (!navButtons.length) return;
+	navButtons.hide();
+	setTimeout(function () {
+		var img = catalog.find('.t-store__card__bgimg');
+		catalog.find('.owl-nav').css({ 'top': (img.height() / 2) + 'px' });
+		navButtons.show();
+	}, 2000);
+}
+
+/**
+ * литсание карусели и lazy load картинок
+ */
+function owlLazyLoadChanged() {
+	window.dispatchEvent(new Event('resize'));
 }

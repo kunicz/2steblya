@@ -482,3 +482,16 @@
 		}
 	}
 }
+
+//Три вертикальных блока в рамках
+.t1032 {
+	@media screen and (max-width: 960px) {
+		&__col {
+			margin-bottom: 0;
+
+			&:not(:first-child)>div {
+				padding-top: 0;
+			}
+		}
+	}
+}

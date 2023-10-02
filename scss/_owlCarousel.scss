@@ -1,0 +1,53 @@
+//карусель
+.owl {
+	&-loaded {
+		position: relative;
+	}
+
+	&-stage-outer {
+		overflow: hidden;
+	}
+
+	&-item {
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	&-nav {
+		&.disabled {
+			display: none;
+		}
+
+		width: 100%;
+		position: absolute;
+
+		$o: &;
+
+		button {
+			&.disabled {
+				display: none;
+			}
+
+			@include navButton(#{$o}+' .owl-prev', #{$o}+' .owl-next');
+
+			@include if('stf') {
+				width: 45px !important;
+				height: 45px !important;
+			}
+
+			position: absolute;
+			top: 0;
+			transform:translateY(-50%);
+		}
+
+		@at-root {
+			#{$o} .owl-next {
+				right: -15px;
+			}
+
+			#{$o} .owl-prev {
+				left: -15px;
+			}
+		}
+	}
+}

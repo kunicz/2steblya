@@ -48,6 +48,16 @@
 	justify-content: center;
 	align-items: center;
 
+	@include if('2steblya') {
+		background-color: $secondary-color;
+		border-radius: 5px;
+		width: auto !important;
+		height: auto !important;
+		padding: 10px;
+		font-weight: 800;
+		text-transform: uppercase;
+	}
+
 	& * {
 		width: 0;
 		height: 0;
@@ -64,10 +74,18 @@
 	@at-root {
 		#{$prev}::before {
 			content: '<';
+
+			@include if('2steblya') {
+				content: '<суда';
+			}
 		}
 
 		#{$next}::before {
 			content: '>';
+
+			@include if('2steblya') {
+				content: 'туда>';
+			}
 		}
 	}
 }
@@ -77,6 +95,7 @@
 		color: $primary-color !important;
 		background-color: $secondary-color !important;
 		border: 0 none !important;
+		font-weight: 800 !important;
 	}
 
 	@include if('stf') {
@@ -95,4 +114,7 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	font-size:$text-font-size;
+	font-family:$text-font;
+	cursor:pointer;
 }

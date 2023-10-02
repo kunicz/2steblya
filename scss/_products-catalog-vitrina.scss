@@ -64,57 +64,5 @@
 				}
 			}
 		}
-
-		//карусель
-		.owl {
-			&-loaded {
-				position: relative;
-				max-width: 1000px;
-			}
-
-			&-item {
-				display: inline-block;
-			}
-
-			&-nav {
-				&.disabled {
-					display: none;
-				}
-
-				width: 100%;
-				position: absolute;
-
-				$o: &;
-
-				button {
-					&.disabled {
-						display: none;
-					}
-
-					@include navButton(#{$o}+' .owl-prev', #{$o}+' .owl-next');
-
-					@include if('stf') {
-						width: 45px !important;
-						height: 45px !important;
-					}
-
-					position: absolute;
-					top: 0;
-				}
-
-				@at-root {
-					#{$o} .owl-next {
-						right: -15px;
-					}
-
-					#{$o} .owl-prev {
-						left: -15px;
-					}
-				}
-			}
-
-
-		}
-
 	}
 }

@@ -4,7 +4,8 @@ $menu_costumized: (
 );
 
 @include if('2steblya') {
-	$menu_costumized: ( //новый год
+	$menu_costumized: (
+		//новый год
 		539199854821: 'https://static.tildacdn.com/tild3738-6161-4362-a230-616135653463/santaHat.png',
 		//8 марта
 		894609841681: 'https://static.tildacdn.com/tild3735-6134-4761-a230-353138316165/flower.png'
@@ -12,18 +13,28 @@ $menu_costumized: (
 }
 
 @include if('stf') {
-	$menu_costumized: ();
+	$menu_costumized: (
+	);
 }
 
 &__parts-switch {
 	&-wrapper {
 		position: relative;
 		z-index: 2;
+
+		@include if('2steblya') {
+			margin-bottom: 15px !important;
+		}
 	}
 
 	&-btn {
 		opacity: 1 !important;
 		text-transform: uppercase;
+
+		@include if('2steblya') {
+			margin: 0 10px 5px 10px !important;
+			font-size: 22px !important;
+		}
 
 		a {
 			color: $contrprimary-color !important;
@@ -53,6 +64,90 @@ $menu_costumized: (
 }
 
 &__filter {
+	margin-bottom: 0 !important;
+
+	&__show {
+		color: $contrprimary-color;
+		text-align: right;
+		cursor: pointer;
+		font-family: $text-font;
+		font-size: $text-font-size;
+		font-weight: 300;
+		padding: 5px 10px 10px 35px;
+		margin-bottom: 15px;
+		display: block;
+		float: right;
+		background-position: left center;
+		background-repeat: no-repeat;
+
+		@media screen and (min-width:1201px) {
+			padding-right: 20px;
+		}
+
+		@media screen and (max-width:976px) {
+			margin-left: auto;
+			margin-right: auto;
+			float: none;
+			display: inline-block;
+			padding-right: 0;
+		}
+
+		@include if('2steblya') {
+			background-image: url(https://static.tildacdn.com/tild3563-3865-4537-b536-393131303032/filter.png);
+
+			&::after {
+				content: 'фильтровать базар';
+			}
+		}
+
+		@include if('stf') {
+			&::after {
+				content: 'фильтры, поиск, сортировка';
+			}
+		}
+	}
+
+	&__hide {
+		position: absolute;
+		top: -20px;
+		right: 10px;
+		background-position: 10px center;
+		background-repeat: no-repeat;
+		cursor: pointer;
+		background-color: $primary-color;
+		color: $contrprimary-color;
+		font-family: $text-font;
+		font-size: $text-font-size;
+		font-weight: 300;
+		padding: 5px 10px 10px 27px;
+
+		@include if('2steblya') {
+			background-image: url(https://static.tildacdn.com/tild3461-3062-4536-a634-333134363361/smallCross.png);
+		}
+
+		&::after {
+			content: 'скрыть';
+		}
+
+		@media screen and (max-width:640px) {
+			top: 20px;
+			right: 20px;
+			background-size: contain;
+			background-position: center;
+			padding: 0;
+			width: 20px;
+			height: 20px;
+
+			@include if('2steblya') {
+				background-image: url(https://static.tildacdn.com/tild3134-6634-4361-b963-326263663332/bigCross.png);
+			}
+
+			&::after {
+				content: '';
+			}
+		}
+	}
+
 	&__controls-wrapper {
 		text-align: center;
 		display: block !important;
@@ -80,17 +175,162 @@ $menu_costumized: (
 		}
 	}
 
-	&__opts-mob-btn {
+	&__options {
+		display: flex !important;
+		flex-wrap: wrap;
+		justify-content: space-between;
+
+		@media screen and (max-width:400px) {
+			justify-content: center;
+		}
+	}
+
+	&__item {
+		margin: 0 !important;
+		border: 0 none !important;
+		white-space: nowrap;
+
+		@media screen and (max-width:960px) {
+			flex-basis: 50%;
+			display: flex !important;
+			justify-content: center;
+			flex-wrap: wrap;
+			align-content: start;
+			padding: 0 !important;
+		}
+
+		@media screen and (max-width:400px) {
+			/*flex-basis: 100%;*/
+		}
+	}
+
+	&__item_available {
 		display: none !important;
 	}
 
-	&__options {
-		display: none;
+	&__item-title {
+		max-width: unset !important;
+		padding: 0 !important;
+		cursor: default !important;
+		opacity: 1 !important;
+		text-transform: uppercase;
+		text-align: left;
+
+		&::after {
+			content: ':' !important;
+			border: 0 none !important;
+			width: auto !important;
+			height: auto !important;
+			position: static !important;
+			transform: none !important;
+		}
+
+		@media screen and (max-width:960px) {
+			text-align: center;
+			width: 100%;
+		}
+	}
+
+	&__item-controls-wrap {
+		display: block !important;
+		position: static !important;
+		background-color: transparent !important;
+		box-shadow: none;
+		border-radius: 0;
+		margin-bottom: 20px;
+		min-width: unset !important;
+	}
+
+	&__item-controls-container {
+		padding: 0 !important;
+	}
+
+	&__item_checkbox {
+		min-width: unset !important;
+	}
+
+	&__checkbox {
+		margin-bottom: 0 !important;
+
+		.t-checkbox__indicator {
+			background-color: #fff;
+			width: 20px;
+			height: 20px;
+			opacity: 1 !important;
+
+			&::after {
+				border: 0 none;
+				width: 10px;
+				height: 10px;
+				background-color: $secondary-color;
+				top: 3px;
+				left: 3px;
+				transform: none;
+			}
+		}
+	}
+
+	&__item-price-box {
+		padding: 0 !important;
+
+		input {
+			width: 82px !important;
+
+			@media screen and (min-width:960px) {
+				width: 100px !important;
+			}
+		}
+
+		button {
+			float: none !important;
+			display: block;
+			margin-top: 12px;
+			margin-left: 43px !important;
+			width: 40px !important;
+			padding: 0 !important;
+			height: auto !important;
+		}
+
+		&::before {
+			content: 'от: ';
+		}
+
+		span {
+			font-family: $text-font;
+			font-weight: 100;
+			text-indent: -9999px;
+			overflow: hidden;
+			font-size: 0px;
+			color: transparent;
+
+			&::before {
+				content: '';
+				display: block;
+				height: 12px;
+			}
+
+			&::after {
+				content: 'до: ';
+				color: $contrprimary-color;
+				font-size: 18px;
+			}
+		}
+	}
+
+	&__btn {
+		@include btn;
+		padding: 0 7px !important;
+	}
+
+	&__item_sort-mobile,
+	&__opts-mob-btn,
+	&__search-mob-btn {
+		display: none !important;
 	}
 
 	&__search-and-sort {
 		display: block !important;
-		margin: 0;
+		margin: 0 !important;
 
 		&>div {
 			display: block !important;
@@ -146,8 +386,18 @@ $menu_costumized: (
 		}
 	}
 
+	&__chosen-wrapper {
+		margin: 10px 0 0 0 !important;
+
+		div {
+			&:hover {
+				opacity: 1 !important;
+			}
+		}
+	}
+
 	&__chosen-val {
-		margin: 0 10px 10px 0 !important;
+		margin: 10px 10px 0 0 !important;
 		border-radius: 5px !important;
 		text-transform: lowercase;
 		background-image: url(https://static.tildacdn.com/tild3461-3062-4536-a634-333134363361/smallCross.png);
@@ -160,11 +410,41 @@ $menu_costumized: (
 		}
 
 		@media screen and (max-width:960px) {
-			margin: 0 5px 10px 5px !important;
+			margin: 10px 5px 0 5px !important;
+		}
+	}
+
+	&__reset {
+		display: none !important;
+		padding: 6px 20px 9px 20px !important;
+		background-color: $secondary-color;
+		border-radius: 5px !important;
+		border: 0 none !important;
+		line-height: 1.4 !important;
+		margin-left: 0 !important;
+		margin-top: 10px;
+		text-transform: lowercase;
+
+		@media screen and (max-width: 960px) {
+			margin-left: 5px !important;
 		}
 	}
 
 	&__prods-number {
 		display: none;
 	}
+
+	&__apply {
+		@include btn;
+		margin: 20px auto 0 auto;
+
+		@media screen and (min-width:641px) {
+			display: none !important;
+		}
+
+		&::after {
+			content: 'применить';
+		}
+	}
+
 }
