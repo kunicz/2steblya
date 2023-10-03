@@ -64,7 +64,7 @@
 			margin: 0 15px;
 			position: relative;
 
-			:nth-child(2) {
+			&:nth-child(2) {
 				margin: 0;
 			}
 		}
@@ -219,7 +219,7 @@
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			width: 80%;
+			width: 100%;
 			text-align: center;
 			display: block;
 			box-sizing: border-box;
@@ -232,11 +232,11 @@
 			opacity: .5;
 
 			@include if('2steblya') {
-				content: 'черт чета черная засосала наш запретграм\Aну чё сидишь думаешь? подрубай випиэн';
+				content: 'черт чета черная дыра засосала наш запретграм\Aну чё сидишь думаешь? подрубай випиэн';
 			}
 
 			@include if('stf') {
-				content: 'Скорее всего вам необходимо включить VPN, чтобы загрузились картинки.';
+				content: 'Скорее всего вам необходимо включить VPN, чтобы загрузились картинки';
 			}
 
 			@include max(500) {

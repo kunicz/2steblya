@@ -1,7 +1,9 @@
 //карусель
 .owl {
+
 	&-loaded {
 		position: relative;
+		touch-action: manipulation !important;
 	}
 
 	&-stage-outer {

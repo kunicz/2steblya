@@ -179,6 +179,9 @@ function productCatalogMutationObserver(catalog) {
 				productCatalogTovarFunctions($(this), catalog);
 			});
 			window.dispatchEvent(new Event('resize'));
+
+			//каталог с фильтром
+			if (typeof reorderTovarsByCardWrapper == 'function') reorderTovarsByCardWrapper();
 		}, 1000);
 	}
 }
@@ -665,6 +668,8 @@ function owlNavButtons(catalog) {
 /**
  * литсание карусели и lazy load картинок
  */
-function owlLazyLoadChanged() {
-	window.dispatchEvent(new Event('resize'));
+function owlLazyLoadChanged(catalog) {
+	catalog.find('.js-product-img').each(function () {
+		$(this).css('background-image', 'url(' + $(this).data('original') + ')');
+	});
 }
