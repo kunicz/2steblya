@@ -275,16 +275,21 @@ function cartDelivery() {
 		}
 
 		/**
-		 * открываем продажу на сегодня для корзины с товарами из витрины (НИТАКОЙ всегда должен быть на витрине в скрытом виде)
+		 * открываем продажу на сегодня
 		 */
 		function vitrinaTodayPurchase() {
-			var vitrinaList = getVitrinaTovarsIds();
-			if (!vitrinaList.length) return;
+			/*var vitrinaList = getVitrinaTovarsIds();*/
+			if (!allowedTodayProducts[site].length) return;
 			var allow = true;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			tovars.each(function () {
-				if (vitrinaList.includes(getTovarInCartId($(this)))) return;
+				/*if (vitrinaList.includes(getTovarInCartId($(this)))) return;*/
+				var allowedTovars = [];
+				$.each(allowedTodayProducts[site], function (i, allowedTovar) {
+					allowedTovars.push(allowedTovar[0]);
+				});
+				if (allowedTovars.includes(getTovarInCartId($(this)))) return;
 				allow = false;
 				return false;
 			});
@@ -298,20 +303,17 @@ function cartDelivery() {
 		function vitrinaOnlyTwoDays() {
 			var vitrinaList = getVitrinaTovarsIds();
 			if (!vitrinaList.length) return;
-			var allow = true;
+			var onlyToday = false;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			tovars.each(function () {
-				if (vitrinaList.includes(getTovarInCartId($(this)))) return;
-				allow = false;
+				var id = getTovarInCartId($(this));
+				if (!vitrinaList.includes(id)) return;
+				if (!Object.values(nitakoi).includes(id)) return;
+				onlyToday = true;
 				return false;
 			});
-			tovars.each(function () {
-				if (![400814140661, 105671635591].includes(getTovarInCartId($(this)))) return;
-				allow = false;
-				return false;
-			});
-			if (!allow) return;
+			if (!onlyToday) return;
 			var data = {
 				'2steblya': 'с ветрины только щас или завтро',
 				'staytrueflowers': 'с витрины только на сегодня или на завтра'
@@ -799,7 +801,7 @@ function cartOnlyOneFromVitrina() {
 	tovars.each(function () {
 		var id = getTovarInCartId($(this));
 		if (!vitrinaList.includes(id)) return;
-		if (id == 105671635591) return; //НИТАКОЙ
+		if (id == nitakoi[site]) return; //НИТАКОЙ
 		$(this).children('.t706__product-plusminus').empty();
 	});
 }
