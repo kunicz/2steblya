@@ -278,24 +278,37 @@ function cartDelivery() {
 		 * открываем продажу на сегодня
 		 */
 		function vitrinaTodayPurchase() {
-			/*var vitrinaList = getVitrinaTovarsIds();*/
-			if (!allowedTodayProducts[site].length) return;
+			var vitrinaList = getVitrinaTovarsIds();
+			if (!allowedTodayProducts[site].length && !vitrinaList.length) return;
 			var allow = true;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
+			var allowedTovars = [];
+			$.each(allowedTodayProducts[site], function (i, allowedTovar) {
+				allowedTovars.push(allowedTovar[0]);
+			});
 			tovars.each(function () {
-				/*if (vitrinaList.includes(getTovarInCartId($(this)))) return;*/
-				var allowedTovars = [];
-				$.each(allowedTodayProducts[site], function (i, allowedTovar) {
-					allowedTovars.push(allowedTovar[0]);
-				});
-				if (allowedTovars.includes(getTovarInCartId($(this)))) return;
+				var id = getTovarInCartId($(this));
+				if (allowedTovars.includes(id) || vitrinaList.includes(id)) return;
 				allow = false;
 				return false;
 			});
+			if (todayUrl()) allow = true;
 			if (!allow) return;
 			if (dates['today'].getHours() >= 22) return;
 			$('.t706 .t_datepicker__today').removeClass('t_datepicker__day-cell--disabled');
+
+			function todayUrl() {
+				var cookie = Cookies.get('buytoday');
+				if (!cookie) return false;
+				var date = new Date();
+				var currentDay = String(date.getDate()).padStart(2, '0');
+				var currentMonth = String(date.getMonth() + 1).padStart(2, '0');
+				var currentYear = date.getFullYear();
+				var hash = CryptoJS.MD5(currentDay + '' + currentMonth + '' + currentYear).toString();
+				if (cookie != hash) return false;
+				return true;
+			}
 		}
 		/**
 		 * витрина только на сегодня и завтра

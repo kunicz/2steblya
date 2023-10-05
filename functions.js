@@ -1,6 +1,7 @@
 $(document).ready(function () {
 	redirectHome();
 	headerMenu();
+	buyToday();
 	externalLinks();
 	product();
 	cart();
@@ -22,6 +23,15 @@ function redirectHome() {
 			document.location.href = '/';
 		}
 	});
+}
+
+/**
+ * возможность покупать любой букет сегодня
+ */
+function buyToday() {
+	var urlParams = new URLSearchParams(window.location.search);
+	if (!urlParams.has('buytoday')) return;
+	Cookies.set('buytoday', urlParams.get('buytoday'));
 }
 
 /**
