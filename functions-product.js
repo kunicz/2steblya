@@ -645,6 +645,76 @@ function isVitrina(catalog, inFooter = false) {
 }
 
 /**
+ * превращяем витрину в карусель
+ */
+function owlVitrina(vitrinaBlocks) {
+	var showed = false;
+	var catalog;
+	var tovars;
+	var tovarsLength = 0;
+	setInterval(function () {
+		if (showed) return;
+		if (typeof getVitrinaTovarsIds !== 'function') return;
+		var vitrinaList = getVitrinaTovarsIds();
+		if (vitrinaList.length < 2) return; // на витрине всегда есть НИ ТАКОЙ КАК ВСЕ
+		catalog = $('.uc-vitrina__catalog');
+		if (!catalog.length) return;
+		tovars = catalog.find('.js-store-grid-cont .js-product');
+		tovarsLength = tovars.length;
+		if (!tovarsLength) return;
+		vitrinaRemoveJunk();
+		if (!tovarsLength) return;
+		vitrinaCarousel();
+		vitrinaShow();
+	}, 2000);
+
+	/* показываем витрину */
+	function vitrinaShow() {
+		vitrinaBlocks.css('opacity', 0).show();
+		showed = true;
+		var int = setInterval(
+			function () {
+				if (catalog.find('.owl-item').width() < 200) return;
+				clearInterval(int);
+				owlNavButtons(catalog);
+				owlLazyLoadChanged(catalog);
+				vitrinaBlocks.css('opacity', 1);
+			}, 100
+		);
+
+	}
+	/* удаляем с витрины ненужное */
+	function vitrinaRemoveJunk() {
+		/* сепараторы */
+		owlRemoveSeparators(catalog);
+		/* НИ ТАКОЙ */
+		catalog.find('.js-store-grid-cont .js-product:first').remove();
+		tovarsLength--;
+		/* распроданный товар */
+		tovars.each(function () {
+			var tovar = $(this);
+			if (!tovar.find('.js-store-prod-sold-out').length) return;
+			tovar.remove();
+			tovarsLength--;
+		});
+	}
+	/* карусель */
+	function vitrinaCarousel() {
+		var onScreen = 1;
+		if ($(window).width() > 550) onScreen++;
+		if ($(window).width() > 850) onScreen++;
+		if (onScreen == 3) catalog.addClass('twoItems');
+		catalog.find('.js-store-grid-cont').owlCarousel({
+			items: (tovarsLength > onScreen ? onScreen : tovarsLength),
+			margin: 30,
+			loop: false,
+			nav: tovarsLength > onScreen,
+			dots: false,
+		});
+	}
+}
+
+/**
  * убираем сепаратары из карусели
  */
 function owlRemoveSeparators(catalog) {
@@ -657,12 +727,7 @@ function owlRemoveSeparators(catalog) {
 function owlNavButtons(catalog) {
 	var navButtons = catalog.find('.owl-nav:not(.disabled)');
 	if (!navButtons.length) return;
-	navButtons.hide();
-	setTimeout(function () {
-		var img = catalog.find('.t-store__card__bgimg');
-		catalog.find('.owl-nav').css({ 'top': (img.height() / 2) + 'px' });
-		navButtons.show();
-	}, 2000);
+	catalog.find('.owl-nav').css({ 'top': (catalog.find('.t-store__card__bgimg').height() / 2) + 'px' });
 }
 
 /**

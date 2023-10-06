@@ -22,6 +22,16 @@
 		background-repeat: no-repeat;
 		background-position: top center;
 
+		&.twoItems {
+			.owl-item:first-child .js-product {
+				float: right;
+			}
+
+			.owl-item:last-child .js-product {
+				float: left;
+			}
+		}
+
 		.t-store {
 			padding: 0 30px;
 		}
