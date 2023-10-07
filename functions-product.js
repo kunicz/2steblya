@@ -335,18 +335,51 @@ function productButton(tovar) {
  * характеристика "на фото" реально на фото
  */
 function productOnPhoto(tovar) {
-	if (site == '2steblya') return;
-	var charcs = tovar.find('.js-store-prod-charcs');
-	if (!charcs.length) return;
-	var photoBlock = tovar.find('.t-slds__item:not([data-slide-index="2"])');
-	if (!photoBlock.length) return;
-	var photoCharc;
-	charcs.each(function () {
-		if (!(new RegExp('на фото')).test($(this).text())) return;
-		photoCharc = $(this);
-		return false;
-	});
-	if (photoCharc) photoCharc.addClass('photoPlashka').appendTo(photoBlock);
+	if ($('#allrecords > *').length <= 4) { page(); } else { popup(); }
+	function popup() {
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("GET", tovar.attr('data-product-url'), false);
+		xmlhttp.send();
+		var parser = new DOMParser();
+		apply($(parser.parseFromString(xmlhttp.responseText, "text/html")).find('.t-rec:first > script'));
+	}
+	function page() {
+		apply(tovar.parents('.t-rec').children('script'));
+	}
+	function apply(script) {
+		var product = script.text().match(/var product = (.*)\n/);
+		if (!product) return;
+		if (product.length < 2) return;
+		product = JSON.parse(product[1].slice(0, -1));
+		var sizes = [];
+		var format = {
+			'2steblya': 'фор мат',
+			'staytrueflowers': 'формат'
+		};
+		var photos = [];
+		for (var i = 0; i < product.editions.length; i++) {
+			if (!product.editions[i].img) continue;
+			photos.push([product.editions[i][format[site]], product.editions[i].img]);
+			sizes.push(product.editions[i][format[site]]);
+		}
+		if (!photos.length) return;
+		var i = 0;
+		tovar.find('.t-slds__main .t-slds__bgimg').each(function () {
+			if (typeof photos[i + 1] !== 'undefined') {
+				if ($(this).attr('data-original') == photos[i + 1][1]) i++;
+			}
+			$(this).append('<div class="photoPlashka">' + photos[i][0] + '</div>');
+		});
+		if (site == '2steblya') {
+			tovar.find('.t-typography__characteristics').each(function () {
+				if (!$(this).find('b').text() == 'на фото') return;
+				$(this).remove();
+				return false;
+			});
+			var charc = $('<p class="t-typography__characteristics js-store-prod-charcs costumized"></p>');
+			charc.html('<b>на фото</b> ' + sizes.join(', ')).prependTo(tovar.find('.js-store-prod-all-charcs'));
+		}
+	}
 }
 
 /**
@@ -654,7 +687,6 @@ function owlVitrina(vitrinaBlocks) {
 	var tovarsLength = 0;
 	setInterval(function () {
 		if (showed) return;
-		if (typeof getVitrinaTovarsIds !== 'function') return;
 		var vitrinaList = getVitrinaTovarsIds();
 		if (vitrinaList.length < 2) return; // на витрине всегда есть НИ ТАКОЙ КАК ВСЕ
 		catalog = $('.uc-vitrina__catalog');
