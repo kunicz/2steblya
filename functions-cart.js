@@ -322,7 +322,6 @@ function cartDelivery() {
 			tovars.each(function () {
 				var id = getTovarInCartId($(this));
 				if (!vitrinaList.includes(id)) return;
-				if (!Object.values(nitakoi).includes(id)) return;
 				onlyToday = true;
 				return false;
 			});

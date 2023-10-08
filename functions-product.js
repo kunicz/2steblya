@@ -35,10 +35,11 @@ function productTovarFunctions(tovar) {
 	productHtmlInDescription(tovar);
 	productHideEmptyText(tovar);
 	productAddAdditionalText(tovar);
+	productFlowersSeason(tovar);
 	productCharcs(tovar);
 	productBlackFriday(tovar);
 	productSoldOut(tovar);
-	productBomjPlashka(tovar);
+	//productBomjPlashka(tovar);
 	productButton(tovar);
 	productOnPhoto(tovar);
 	productCartDisabled(tovar);
@@ -69,6 +70,14 @@ function productCatalogFunctions(catalog) {
 	productPopupClose();
 	productCatalogMenu(catalog);
 	productCatalogMutationObserver(catalog);
+}
+
+/**
+ * определяем попап или страница
+ */
+function productIsPopup() {
+	if ($('#allrecords > *').length <= 4) return false;
+	return true;
 }
 
 /**
@@ -335,7 +344,11 @@ function productButton(tovar) {
  * характеристика "на фото" реально на фото
  */
 function productOnPhoto(tovar) {
-	if ($('#allrecords > *').length <= 4) { page(); } else { popup(); }
+	if (productIsPopup()) {
+		popup();
+	} else {
+		page();
+	}
 	function popup() {
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.open("GET", tovar.attr('data-product-url'), false);
@@ -351,6 +364,7 @@ function productOnPhoto(tovar) {
 		if (!product) return;
 		if (product.length < 2) return;
 		product = JSON.parse(product[1].slice(0, -1));
+		if (product.editions.length < 2) return;
 		var sizes = [];
 		var format = {
 			'2steblya': 'фор мат',
@@ -364,7 +378,8 @@ function productOnPhoto(tovar) {
 		}
 		if (!photos.length) return;
 		var i = 0;
-		tovar.find('.t-slds__main .t-slds__bgimg').each(function () {
+		tovar.find('.t-slds__main .t-slds__bgimg').each(function (j, e) {
+			if (j < 2) return;
 			if (typeof photos[i + 1] !== 'undefined') {
 				if ($(this).attr('data-original') == photos[i + 1][1]) i++;
 			}
@@ -380,6 +395,34 @@ function productOnPhoto(tovar) {
 			charc.html('<b>на фото</b> ' + sizes.join(', ')).prependTo(tovar.find('.js-store-prod-all-charcs'));
 		}
 	}
+}
+
+/**
+ * если в товаре есть сезонные цветы
+ */
+function productFlowersSeason(tovar) {
+	var flowers = Object.keys(flowersSeasons).join('|');
+	var block = tovar.find('.js-store-prod-all-text');
+	tovar.find('.js-store-prod-charcs').each(function () {
+		if (!$(this).text().startsWith('состав')) return;
+		var regex = new RegExp(`состав: с (${flowers})`);
+		var flower = $(this).text().match(regex);
+		if (!flower) return;
+		if (flower.length < 2) return;
+		var seasonMsg = {
+			'2steblya': {
+				'пион': 'если сезон пионов (' + flowersSeasons['пион'] + ') закончилса, то мы поставим вместо их кросивые пивоно видные розы',
+				'георгина': 'если сезон георгин (' + flowersSeasons['георгина'] + ') закончилса, то мы поставим вместо их кросивые розы'
+			},
+			'staytrueflowers': {
+				'пион': '',
+				'георгина': ''
+			}
+		}
+		if (!seasonMsg[site][flower[1]]) return;
+		var msg = '<br><br><strong>' + seasonMsg[site][flower[1]] + '</strong>';
+		block.html(block.html() + msg);
+	});
 }
 
 /**
@@ -688,7 +731,6 @@ function owlVitrina(vitrinaBlocks) {
 	setInterval(function () {
 		if (showed) return;
 		var vitrinaList = getVitrinaTovarsIds();
-		if (vitrinaList.length < 2) return; // на витрине всегда есть НИ ТАКОЙ КАК ВСЕ
 		catalog = $('.uc-vitrina__catalog');
 		if (!catalog.length) return;
 		tovars = catalog.find('.js-store-grid-cont .js-product');
@@ -702,26 +744,15 @@ function owlVitrina(vitrinaBlocks) {
 
 	/* показываем витрину */
 	function vitrinaShow() {
-		vitrinaBlocks.css('opacity', 0).show();
+		vitrinaBlocks.show();
 		showed = true;
-		var int = setInterval(
-			function () {
-				if (catalog.find('.owl-item').width() < 200) return;
-				clearInterval(int);
-				owlNavButtons(catalog);
-				owlLazyLoadChanged(catalog);
-				vitrinaBlocks.css('opacity', 1);
-			}, 100
-		);
-
+		owlNavButtons(catalog);
+		owlLazyLoadChanged(catalog);
 	}
 	/* удаляем с витрины ненужное */
 	function vitrinaRemoveJunk() {
 		/* сепараторы */
 		owlRemoveSeparators(catalog);
-		/* НИ ТАКОЙ */
-		catalog.find('.js-store-grid-cont .js-product:first').remove();
-		tovarsLength--;
 		/* распроданный товар */
 		tovars.each(function () {
 			var tovar = $(this);
@@ -735,7 +766,7 @@ function owlVitrina(vitrinaBlocks) {
 		var onScreen = 1;
 		if ($(window).width() > 550) onScreen++;
 		if ($(window).width() > 850) onScreen++;
-		if (onScreen == 3) catalog.addClass('twoItems');
+		if (onScreen == 2) catalog.addClass('twoItems');
 		catalog.find('.js-store-grid-cont').owlCarousel({
 			items: (tovarsLength > onScreen ? onScreen : tovarsLength),
 			margin: 30,
