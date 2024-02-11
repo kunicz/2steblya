@@ -387,8 +387,8 @@ function productOnPhoto(tovar) {
 		});
 		if (site == '2steblya') {
 			tovar.find('.t-typography__characteristics').each(function () {
-				if (!$(this).find('b').text() == 'на фото') return;
-				$(this).remove();
+				if (!$(this).find('b').text() != 'на фото') return;
+				$(this).hide();
 				return false;
 			});
 			var charc = $('<p class="t-typography__characteristics js-store-prod-charcs costumized"></p>');
@@ -502,7 +502,12 @@ function productReplaceCardImgWithText(tovar, catalog) {
 		ids['2steblya'].push(103878497051);
 		ids['2steblya'].push(448865187471);
 		ids['2steblya'].push(260954710551);
+		ids['2steblya'].push(261571212781);
+		ids['2steblya'].push(205136042441);
+		ids['2steblya'].push(900932199741);
+		ids['2steblya'].push(227549887751);
 		ids['2steblya'].push(953890300331); // всрадость
+		ids['2steblya'].push(682388766291); // жопка
 		if (ids[site].includes(getTovarId(tovar))) return false;
 		return true;
 	}
@@ -573,7 +578,7 @@ function productRemoveCharcs(charcBlock) {
 		'2steblya': ['гамма', 'цвет', 'состав'],
 		'staytrueflowers': []
 	}
-	if (techCharcs[site].includes(charcBlock.children('b').text())) charcBlock.remove();
+	if (techCharcs[site].includes(charcBlock.children('b').text())) charcBlock.hide();
 }
 
 /**
@@ -731,6 +736,7 @@ function owlVitrina(vitrinaBlocks) {
 	setInterval(function () {
 		if (showed) return;
 		var vitrinaList = getVitrinaTovarsIds();
+		if (!vitrinaList.length) return;
 		catalog = $('.uc-vitrina__catalog');
 		if (!catalog.length) return;
 		tovars = catalog.find('.js-store-grid-cont .js-product');
@@ -744,10 +750,17 @@ function owlVitrina(vitrinaBlocks) {
 
 	/* показываем витрину */
 	function vitrinaShow() {
-		vitrinaBlocks.show();
+		vitrinaBlocks.css('opacity', 0).show();
 		showed = true;
-		owlNavButtons(catalog);
-		owlLazyLoadChanged(catalog);
+		var int = setInterval(
+			function () {
+				if (catalog.find('.owl-item').width() < 230) return;
+				clearInterval(int);
+				owlNavButtons(catalog);
+				owlLazyLoadChanged(catalog);
+				vitrinaBlocks.css('opacity', 1);
+			}, 100
+		);
 	}
 	/* удаляем с витрины ненужное */
 	function vitrinaRemoveJunk() {
@@ -766,7 +779,7 @@ function owlVitrina(vitrinaBlocks) {
 		var onScreen = 1;
 		if ($(window).width() > 550) onScreen++;
 		if ($(window).width() > 850) onScreen++;
-		if (onScreen == 2) catalog.addClass('twoItems');
+		if (onScreen > 1 && catalog.find('.js-store-grid-cont .js-product').length == 2) catalog.addClass('twoItems');
 		catalog.find('.js-store-grid-cont').owlCarousel({
 			items: (tovarsLength > onScreen ? onScreen : tovarsLength),
 			margin: 30,

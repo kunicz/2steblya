@@ -42,6 +42,8 @@ function cartFunctions() {
 	cartSetCookies();
 	cartUseCookies();
 	cartHideOtkudaUznal();
+	cartHtmlEntities();
+	cartLovixlube();
 	cartSuccess();
 }
 
@@ -108,7 +110,7 @@ function cartInputContainersClasses() {
 function cartCountItems() {
 	var oldVal;
 	setInterval(function () {
-		var products = $('.t706__cartwin-products > .t706__product');
+		var products = $('.t706__cartwin-products').children();
 		if (oldVal == products.length) return;
 		cartDynamicFunctions();
 		oldVal = products.length;
@@ -140,7 +142,7 @@ function cartDelivery() {
 	datePicker();
 	deliveryInterval();
 	telegramLinkInDateFieldDescription();
-	price();
+	//price();
 
 	/**
 	 * проверяем не наступило ли завтра (раз в минуту)
@@ -280,7 +282,7 @@ function cartDelivery() {
 		function vitrinaTodayPurchase() {
 			var vitrinaList = getVitrinaTovarsIds();
 			if (!allowedTodayProducts[site].length && !vitrinaList.length) return;
-			var allow = true;
+			var allow = false;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			var allowedTovars = [];
@@ -289,13 +291,12 @@ function cartDelivery() {
 			});
 			tovars.each(function () {
 				var id = getTovarInCartId($(this));
-				if (allowedTovars.includes(id) || vitrinaList.includes(id)) return;
-				allow = false;
-				return false;
+				allow = allowedTovars.includes(id) || vitrinaList.includes(id) ? true : false;
+				if (!allow) return false;
 			});
 			if (todayUrl()) allow = true;
 			if (!allow) return;
-			if (dates['today'].getHours() >= 22) return;
+			//if (dates['today'].getHours() >= 22) return;
 			$('.t706 .t_datepicker__today').removeClass('t_datepicker__day-cell--disabled');
 
 			function todayUrl() {
@@ -321,9 +322,8 @@ function cartDelivery() {
 			if (!tovars.length) return;
 			tovars.each(function () {
 				var id = getTovarInCartId($(this));
-				if (!vitrinaList.includes(id)) return;
-				onlyToday = true;
-				return false;
+				onlyToday = vitrinaList.includes(id) ? true : false;
+				if (!onlyToday) return false;
 			});
 			if (!onlyToday) return;
 			var data = {
@@ -347,7 +347,10 @@ function cartDelivery() {
 		 * если меняется дата или меняется интервал
 		 */
 		$('body').on('change', intervalField.selector + ',' + dateField.selector, function () {
-			intervalField.children('option').attr('disabled', false);
+			//intervalField.children('option').attr('disabled', false);
+			for (var i = 0; i < intervalField.length; i++) {
+				$(intervalField[i]).attr('disabled', false).parent().css('opacity', 1);
+			}
 			if (!dates['selected-0']) return;
 			if (dates['selected-0'].toDateString() == dates['tomorrow-0'].toDateString()) tomorrowDeliveryInterval();
 			if (dates['selected-0'].toDateString() == dates['today-0'].toDateString()) todayDeliveryInterval();
@@ -377,17 +380,24 @@ function cartDelivery() {
 					return false;
 				});
 			});
-			for (i = 1; i <= 3; i++) {
+			for (i = 1; i <= 4; i++) {
 				if (hour >= startHour + 4 * i) disableOpt(i); //за два часа до истечения интервала
 			}
 			disableOpt(1);
 		}
 		function disableOpt(i) {
-			var opt = intervalField.children('option:nth-child(' + i + ')');
+			//select
+			/*var opt = intervalField.children('option:nth-child(' + i + ')');
 			opt.attr('disabled', true);
 			if (opt.is(':selected')) {
 				opt.removeAttr('selected');
 				opt.next().attr('selected', true);
+			}*/
+			//radiobutton
+			i--;
+			$(intervalField[i]).attr('disabled', true).parent().css('opacity', .3);
+			if ($(intervalField[i]).is(':checked')) {
+				$(intervalField[i + 1]).trigger('click');
 			}
 		}
 	}
@@ -518,7 +528,7 @@ function cartImportantFields() {
 		]
 	}
 	var lastImportant = $('#dostavka-interval');
-	lastImportant.nextAll().not(':last').hide();
+	lastImportant.nextAll().not(':last').hide().addClass('unimportantField');
 	var parts = [
 		'<div class="t-input-group t-input-group_cb" id="unimportantTrigger">',
 		'<div class="t-input-title t-descr t-descr_md">' + data[site][0] + '</div>',
@@ -536,6 +546,20 @@ function cartImportantFields() {
 		btn.nextAll().not(':last').toggle($(this).is(':checked'));
 		$('#unimportantTrigger').remove();
 	});
+}
+
+function cartHtmlEntities() {
+	var fields = $('.t706 .unimportantField textarea, .t706 .unimportantField input');
+	fields.on('blur', function () {
+		$(this).val($(this).val().replaceAll('@', '&#64;'));
+	});
+}
+
+/**
+ * добавляем ссылку на страницу в поле Lovixlube
+ */
+function cartLovixlube() {
+	$('#lovixlube[data-input-lid="1688065007506"] .t-input-block').append('<a href="/14feb" />');
 }
 
 /**
@@ -823,24 +847,27 @@ function cartOnlyOneFromVitrina() {
  */
 var promocodeApplied = [];
 function cartPromocodeTovars() {
-	if (promocodeType[site] == 'all') return;
-	/**
-	 * прмокоды только на отдельные товары (promocodeType[site] == 'individual') 
-	 */
-	var exists = false;
-	var tovars = $('.t706__product');
-	tovars.each(function () {
-		if (!promocodeTovars[site].includes(getTovarInCartId($(this)))) return;
-		exists = true;
-		return false;
-	});
-	$('#promocode > div').toggle(exists);
-	if (!promocodeApplied.length) return;
-	if (promocodeApplied.length && exists) {
-		var price = $('.t706__cartwin-prodamount-wrap .t706__cartwin-prodamount-price');
-		var currentPrice = parseInt(price.text().replace(' ', ''));
-		price.text((currentPrice - promocodeApplied[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '));
-		return;
+	if (promocodeType[site] == 'all') {
+		$('#promocode > div').show();
+	} else {
+		/**
+		 * прмокоды только на отдельные товары (promocodeType[site] == 'individual') 
+		 */
+		var exists = false;
+		var tovars = $('.t706__product');
+		tovars.each(function () {
+			if (!promocodeTovars[site].includes(getTovarInCartId($(this)))) return;
+			exists = true;
+			return false;
+		});
+		$('#promocode > div').toggle(exists);
+		/*if (!promocodeApplied.length) return;
+		if (promocodeApplied.length && exists) {
+			var price = $('.t706__cartwin-prodamount-wrap .t706__cartwin-prodamount-price');
+			var currentPrice = parseInt(price.text().replace(' ', ''));
+			price.text((currentPrice - promocodeApplied[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '));
+			return;
+		}*/
 	}
 }
 function cartPromocode() {
@@ -867,14 +894,14 @@ function cartPromocode() {
 	$('.t706 .t-inputpromocode__btn').on('click', function () {
 		setTimeout(function () {
 			if ($('.t706 .t-inputpromocode__btn').length) return;
-			var price = $('.t706__cartwin-prodamount-wrap .t706__cartwin-prodamount-price');
+			/*var price = $('.t706__cartwin-prodamount-wrap .t706__cartwin-prodamount-price');
 			var currentPrice = parseInt(price.text().replace(' ', ''));
 			var skidka = parseInt(wrapper.find('.t706__cartwin-prodamount-price').text());
-			price.text((currentPrice - skidka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '));
+			price.text((currentPrice - skidka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '));*/
 			if (site == '2steblya') {
 				wrapper.find('.t-text').addClass('showed').html($('.t-inputpromocode__wrapper .t-text').html().replace('Ваша', 'твоя').replace('Промокод', 'промокод').replace('.', ''));
 			}
-			promocodeApplied.push(skidka);
+			//promocodeApplied.push(skidka);
 		}, 500);
 	});
 }

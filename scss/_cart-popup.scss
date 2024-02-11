@@ -80,6 +80,13 @@
 
 	&-totalamount-wrap {
 		margin-bottom: 70px;
-		display: none !important;
+		color: $contrprimary-color;
+		text-align: left;
+		text-transform: lowercase;
+
+		& * {
+			font-size: $text-font-size !important;
+			font-weight: 100 !important;
+		}
 	}
 }

@@ -6,7 +6,7 @@ $menu_costumized: (
 @include if('2steblya') {
 	$menu_costumized: (
 		//новый год
-		539199854821: 'https://static.tildacdn.com/tild3738-6161-4362-a230-616135653463/santaHat.png',
+		669802060861: 'https://static.tildacdn.com/tild3738-6161-4362-a230-616135653463/santaHat.png',
 		//8 марта
 		894609841681: 'https://static.tildacdn.com/tild3735-6134-4761-a230-353138316165/flower.png'
 	);
@@ -67,34 +67,17 @@ $menu_costumized: (
 	margin-bottom: 0 !important;
 
 	&__show {
-		color: $contrprimary-color;
-		text-align: right;
-		cursor: pointer;
-		font-family: $text-font;
-		font-size: $text-font-size;
-		font-weight: 300;
-		padding: 5px 10px 10px 35px;
-		margin-bottom: 15px;
-		display: block;
+		margin: 0 20px 15px 20px;
 		float: right;
-		background-position: left center;
-		background-repeat: no-repeat;
-
-		@media screen and (min-width:1201px) {
-			padding-right: 20px;
-		}
+		@include btn;
 
 		@media screen and (max-width:976px) {
 			margin-left: auto;
 			margin-right: auto;
 			float: none;
-			display: inline-block;
-			padding-right: 0;
 		}
 
 		@include if('2steblya') {
-			background-image: url(https://static.tildacdn.com/tild3563-3865-4537-b536-393131303032/filter.png);
-
 			&::after {
 				content: 'фильтровать базар';
 			}

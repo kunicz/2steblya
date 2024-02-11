@@ -58,6 +58,11 @@
 
 			&_old {
 				opacity: .5;
+				margin: 0 10px;
+
+				& * {
+					font-size: 14px;
+				}
 			}
 		}
 

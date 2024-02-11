@@ -91,7 +91,7 @@ var specialDatesList = [
 		'm': 2,
 		'2steblya': {
 			'minPrice': 10000,
-			'exclude': []
+			'exclude': [205136042441, 663441383001] //пупырка, лучший весенний суп
 		},
 		'staytrueflowers': {
 			'minPrice': 7500,
@@ -128,7 +128,7 @@ var specialDatesList = [
  * промокоды общие "all" или штучные "individual" (только на конкретный товар)
  */
 var promocodeType = {
-	'2steblya': 'individual',
+	'2steblya': 'all',
 	'staytrueflowers': 'individual'
 }
 

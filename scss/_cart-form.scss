@@ -45,6 +45,9 @@ $cartIncompleteCheck: (
 	//промокод
 	@import 'cart-form-promocode';
 
+	//lovixlube
+	@import 'cart-form-lovixlube';
+
 	//адрес
 	#adresDataSmall {
 		&>div {
@@ -140,6 +143,45 @@ $cartIncompleteCheck: (
 
 			&::before {
 				display: none;
+			}
+		}
+	}
+}
+
+//итого цена
+@include if('2steblya') {
+	&__cartwin-totalamount {
+		&-wrap {
+			background-image: url(https://static.tildacdn.com/tild6231-6438-4534-b833-303435363564/money-smell.gif);
+			background-repeat: no-repeat;
+			background-size: 85px;
+			background-position: left center;
+			padding-left: 100px;
+			padding-top: 5px;
+			min-height: 80px;
+			margin-top: 60px;
+		}
+
+		&-info {
+			margin-top: 0 !important;
+
+			&_label:first-child::before {
+				content: 'попукочки:';
+			}
+		}
+
+		&-label::before {
+			content: 'нужно отслюнявить: '
+		}
+
+		&-info_label:first-child,
+		&-label {
+			font-size: 0 !important;
+			color: $primary-color;
+
+			&::before {
+				font-size: 18px !important;
+				color: $contrprimary-color;
 			}
 		}
 	}
