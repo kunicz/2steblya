@@ -32,7 +32,7 @@ $menu_costumized: (
 		text-transform: uppercase;
 
 		@include if('2steblya') {
-			margin: 0 10px 5px 10px !important;
+			margin: 0 15px 5px 15px !important;
 			font-size: 22px !important;
 		}
 
@@ -67,8 +67,7 @@ $menu_costumized: (
 	margin-bottom: 0 !important;
 
 	&__show {
-		margin: 0 20px 15px 20px;
-		float: right;
+		margin: 0 20px 50px 20px;
 		@include btn;
 
 		@media screen and (max-width:976px) {

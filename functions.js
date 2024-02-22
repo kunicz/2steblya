@@ -139,3 +139,103 @@ function footer() {
 		f.text(f.text().replace(startYear[site], startYear[site] + '-' + currentYear));
 	}
 }
+
+/**
+ * функция делает запрос к базе данных php.2steblya
+ * и выполняет callback, после получения данных из базы
+ */
+function getFromDB(request, callback) {
+	$.ajax({
+		url: 'https://php.2steblya.ru/ajax.php?script=' + request,
+		crossDomain: true,
+		type: 'GET',
+		success: function (data) {
+			var first = data.slice(0, 1);
+			if (first == '{' || first == '[') {
+				callback(JSON.parse(data));
+			} else {
+				callback(data);
+			}
+		}
+	});
+}
+/**
+ * функция прогоняет массив данных из БД и формирует простой одномерный массив данных
+ */
+function arrayOfValuesFromDB(data, field) {
+	if (!Array.isArray(data)) return data;
+	var arrayOfValues = [];
+	$.each(data, function (i, e) {
+		var value = e[field];
+		if (!['card_type'].includes(field)) value = parseInt(value);
+		arrayOfValues.push(value);
+	});
+	return arrayOfValues;
+}
+/**
+ * получаем из БД массив всех товаров по категориям (allowed_today, vitrina и т.д.)
+ */
+getTovarsFromDB();
+function getTovarsFromDB() {
+	var columnsFromDB = [];
+	//получаем все возможные поля таблицы (allowed_today, vitrina и т.д.)
+	getFromDB('TildaTovarsFromDB&site=&tovars=columns', function (data) {
+		columnsFromDB = data;
+	});
+	//прогоняем цикл по всем полям и получаем айдишники товаров, которые относятся к этим категориям
+	var int = setInterval(function () {
+		if (!columnsFromDB.length) return;
+		$.each(columnsFromDB, function (i, e) {
+			getFromDB('TildaTovarsFromDB&tovars=' + e['COLUMN_NAME'] + '&site=' + site, function (data) {
+				tovarsFromDB[e['COLUMN_NAME']] = arrayOfValuesFromDB(data, 'id');
+			});
+		});
+		//карточки
+		getFromDB('TildaTovarsFromDB&tovars=card_types&site=' + site, function (data) {
+			var card_types = arrayOfValuesFromDB(data, 'card_type');
+			$.each(card_types, function (i, e) {
+				getFromDB('TildaTovarsFromDB&tovars=card_type&card_type=' + e + '&site=' + site, function (data) {
+					tovarsFromDB['card_type_' + e] = arrayOfValuesFromDB(data, 'id');
+				});
+			});
+		});
+		clearInterval(int);
+	}, 100);
+	//время на производство
+	getFromDB('TildaTovarsFromDB&tovars=hours_to_produce&site=' + site, function (data) {
+		if (!Array.isArray(data)) return data;
+		tovarsFromDB['hours_to_produce'] = {};
+		$.each(data, function (i, e) {
+			tovarsFromDB['hours_to_produce'][e['id']] = parseInt(e['hours_to_produce']);
+		});
+	});
+	setTimeout(function () {
+		//console.log(tovarsFromDB);
+	}, 2000);
+}
+/**
+ * проверка, загрузились ли все товары из БД
+ */
+function isTovarsFromDBLoaded() {
+	/**
+	 * allowed_today
+	 * vitrina
+	 * card_type
+	 * card_type_no
+	 * card_type_text
+	 * card_type_image
+	 * multiple_prices
+	 * non_flowers
+	 */
+	var fieldsAmount = 8;
+	if (Object.keys(tovarsFromDB).length < fieldsAmount) return false;
+	return true;
+}
+/**
+ * проверка на наличие товаров из бд по ключу
+ */
+function isTovarsFromDBEmpty(field) {
+	if (tovarsFromDB[field] === undefined) return true;
+	if (!tovarsFromDB[field].length) return true;
+	return false;
+}

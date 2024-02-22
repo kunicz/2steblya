@@ -33,7 +33,7 @@
 }
 
 //карточка к букету
-.t-store__card__bgimg_second::after {
+&:not(.noCard) .t-store__card__bgimg_second::after {
 	@include plashka(0, auto, auto, 0, $contrprimary-color, $primary-color, 300);
 
 	@include if('stf') {

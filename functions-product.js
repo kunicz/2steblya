@@ -3,6 +3,7 @@
  */
 function product() {
 	var int = setInterval(function () {
+		if (!isTovarsFromDBLoaded()) return;
 		if (window.location.pathname.includes('/tproduct/')) {
 			/* страница продукта /tproduct/... */
 			productLogoInHeader();
@@ -18,7 +19,15 @@ function product() {
 			var catalogs = $('.js-store');
 			if (!catalogs.length) return;
 			catalogs.each(function () {
-				productCatalogFunctions($(this));
+				var catalog = $(this);
+				//запускаем функции каталога (в том числе и мутатор, который следит за изменениями)
+				productCatalogFunctions(catalog);
+				//запускаем функции товаров каталога (бомжетность, карточка и пр.)
+				//до введения проверки на загрузку товаров из БД это делал мутатор. По видимому, блоки товаров тильды загружались позже мутатора, поэтому он успевал их обработать
+				//сейчас DOM строится раньше чем загружаются товары из БД, поэтому принудительно накатываем разово функции товаров
+				$.each(catalog.find('.js-store-grid-cont .js-product:not(.loaded)'), function () {
+					productCatalogTovarFunctions($(this), catalog);
+				});
 			});
 			clearInterval(int);
 		}
@@ -65,7 +74,6 @@ function productCatalogTovarFunctions(tovar, catalog) {
  * функции для каталога 
  */
 function productCatalogFunctions(catalog) {
-	if (isVitrina(catalog, true)) return;
 	productPopupOpen(catalog);
 	productPopupClose();
 	productCatalogMenu(catalog);
@@ -200,9 +208,8 @@ function productCatalogMutationObserver(catalog) {
  */
 function productHideVitrinaDuplicate(tovar, catalog) {
 	if (isVitrina(catalog)) return;
-	var vitrinaList = getVitrinaTovarsIds();
-	if (!vitrinaList.length) return;
-	$.each(vitrinaList, function (i, id) {
+	if (isTovarsFromDBEmpty('vitrina')) return;
+	$.each(tovarsFromDB['vitrina'], function (i, id) {
 		if (getTovarId(tovar) != id) return;
 		tovar.hide();
 	});
@@ -212,51 +219,17 @@ function productHideVitrinaDuplicate(tovar, catalog) {
  * цена товара
  */
 function productPrices(tovar, catalog) {
-	var options;
-	multipleVariantsProducts();
+	multiplePrices();
 	if (isVitrina(catalog)) return;
-	specialProducts();
 	minPriceCheck();
-	//priceInOption();
 
 	/**
-	 * добавляем класс товару, у которого есть торговые предложения
+	 * добавляем товарам класс, который отвечает за "цена от"
 	 */
-	function multipleVariantsProducts() {
-		options = tovar.find('[data-edition-option-id="' + productFormat[site] + '"] select option');
-		if (options.length < 2) return;
+	function multiplePrices() {
+		if (!isTovarsFromDBEmpty('multiple_prices') && !tovarsFromDB['multiple_prices'].includes(getTovarId(tovar))) return;
+		if (tovar.find('[data-edition-option-id="' + productFormat[site] + '"] select option').length < 2) return; //если формат остался только один, например, остальное раскупили
 		tovar.addClass('multiplePrices');
-	}
-
-	/**
-	 * добавляем класс товару, у которого нет торговых предложений, но есть различные ценовые варианты
-	 */
-	function specialProducts() {
-		var specialProducts = {
-			'2steblya': [
-				857613433221, //донатошная
-				373328609241 //пионы для кисуни
-			],
-			'staytrueflowers': []
-		}
-		if (!specialProducts[site].includes(getTovarId(tovar))) return;
-		tovar.addClass('multiplePrices');
-	}
-
-	/**
-	 * добавляем опцию
-	 */
-	function priceInOption() {
-		options.each(function () {
-			var optionTitle = $(this).text();
-			var price;
-			$.each(productPriceLevels[site], function (p, levels) {
-				if (!levels.includes(optionTitle)) return;
-				price = p;
-				return false;
-			});
-			$(this).attr('price', price);
-		});
 	}
 
 	/**
@@ -366,15 +339,11 @@ function productOnPhoto(tovar) {
 		product = JSON.parse(product[1].slice(0, -1));
 		if (product.editions.length < 2) return;
 		var sizes = [];
-		var format = {
-			'2steblya': 'фор мат',
-			'staytrueflowers': 'формат'
-		};
 		var photos = [];
 		for (var i = 0; i < product.editions.length; i++) {
 			if (!product.editions[i].img) continue;
-			photos.push([product.editions[i][format[site]], product.editions[i].img]);
-			sizes.push(product.editions[i][format[site]]);
+			photos.push([product.editions[i][productFormat[site]], product.editions[i].img]);
+			sizes.push(product.editions[i][productFormat[site]]);
 		}
 		if (!photos.length) return;
 		var i = 0;
@@ -429,14 +398,8 @@ function productFlowersSeason(tovar) {
  * скрываем товары, которые должны быть скрыты
  */
 function productsTotHide(tovar) {
-	var data = {
-		// нитакой как все, индпошив
-		'2steblya': [105671635591, 618173603491],
-		'staytrueflowers': [400814140661, 796318578141]
-	}
-	if (data[site].includes(getTovarId(tovar))) {
-		tovar.prev('.t-clear').addBack().hide();
-	}
+	if (!isTovarsFromDBEmpty('hidden') && !tovarsFromDB['hidden'].includes(getTovarId(tovar))) return;
+	tovar.prev('.t-clear').addBack().hide();
 }
 
 /**
@@ -444,7 +407,6 @@ function productsTotHide(tovar) {
  */
 function productReplaceCardImgWithText(tovar, catalog) {
 	if (!isCardToBeReplaced(tovar)) {
-		removeOption();
 		removeSelect(catalog);
 		return;
 	}
@@ -467,18 +429,7 @@ function productReplaceCardImgWithText(tovar, catalog) {
 			card.height(card.width());
 		}, 500);
 	}
-	removeOption();
 	removeSelect(catalog);
-
-	/**
-	 * удаляем опцию "с нашей карточкой", если нет текста карточки
-	 */
-	function removeOption() {
-		if (getTovarCardText(tovar)) return;
-		tovar.find('.js-product-option').find('select option[value="с нашей карточкой"]').remove();
-		tovar.find('[data-slide-bullet-for="2"]').remove();
-		tovar.addClass('noCard');
-	}
 
 	/**
 	 * удаляем селект "выебри карточку", чтоб он не улетал в срм
@@ -492,24 +443,9 @@ function productReplaceCardImgWithText(tovar, catalog) {
 	 * если товару не надо подменять карточку
 	 */
 	function isCardToBeReplaced(tovar) {
-		// по разделам к сожалению, нельзя использовать атрибут data-product-part-uid (айдишники разделов), так как этот атрибут отсутствует на страницах товаров (только в попапе)
-		// по айдишникам товаров (data-product-gen-uid)
-		var ids = {
-			'2steblya': [],
-			'staytrueflowers': []
-		}
-		ids['2steblya'].push(896292515801); // 14 фераля 2023 (love is)
-		ids['2steblya'].push(103878497051);
-		ids['2steblya'].push(448865187471);
-		ids['2steblya'].push(260954710551);
-		ids['2steblya'].push(261571212781);
-		ids['2steblya'].push(205136042441);
-		ids['2steblya'].push(900932199741);
-		ids['2steblya'].push(227549887751);
-		ids['2steblya'].push(953890300331); // всрадость
-		ids['2steblya'].push(682388766291); // жопка
-		if (ids[site].includes(getTovarId(tovar))) return false;
-		return true;
+		if (!isTovarsFromDBEmpty('card_type_no') && tovarsFromDB['card_type_no'].includes(getTovarId(tovar))) tovar.addClass('noCard');
+		if (!isTovarsFromDBEmpty('card_type_text') && tovarsFromDB['card_type_text'].includes(getTovarId(tovar))) return true;
+		return false;
 	}
 }
 
@@ -704,24 +640,10 @@ function getTovarPrice(tovar) {
 }
 
 /**
- * получаем айдишники товаров с витрины
- */
-function getVitrinaTovarsIds() {
-	var vitrinaList = [];
-	var vitrinaTovars = $('.uc-vitrinaFooter .js-product.t-store__card');
-	if (!vitrinaTovars.length) return vitrinaList;
-	vitrinaTovars.each(function () {
-		vitrinaList.push(getTovarId($(this)));
-	});
-	return vitrinaList;
-}
-
-/**
  * если каталог - это витрина
  */
-function isVitrina(catalog, inFooter = false) {
-	var c = '.uc-' + (inFooter ? 'vitrinaFooter' : 'vitrina__catalog');
-	if (catalog.parents(c).length) return true;
+function isVitrina(catalog) {
+	if (catalog.parents('.uc-vitrina__catalog').length) return true;
 	return false;
 }
 
@@ -735,10 +657,9 @@ function owlVitrina(vitrinaBlocks) {
 	var tovarsLength = 0;
 	setInterval(function () {
 		if (showed) return;
-		var vitrinaList = getVitrinaTovarsIds();
-		if (!vitrinaList.length) return;
 		catalog = $('.uc-vitrina__catalog');
 		if (!catalog.length) return;
+		catalog.addClass('owlCatalog');
 		tovars = catalog.find('.js-store-grid-cont .js-product');
 		tovarsLength = tovars.length;
 		if (!tovarsLength) return;
@@ -754,11 +675,12 @@ function owlVitrina(vitrinaBlocks) {
 		showed = true;
 		var int = setInterval(
 			function () {
-				if (catalog.find('.owl-item').width() < 230) return;
 				clearInterval(int);
 				owlNavButtons(catalog);
 				owlLazyLoadChanged(catalog);
-				vitrinaBlocks.css('opacity', 1);
+				setTimeout(function () {
+					vitrinaBlocks.css('opacity', 1);
+				}, 500);
 			}, 100
 		);
 	}

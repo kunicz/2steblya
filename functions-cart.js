@@ -3,6 +3,7 @@
  */
 function cart() {
 	var int = setInterval(function () {
+		if (!isTovarsFromDBLoaded()) return;
 		if (!$('.t706__cartwin-content').length) return;
 		if (!$('.t706 [name="otkuda-uznal-o-nas"]').length) return;
 		if (!cartEnabled[site]) {
@@ -27,6 +28,7 @@ function cartFunctions() {
 	cartInputContainersClasses();
 	cartPromocode();
 	cartDelivery();
+	cartDeliveryZazhopinsk();
 	cartZakazchikNoTelegramNick();
 	cartZakazchikPoluchatel();
 	cartFormValidationTexts();
@@ -34,6 +36,7 @@ function cartFunctions() {
 	cartHerZnaetPoluchatelya();
 	cartCountItems();
 	cartPlusMinusItems();
+	cartDopsReminder();
 	cartPreventCloseOnOverlayClick();
 	cartErrorsMessageOnClick();
 	cartImportantFields();
@@ -54,7 +57,7 @@ function cartDynamicFunctions() {
 	cartProductOptionsInOneLine();
 	cartOtsluniavit();
 	cartOnlyOneFromVitrina();
-
+	cartPayedDeliveryForOnlyDops();
 	cartDonat();
 	cartPromocodeTovars();
 	cartShow();
@@ -127,13 +130,24 @@ function cartPlusMinusItems() {
 }
 
 /**
+ * напоминалка о допах после товаров
+ */
+function cartDopsReminder() {
+	var data = {
+		'2steblya': 'хош добавить <a href="/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%9F%D0%9E%D0%94%D0%90%D0%A0+%D0%9E%D0%A7%D0%9A%D0%98&tfc_div=:::">подар очек</a> к букету? а што насчёт <a href="https://2steblya.ru/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%92%D0%90%D0%97%D0%AB&tfc_div=:::">вазы</a>?',
+		'staytrueflowers': ''
+	}
+	if (site != '2steblya') return;
+	$('.t706__cartwin-products').after('<div class="t706__cartwin-dopsReminder">' + data[site] + '</div>');
+}
+
+/**
  * доставка
  */
 function cartDelivery() {
 	var dates = {};
 	var dateField = $('.t706 [name="dostavka-date"]');
 	var intervalField = $('.t706 [name="dostavka-interval"]');
-	var priceField = $('.t706 [name="dostavka-price"]');
 
 	dateField.prop('readonly', true);
 
@@ -142,7 +156,6 @@ function cartDelivery() {
 	datePicker();
 	deliveryInterval();
 	telegramLinkInDateFieldDescription();
-	//price();
 
 	/**
 	 * проверяем не наступило ли завтра (раз в минуту)
@@ -192,7 +205,7 @@ function cartDelivery() {
 			if (executed) return;
 			selectedDay();
 			specialDates();
-			vitrinaTodayPurchase();
+			allowToday();
 			vitrinaOnlyTwoDays();
 			dateField.attr('disabled', true);
 			executed = true;
@@ -218,7 +231,7 @@ function cartDelivery() {
 		});
 
 		/**
-		 * обнуляем дату доставки: если корзина зхакрывается
+		 * обнуляем дату доставки: если корзина закрывается
 		 */
 		$('body').on('click', '.t706__close-button,.t706__product-del', function () {
 			dateField.val('');
@@ -232,7 +245,7 @@ function cartDelivery() {
 			if (dateField.val()) datePicker.find('[data-picker="' + dates['selected-yyyy'] + '-' + dates['selected-m'] + '-' + dates['selected-d'] + '"]').addClass('t_datepicker__selected-day');
 		}
 
-		/* перебираем все ячейки календаря */
+		/* перебираем все ячейки календаря в поисках особенных дат */
 		function specialDates() {
 			$('.t706 .t_datepicker__day-cell').each(function () {
 				var cell = $(this);
@@ -249,20 +262,27 @@ function cartDelivery() {
 		 */
 		function applySpecialDate(specialDate, faded) {
 			var allow = false;
+			var hasAllowedTovar = false;
+			var allowedTovars = [];
 			var tovars = $('.t706__product');
-			if (tovars.length) {
+			if (!tovars.length) return;
+			//первичный цикл по товарам : ищем товары, которые не разрешены
+			//если такие товары есть в корзине,
+			tovars.each(function () {
+				var allowedTovar = isAllowed($(this));
+				if (allowedTovar) hasAllowedTovar = true;
+				allowedTovars.push(allowedTovar);
+			});
+			if (!hasAllowedTovar) return;
+			//вторичный цикл, если товаров в корзине больше одного
+			//проверяем, есть ли помимо разрешенного(ых) еще и допники
+			allow = true;
+			if (tovars.length > 1) {
 				tovars.each(function () {
-					var tovar = $(this);
-					if (specialDate[site]['exclude'].includes(getTovarInCartId(tovar))) { // исключения (exclude)
-						allow = true;
-						return;
-					}
-					if (getTovarInCartPrice(tovar) >= specialDate[site]['minPrice']) { // цены (minPrice)
-						allow = true;
-						return;
-					}
+					var id = getTovarInCartId($(this));
+					if (allowedTovars.includes(id)) return;
+					if (isDopnik(id)) return;
 					allow = false;
-					return false;
 				});
 			}
 			if (allow) return;
@@ -274,24 +294,34 @@ function cartDelivery() {
 			zaglushka = $('<div class="t_datepicker__specialDate" title="' + zaglushka + '">от<br>' + minPriceK + '</div>');
 			if (faded) zaglushka.css('opacity', .4);
 			datePicker.find('[data-picker$="-' + specialDate['m'] + '-' + specialDate['d'] + '"]').hide().after(zaglushka);
+
+			//проверяем, находится ли товар в массиве товаров специальной даты
+			//пока что этот массив объявляется в globals.js, но надо переработать его в БД
+			function isAllowed(tovar) {
+				var id = getTovarInCartId(tovar);
+				// исключения (exclude)
+				if (specialDate[site]['exclude'].includes(id)) return id;
+				// цены (minPrice)
+				if (getTovarInCartPrice(tovar) >= specialDate[site]['minPrice']) return id;
+				return false;
+			}
+			//проверяем, может ли этот товар быть сопуткой
+			function isDopnik(id) {
+				if (isTovarsFromDBEmpty('dopnik')) return false;
+				return tovarsFromDB['dopnik'].includes(id);
+			}
 		}
 
 		/**
 		 * открываем продажу на сегодня
 		 */
-		function vitrinaTodayPurchase() {
-			var vitrinaList = getVitrinaTovarsIds();
-			if (!allowedTodayProducts[site].length && !vitrinaList.length) return;
+		function allowToday() {
+			if (isTovarsFromDBEmpty('allowed_today')) return;
 			var allow = false;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
-			var allowedTovars = [];
-			$.each(allowedTodayProducts[site], function (i, allowedTovar) {
-				allowedTovars.push(allowedTovar[0]);
-			});
 			tovars.each(function () {
-				var id = getTovarInCartId($(this));
-				allow = allowedTovars.includes(id) || vitrinaList.includes(id) ? true : false;
+				allow = tovarsFromDB['allowed_today'].includes(getTovarInCartId($(this))) ? true : false;
 				if (!allow) return false;
 			});
 			if (todayUrl()) allow = true;
@@ -315,14 +345,12 @@ function cartDelivery() {
 		 * витрина только на сегодня и завтра
 		 */
 		function vitrinaOnlyTwoDays() {
-			var vitrinaList = getVitrinaTovarsIds();
-			if (!vitrinaList.length) return;
+			if (isTovarsFromDBEmpty('vitrina')) return;
 			var onlyToday = false;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			tovars.each(function () {
-				var id = getTovarInCartId($(this));
-				onlyToday = vitrinaList.includes(id) ? true : false;
+				onlyToday = tovarsFromDB['vitrina'].includes(getTovarInCartId($(this))) ? true : false;
 				if (!onlyToday) return false;
 			});
 			if (!onlyToday) return;
@@ -347,7 +375,6 @@ function cartDelivery() {
 		 * если меняется дата или меняется интервал
 		 */
 		$('body').on('change', intervalField.selector + ',' + dateField.selector, function () {
-			//intervalField.children('option').attr('disabled', false);
 			for (var i = 0; i < intervalField.length; i++) {
 				$(intervalField[i]).attr('disabled', false).parent().css('opacity', 1);
 			}
@@ -366,19 +393,20 @@ function cartDelivery() {
 
 		/**
 		 * доставка сегодня
-		 * на сегодня можно заказать либо с витрины, либо товары из allowedTodayProducts
+		 * на сегодня можно заказать только товары из tovarsFromDB['allowed_today']
+		 * в этот массив собраны все товары с флагом allowed_today=1 и vitrina=1
 		 */
 		function todayDeliveryInterval() {
+			if (isTovarsFromDBEmpty('allowed_today')) return;
 			var hour = dates['today'].getHours();
 			var tovars = $('.t706__product');
 			var startHour = 6;
 			tovars.each(function () {
-				var tovar = $(this);
-				$.each(allowedTodayProducts, function (i, product) {
-					if (product[0] != getTovarInCartId(tovar)) return true;
-					startHour -= product[1];
-					return false;
-				});
+				var tovarId = getTovarInCartId($(this));
+				if (!tovarsFromDB['allowed_today'].includes(tovarId)) return;
+				if (isTovarsFromDBEmpty('hours_to_produce')) return;
+				if (!Object.keys(tovarsFromDB['hours_to_produce']).includes(tovarId)) return;
+				startHour -= tovarsFromDB['hours_to_produce'][tovarId];
 			});
 			for (i = 1; i <= 4; i++) {
 				if (hour >= startHour + 4 * i) disableOpt(i); //за два часа до истечения интервала
@@ -386,14 +414,6 @@ function cartDelivery() {
 			disableOpt(1);
 		}
 		function disableOpt(i) {
-			//select
-			/*var opt = intervalField.children('option:nth-child(' + i + ')');
-			opt.attr('disabled', true);
-			if (opt.is(':selected')) {
-				opt.removeAttr('selected');
-				opt.next().attr('selected', true);
-			}*/
-			//radiobutton
 			i--;
 			$(intervalField[i]).attr('disabled', true).parent().css('opacity', .3);
 			if ($(intervalField[i]).is(':checked')) {
@@ -414,13 +434,15 @@ function cartDelivery() {
 		var html = descr.text().replace(data[site][0], '<a href="' + data[site][1] + '">' + data[site][0] + '</a>');
 		descr.html(html);
 	}
-
-	/**
-	 * стоимость доставки
-	 */
-	function price() {
-		priceField.val(500);
-	}
+}
+/**
+ * обрабатываем галочку для доставки в зажопинск
+ */
+function cartDeliveryZazhopinsk() {
+	$('#adres-zazhopinsk').wrap('<div id="adres-zazhopinsk__cont"></div>');
+	$('#adres-zazhopinsk input').on('change', function () {
+		deliveryPriceInterval(!$(this).is(':checked')); //для зажопинцев доставка беслпатно на сайте (отдельно в переписке будет обозначена менеджером)
+	});
 }
 
 /**
@@ -440,7 +462,11 @@ function cartDonat() {
 	var tovars = $('.t706__product');
 	if (!tovars.length) return;
 	if (tovars.length > 1) return;
-	if (getTovarInCartId(tovars.eq(0)) != 857613433221) return;
+	var data = {
+		'2steblya': 857613433221,
+		'staytrueflowers': ''
+	}
+	if (getTovarInCartId(tovars.eq(0)) != data[site]) return;
 	$('.t706__cartwin-content').addClass('donat');
 	cartIncompleteRemoveRequired();
 	cartDonatComment();
@@ -563,6 +589,39 @@ function cartLovixlube() {
 }
 
 /**
+ * платная доставка, если в корзине только эти товары
+ */
+function cartPayedDeliveryForOnlyDops() {
+	if (isTovarsFromDBEmpty('dopnik')) return;
+	var onlyDops = false;
+	var tovars = $('.t706__product');
+	if (!tovars.length) return;
+	tovars.each(function () {
+		onlyDops = tovarsFromDB['dopnik'].includes(getTovarInCartId($(this))) ? true : false;
+		if (!onlyDops) return false;
+	});
+	if (!onlyDops) {
+		$('#adres-zazhopinsk input').prop('checked', false);
+		$('#adres-zazhopinsk').hide();
+		deliveryPriceInterval(false);
+		return;
+	}
+	$('#adres-zazhopinsk').show();
+	deliveryPriceInterval(true);
+}
+/**
+ * платный/бесплатный интервад доставки
+ * последний вариант игнорируется, так как он всегда платный (с 22 до 8)
+ */
+function deliveryPriceInterval(action) {
+	//action - true/false (increase/decrease)
+	$('#dostavka-interval label:not(:last) input').attr('data-delivery-price', action ? $('.t706 [name="dostavka-price"]').val() : '');
+	var selectedInterval = $('input[data-delivery-price]:checked');
+	$('input[data-delivery-price]:last').trigger('click');
+	selectedInterval.trigger('click');
+}
+
+/**
  * поля обязательные если cartExpanded
  */
 function cartRequiredFields() {
@@ -586,7 +645,7 @@ function cartFormValidationTexts() {
 		'2steblya': [
 			'ну не-е-е-е...',                       	//name
 			'скинь телефончик, а?',                 	//phone
-			//'судью на мыло. но на какое?',            	//email
+			//'судью на мыло. но на какое?',            //email
 			'а куда фотку букета выслать?',         	//telegram
 			'ты календарь... переверни...',         	//delivery date
 			'а вдруг разбудим?',                     	//delivery interval
@@ -610,9 +669,7 @@ function cartAdresPoluchatelya() {
 	var adresProps = ['city', 'street', 'dom', 'kvartira', 'korpus', 'stroenie', 'podezd', 'etazh', 'domofon'];
 	var adresInputs = {};
 	var adresSmall = [];
-
 	collectAdresFields();
-	//buildAdres();
 	wrapAdresFields();
 
 	/**
@@ -623,28 +680,6 @@ function cartAdresPoluchatelya() {
 			adresInputs[val] = $('.t706 [name="adres-poluchatelya-' + val + '"]');
 			if (['city', 'street'].includes(val)) return;
 			adresSmall.push('#adres-poluchatelya-' + val);
-		});
-	}
-
-	/**
-	 * собираем адрес получателя из многих полей, в одно
-	 */
-	function buildAdres() {
-		$.each(adresInputs, function (i, input) {
-			input.addClass('adresInput');
-			input.on('change', function () {
-				var adresValue = '';
-				adresValue += 'г.' + (adresInputs.city.val() ? adresInputs.city.val() : 'Москва');
-				if (adresInputs.street.val()) adresValue += ', ул.' + adresInputs.street.val().replace(/^[Уу]л\.*/, '').replace(/^ица\s/, '').trim();
-				if (adresInputs.dom.val()) adresValue += ' ' + adresInputs.dom.val();
-				if (adresInputs.korpus.val()) adresValue += 'к' + adresInputs.korpus.val();
-				if (adresInputs.stroenie.val()) adresValue += 'c' + adresInputs.stroenie.val();
-				if (adresInputs.kvartira.val()) adresValue += ', кв.' + adresInputs.kvartira.val();
-				if (adresInputs.podezd.val()) adresValue += ', подъезд ' + adresInputs.podezd.val();
-				if (adresInputs.etazh.val()) adresValue += ', этаж ' + adresInputs.etazh.val();
-				//if(adresInputs.domofon.val())    adresValue += ', домофон ' +adresInputs.domofon.val();
-				$('[name="adres-poluchatelya"]').val(adresValue);
-			});
 		});
 	}
 
@@ -668,7 +703,6 @@ function cartHerZnaetPoluchatelya() {
 	}
 	herZnaet.on('change', function () {
 		$('#adresData').toggle(!$(this).is(':checked'));
-		//$('.t706 [name="adres-poluchatelya"]').val('');
 		$('.t706 [name="courier-comment"]').val('').trigger('change');
 		$('.t706 .adresInput').each(function () {
 			$(this).val('');
@@ -785,11 +819,11 @@ function cartFormIncomplete() {
  * удаляем атрибут "обязательное поле" у поля cartIncomplete
  */
 function cartIncompleteRemoveRequired() {
-	var field = {
+	var data = {
 		'2steblya': '1675967313188',
 		'staytrueflowers': ''
 	}
-	$('.t706 [data-input-lid="' + field[site] + '"] input').removeAttr('data-tilda-req');
+	$('.t706 [data-input-lid="' + data[site] + '"] input').removeAttr('data-tilda-req');
 }
 
 /**
@@ -830,13 +864,12 @@ function cartIconUponHeader() {
  * убираем возможность менять количество в корзине для товаров с витрины
  */
 function cartOnlyOneFromVitrina() {
-	var vitrinaList = getVitrinaTovarsIds();
-	if (!vitrinaList.length) return;
+	if (!tovarsFromDB['vitrina'].length) return;
 	var tovars = $('.t706__product');
 	if (!tovars.length) return;
 	tovars.each(function () {
 		var id = getTovarInCartId($(this));
-		if (!vitrinaList.includes(id)) return;
+		if (!isTovarsFromDBEmpty('vitrina') && !tovarsFromDB['vitrina'].includes(id)) return;
 		if (id == nitakoi[site]) return; //НИТАКОЙ
 		$(this).children('.t706__product-plusminus').empty();
 	});

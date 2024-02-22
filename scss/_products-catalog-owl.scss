@@ -1,0 +1,62 @@
+.owlCatalog {
+
+	//каталог
+	& {
+		text-align: center;
+		background-repeat: no-repeat;
+		background-position: top center;
+
+		&.twoItems {
+			.owl-item:first-child .js-product {
+				float: right;
+			}
+
+			.owl-item:last-child .js-product {
+				float: left;
+			}
+		}
+
+		.t-store {
+			padding: 0 30px;
+		}
+
+		//товар
+		.t-store__grid-cont {
+			padding: 0 !important;
+
+			.js-product {
+				margin: 0 !important;
+				padding: 0 !important;
+				width: 100% !important;
+				max-width: 360px;
+
+				.card {
+					&__container {
+						padding: 25px;
+
+						&::before {
+							display: none;
+						}
+					}
+
+					&__title {
+						font-size: 1.6em !important;
+					}
+
+					&__text,
+					&__buket {
+						font-size: .8em;
+					}
+
+					&__your-text {
+						display: none;
+					}
+				}
+
+				.t-store__card__descr {
+					display: none;
+				}
+			}
+		}
+	}
+}

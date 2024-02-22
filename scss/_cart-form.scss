@@ -184,6 +184,11 @@ $cartIncompleteCheck: (
 				color: $contrprimary-color;
 			}
 		}
+
+		&-info_value *,
+		& * {
+			font-weight: 600 !important;
+		}
 	}
 }
 

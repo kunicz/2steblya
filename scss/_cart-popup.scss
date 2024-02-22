@@ -89,4 +89,14 @@
 			font-weight: 100 !important;
 		}
 	}
+
+	//dopsReminder
+	&-dopsReminder {
+		margin-top: 30px;
+		color: $contrprimary-color;
+		text-align: left;
+		font-size: $text-font-size;
+		font-family: $text-font;
+		font-weight: 300;
+	}
 }
