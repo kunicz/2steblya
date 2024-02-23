@@ -101,7 +101,7 @@ var specialDatesList = [
 		'd': 7,
 		'm': 3,
 		'2steblya': {
-			'minPrice': 15000,
+			'minPrice': 6000,
 			'exclude': [
 				969888387731, //лучшей женщине
 				690076603321, //суп
@@ -110,7 +110,7 @@ var specialDatesList = [
 			],
 		},
 		'staytrueflowers': {
-			'minPrice': 10000,
+			'minPrice': 6000,
 			'exclude': []
 		}
 	},
@@ -118,7 +118,7 @@ var specialDatesList = [
 		'd': 8,
 		'm': 3,
 		'2steblya': {
-			'minPrice': 15000,
+			'minPrice': 6000,
 			'exclude': [
 				969888387731, //лучшей женщине
 				690076603321, //суп
@@ -127,7 +127,7 @@ var specialDatesList = [
 			],
 		},
 		'staytrueflowers': {
-			'minPrice': 10000,
+			'minPrice': 6000,
 			'exclude': []
 		}
 	}

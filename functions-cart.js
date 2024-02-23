@@ -5,7 +5,6 @@ function cart() {
 	var int = setInterval(function () {
 		if (!isTovarsFromDBLoaded()) return;
 		if (!$('.t706__cartwin-content').length) return;
-		if (!$('.t706 [name="otkuda-uznal-o-nas"]').length) return;
 		if (!cartEnabled[site]) {
 			$('.t706').remove();
 			clearInterval(int);
@@ -56,7 +55,7 @@ function cartFunctions() {
 function cartDynamicFunctions() {
 	cartProductOptionsInOneLine();
 	cartOtsluniavit();
-	cartOnlyOneFromVitrina();
+	cartOnlyOneTovar();
 	cartPayedDeliveryForOnlyDops();
 	cartDonat();
 	cartPromocodeTovars();
@@ -204,6 +203,9 @@ function cartDelivery() {
 			}
 			if (executed) return;
 			selectedDay();
+			addDisclaimer();
+			dateToOpen();
+			daysToClose();
 			specialDates();
 			allowToday();
 			vitrinaOnlyTwoDays();
@@ -243,6 +245,92 @@ function cartDelivery() {
 		function selectedDay() {
 			datePicker.find('.t_datepicker__selected-day').removeClass('t_datepicker__selected-day');
 			if (dateField.val()) datePicker.find('[data-picker="' + dates['selected-yyyy'] + '-' + dates['selected-m'] + '-' + dates['selected-d'] + '"]').addClass('t_datepicker__selected-day');
+		}
+
+		/**
+		 * добавим пояснение по закрытым датам календаря
+		 */
+		function addDisclaimer() {
+			$('.t_datepicker__disclaimer').remove();
+			var body = $('.t706 .t_datepicker__body');
+			$('<div class="t_datepicker__disclaimer" style="width:' + body.width() + 'px"></div>').insertAfter(body);
+		}
+
+		/**
+		 * закрываем дни до даты, указанной в товаре (в бд)
+		 */
+		function dateToOpen() {
+			if (isTovarsFromDBEmpty('date_to_open')) return;
+			var tovars = $('.t706__product');
+			if (!tovars.length) return;
+			var dateOpen = dates['tomorrow-0'];
+			$.each(tovars, function () {
+				var tovar = $(this);
+				$.each(tovarsFromDB['date_to_open'], function (id, tovarDate) {
+					if (getTovarInCartId(tovar) != id) return;
+					tovarDate = new Date(tovarDate);
+					tovarDate.setDate(tovarDate.getDate() - 1); //последний закрытый в каледнаре день - это день, предшествующий date_to_open из бд
+					if (dateOpen < tovarDate) {
+						datesDiff = Math.floor((tovarDate - dates['today-0']) / (1000 * 60 * 60 * 24));
+						dateOpen = tovarDate;
+						var disclaimerData = {
+							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
+							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff)
+						}
+						$('.t_datepicker__disclaimer').text(disclaimerData[site]);
+					}
+				});
+			});
+			if (dateOpen <= dates['tomorrow-0']) return;
+			var dateList = [];
+			var currentDate = new Date(dates['tomorrow-0']);
+			while (currentDate <= dateOpen) {
+				var formattedDate = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+				dateList.push(formattedDate);
+				currentDate.setDate(currentDate.getDate() + 1);
+			}
+			disableDates(dateList);
+		}
+
+		/**
+		 * закрываем количество дней, указанное в товаре (в бд) от сегодняшней
+		 */
+		function daysToClose() {
+			if (isTovarsFromDBEmpty('days_to_close')) return;
+			var tovars = $('.t706__product');
+			if (!tovars.length) return;
+			var daysClosed = 0;
+			$.each(tovars, function () {
+				var tovar = $(this);
+				$.each(tovarsFromDB['days_to_close'], function (id, tovarDays) {
+					if (getTovarInCartId(tovar) != id) return;
+					if (daysClosed < tovarDays) {
+						daysClosed = tovarDays;
+						var disclaimerData = {
+							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
+							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed)
+						}
+						$('.t_datepicker__disclaimer').text(disclaimerData[site]);
+					}
+				});
+			});
+			if (!daysClosed) return;
+			var dateList = [];
+			for (var i = 0; i < daysClosed; i++) {
+				var futureDate = new Date(dates['today']);
+				futureDate.setDate(dates['today'].getDate() + i);
+				dateList.push(futureDate.getFullYear() + '-' + (futureDate.getMonth() + 1) + '-' + futureDate.getDate());
+			}
+			disableDates(dateList);
+		}
+		/**
+		 * закрываем дату в каледнаре
+		 */
+		function disableDates(dateList) {
+			if (!dateList.length) return;
+			$.each(dateList, function (i, date) {
+				$('.t706 .t_datepicker__day-cell[data-picker="' + date + '"]').addClass('t_datepicker__day-cell--disabled');
+			});
 		}
 
 		/* перебираем все ячейки календаря в поисках особенных дат */
@@ -863,7 +951,7 @@ function cartIconUponHeader() {
 /**
  * убираем возможность менять количество в корзине для товаров с витрины
  */
-function cartOnlyOneFromVitrina() {
+function cartOnlyOneTovar() {
 	if (!tovarsFromDB['vitrina'].length) return;
 	var tovars = $('.t706__product');
 	if (!tovars.length) return;
@@ -1030,4 +1118,11 @@ function getTovarInCartId(tovar) {
  */
 function getTovarInCartPrice(tovar) {
 	return parseInt(tovar.find('.t706__cartwin-prodamount-price').text().replace(/[^\d]/, ''));
+}
+
+/**
+ * получаем название товара в корзине
+ */
+function getTovarInCartTitle(tovar) {
+	return tovar.find('.t706__product-title a').text();
 }

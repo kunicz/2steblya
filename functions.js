@@ -177,40 +177,37 @@ function arrayOfValuesFromDB(data, field) {
  */
 getTovarsFromDB();
 function getTovarsFromDB() {
-	var columnsFromDB = [];
-	//получаем все возможные поля таблицы (allowed_today, vitrina и т.д.)
-	getFromDB('TildaTovarsFromDB&site=&tovars=columns', function (data) {
-		columnsFromDB = data;
+	var queries = {
+		'id': ['hidden', 'vitrina', 'dopnik', 'paid_delivery', 'multiple_prices', 'allowed_today'],
+		'idValue': ['hours_to_produce', 'date_to_open', 'days_to_close'],
+		'card_type': ['no', 'text', 'image']
+	};
+	//получаем айдишники товаров по харакетристика (только id)
+	$.each(queries['id'], function (i, e) {
+		getFromDB('TildaTovarsFromDB&tovars=' + e + '&site=' + site, function (data) {
+			tovarsFromDB[e] = arrayOfValuesFromDB(data, 'id');
+		});
 	});
-	//прогоняем цикл по всем полям и получаем айдишники товаров, которые относятся к этим категориям
-	var int = setInterval(function () {
-		if (!columnsFromDB.length) return;
-		$.each(columnsFromDB, function (i, e) {
-			getFromDB('TildaTovarsFromDB&tovars=' + e['COLUMN_NAME'] + '&site=' + site, function (data) {
-				tovarsFromDB[e['COLUMN_NAME']] = arrayOfValuesFromDB(data, 'id');
-			});
+	//получаем айдишники товаров по типам карточек
+	$.each(queries['card_type'], function (i, e) {
+		getFromDB('TildaTovarsFromDB&tovars=card_type&card_type=' + e + '&site=' + site, function (data) {
+			tovarsFromDB['card_type_' + e] = arrayOfValuesFromDB(data, 'id');
 		});
-		//карточки
-		getFromDB('TildaTovarsFromDB&tovars=card_types&site=' + site, function (data) {
-			var card_types = arrayOfValuesFromDB(data, 'card_type');
-			$.each(card_types, function (i, e) {
-				getFromDB('TildaTovarsFromDB&tovars=card_type&card_type=' + e + '&site=' + site, function (data) {
-					tovarsFromDB['card_type_' + e] = arrayOfValuesFromDB(data, 'id');
-				});
+	});
+	//получаем айдишники со значением
+	$.each(queries['idValue'], function (i, e) {
+		getFromDB('TildaTovarsFromDB&tovars=' + e + '&site=' + site, function (data) {
+			if (!Array.isArray(data)) return data;
+			tovarsFromDB[e] = {};
+			$.each(data, function (i, j) {
+				var value = j[e];
+				if (e != 'date_to_open') value = parseInt(value);
+				tovarsFromDB[e][j['id']] = value;
 			});
-		});
-		clearInterval(int);
-	}, 100);
-	//время на производство
-	getFromDB('TildaTovarsFromDB&tovars=hours_to_produce&site=' + site, function (data) {
-		if (!Array.isArray(data)) return data;
-		tovarsFromDB['hours_to_produce'] = {};
-		$.each(data, function (i, e) {
-			tovarsFromDB['hours_to_produce'][e['id']] = parseInt(e['hours_to_produce']);
 		});
 	});
 	setTimeout(function () {
-		//console.log(tovarsFromDB);
+		console.log(tovarsFromDB);
 	}, 2000);
 }
 /**
@@ -236,6 +233,25 @@ function isTovarsFromDBLoaded() {
  */
 function isTovarsFromDBEmpty(field) {
 	if (tovarsFromDB[field] === undefined) return true;
-	if (!tovarsFromDB[field].length) return true;
+	if (Array.isArray(tovarsFromDB[field]) && !tovarsFromDB[field].length) return true;
+	if (typeof tovarsFromDB[field] === 'object' && !Object.keys(tovarsFromDB[field]).length) return true;
 	return false;
+}
+
+
+
+/**
+ * СЕРВИСНЫЕ
+ */
+/**
+ * день,дня,дней
+ */
+function getRussianDaysWord(number) {
+	if (typeof number !== 'number' || isNaN(number)) return 'дней';
+	number = Math.abs(number); // Making sure the number is positive
+	var lastDigit = number % 10; // Get the last digit of the number
+	if (lastDigit === 0 || (lastDigit >= 5 && lastDigit <= 9) || (number >= 11 && number <= 19)) return 'дней';
+	if (lastDigit === 1) return 'день';
+	if (lastDigit >= 2 && lastDigit <= 4) return 'дня';
+	return 'Error';
 }
