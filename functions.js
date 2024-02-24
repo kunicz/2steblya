@@ -140,6 +140,20 @@ function footer() {
 	}
 }
 
+
+
+
+/**
+ * РАБОТЫ С БД
+ */
+getTovarsFromDBPromise()
+	.then(() => {
+		tovarsFromDBReady = true;
+		console.log(tovarsFromDB);
+	})
+	.catch(error => {
+		console.error('Error:', error);
+	});
 /**
  * функция делает запрос к базе данных php.2steblya
  * и выполняет callback, после получения данных из базы
@@ -174,73 +188,94 @@ function arrayOfValuesFromDB(data, field) {
 }
 /**
  * получаем из БД массив всех товаров по категориям (allowed_today, vitrina и т.д.)
+ * каждый запрос запихиваем в промис, чтоб быть уверенными, что перед началом работы сайта все данные наверняка будут получены из бд
  */
-getTovarsFromDB();
-function getTovarsFromDB() {
+function getTovarsFromDBPromise() {
+	var promises = [];
 	var queries = {
 		'id': ['hidden', 'dopnik', 'paid_delivery', 'multiple_prices', 'allowed_today'],
 		'idValue': ['hours_to_produce', 'date_to_open', 'days_to_close'],
 		'card_type': ['no', 'text', 'image']
 	};
+
 	//получаем айдишники товаров по харакетристика (только id)
-	$.each(queries['id'], function (i, e) {
-		getFromDB('TildaTovarsFromDB&tovars=' + e + '&site=' + site, function (data) {
+	queries['id'].forEach(e => {
+		promises.push(getFromDBPromise('TildaTovarsFromDB&tovars=' + e + '&site=' + site).then(data => {
 			tovarsFromDB[e] = arrayOfValuesFromDB(data, 'id');
-		});
+		}));
 	});
-	//витрина
-	getFromDB('TildaTovarsFromDB&tovars=vitrina_id&site=' + site, function (data) {
+
+	//получаем айдишники витринных товаров и массив с парой ключ/значение (id витринного товара / id родительского товара)
+	promises.push(getFromDBPromise('TildaTovarsFromDB&tovars=vitrina_id&site=' + site).then(data => {
 		tovarsFromDB['vitrina'] = [];
-		if (!Array.isArray(data)) return data;
-		$.each(data, function (i, e) {
-			if (e['vitrina_id'].includes(',')) {
-				var idsSplit = e['vitrina_id'].split(',');
-				tovarsFromDB['vitrina'].push(...idsSplit.map(id => parseInt(id)));
-			} else {
-				tovarsFromDB['vitrina'].push(parseInt(e['vitrina_id']));
-			}
-		});
-	});
-	//получаем айдишники товаров по типам карточек
-	$.each(queries['card_type'], function (i, e) {
-		getFromDB('TildaTovarsFromDB&tovars=card_type&card_type=' + e + '&site=' + site, function (data) {
-			tovarsFromDB['card_type_' + e] = arrayOfValuesFromDB(data, 'id');
-		});
-	});
-	//получаем айдишники со значением
-	$.each(queries['idValue'], function (i, e) {
-		getFromDB('TildaTovarsFromDB&tovars=' + e + '&site=' + site, function (data) {
-			if (!Array.isArray(data)) return data;
-			tovarsFromDB[e] = {};
-			$.each(data, function (i, j) {
-				var value = j[e];
-				if (e != 'date_to_open') value = parseInt(value);
-				tovarsFromDB[e][j['id']] = value;
+		tovarsFromDB['vitrina_parents'] = {};
+
+		if (Array.isArray(data)) {
+			data.forEach(e => {
+				if (e['vitrina_id'].includes(',')) {
+					var idsSplit = e['vitrina_id'].split(',');
+					tovarsFromDB['vitrina'].push(...idsSplit.map(id => parseInt(id)));
+					idsSplit.forEach(id => { tovarsFromDB['vitrina_parents'][parseInt(id)] = parseInt(e['id']); });
+				} else {
+					tovarsFromDB['vitrina'].push(parseInt(e['vitrina_id']));
+					tovarsFromDB['vitrina_parents'][parseInt(e['vitrina_id'])] = parseInt(e['id']);
+				}
 			});
+		}
+	}));
+
+	//получаем айдишники товаров по типам карточек
+	queries['card_type'].forEach(e => {
+		promises.push(getFromDBPromise('TildaTovarsFromDB&tovars=card_type&card_type=' + e + '&site=' + site).then(data => {
+			tovarsFromDB['card_type_' + e] = arrayOfValuesFromDB(data, 'id');
+		}));
+	});
+
+	//получаем данные для которых требуется пара ключ/значение
+	queries['idValue'].forEach(e => {
+		promises.push(getFromDBPromise('TildaTovarsFromDB&tovars=' + e + '&site=' + site).then(data => {
+			if (Array.isArray(data)) {
+				tovarsFromDB[e] = {};
+				data.forEach(j => {
+					var value = j[e];
+					if (e != 'date_to_open') value = parseInt(value);
+					tovarsFromDB[e][j['id']] = value;
+				});
+			}
+		}));
+	});
+
+	//когда все данные получены из бд, производим дополнительные операции в функции afterGetFromDB
+	return Promise.all(promises).then(() => {
+		return afterGetFromDB();
+	});
+}
+
+//вспомогательная функция, оборачивающая запрос к бд в промис
+function getFromDBPromise(request) {
+	return new Promise((resolve, reject) => {
+		getFromDB(request, data => {
+			resolve(data);
 		});
 	});
-	setTimeout(function () {
-		console.log(tovarsFromDB);
-	}, 2000);
 }
-/**
- * проверка, загрузились ли все товары из БД
- */
-function isTovarsFromDBLoaded() {
-	/**
-	 * allowed_today
-	 * vitrina
-	 * card_type
-	 * card_type_no
-	 * card_type_text
-	 * card_type_image
-	 * multiple_prices
-	 * non_flowers
-	 */
-	var fieldsAmount = 8;
-	if (Object.keys(tovarsFromDB).length < fieldsAmount) return false;
-	return true;
+
+//дополнительная логика после получения всех данных из бд.
+//оборнул в промис на всякий случай, чтоб точно быть уверенным, что сайт не начнет обрабатывать товары, пока все логические операции не будут завершены
+function afterGetFromDB() {
+	return new Promise((resolve, reject) => {
+		//витринные товары получают свойства своих родителей
+		//добавляем витринные товары в массивы, где есть и родительские товары
+		var vitrinaParams = ['multiple_prices', 'card_type_no', 'card_type_text', 'card_type_image'];
+		for (var id in tovarsFromDB['vitrina_parents']) {
+			vitrinaParams.forEach(param => {
+				if (tovarsFromDB[param].includes(tovarsFromDB['vitrina_parents'][id])) tovarsFromDB[param].push(parseInt(id));
+			});
+		}
+		resolve();
+	});
 }
+
 /**
  * проверка на наличие товаров из бд по ключу
  */

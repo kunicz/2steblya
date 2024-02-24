@@ -2,6 +2,7 @@
  * товары из БД
  */
 var tovarsFromDB = {}
+var tovarsFromDBReady = false;
 
 /**
  * корзина включена/выключена

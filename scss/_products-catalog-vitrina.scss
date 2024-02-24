@@ -1,6 +1,6 @@
 //скрываем витрину
 [class*="vitrina"] {
-	display: none;
+	//display: none;
 }
 
 .uc-vitrina {
@@ -13,6 +13,16 @@
 					display: none;
 				}
 			}
+		}
+	}
+
+	//каталог
+	&__catalog {
+		@include if('2steblya') {
+			background-image: url('https://static.tildacdn.com/tild3939-3961-4539-b565-653438303236/vitrina_02.jpg');
+			background-size: 800px;
+			background-repeat: no-repeat;
+			background-position: top center;
 		}
 	}
 }

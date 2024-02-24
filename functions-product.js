@@ -3,7 +3,8 @@
  */
 function product() {
 	var int = setInterval(function () {
-		if (!isTovarsFromDBLoaded()) return;
+		if (!tovarsFromDBReady) return;
+		console.log('start_product');
 		if (window.location.pathname.includes('/tproduct/')) {
 			/* страница продукта /tproduct/... */
 			productLogoInHeader();
@@ -22,12 +23,6 @@ function product() {
 				var catalog = $(this);
 				//запускаем функции каталога (в том числе и мутатор, который следит за изменениями)
 				productCatalogFunctions(catalog);
-				//запускаем функции товаров каталога (бомжетность, карточка и пр.)
-				//до введения проверки на загрузку товаров из БД это делал мутатор. По видимому, блоки товаров тильды загружались позже мутатора, поэтому он успевал их обработать
-				//сейчас DOM строится раньше чем загружаются товары из БД, поэтому принудительно накатываем разово функции товаров
-				$.each(catalog.find('.js-store-grid-cont .js-product:not(.loaded)'), function () {
-					productCatalogTovarFunctions($(this), catalog);
-				});
 			});
 			clearInterval(int);
 		}
@@ -648,91 +643,74 @@ function isVitrina(catalog) {
 }
 
 /**
- * превращяем витрину в карусель
+ * делаем каталог товаров каруселью
  */
-function owlVitrina(vitrinaBlocks) {
-	var showed = false;
-	var catalog;
+function owlCatalog(catalog, className) {
 	var tovars;
-	var tovarsLength = 0;
-	setInterval(function () {
-		if (showed) return;
-		catalog = $('.uc-vitrina__catalog');
-		if (!catalog.length) return;
-		catalog.addClass('owlCatalog');
+	catalog.addClass('uc-' + className + '__catalog').addClass('owlCatalog');
+	var int = setInterval(function () {
 		tovars = catalog.find('.js-store-grid-cont .js-product');
-		tovarsLength = tovars.length;
-		if (!tovarsLength) return;
-		vitrinaRemoveJunk();
-		if (!tovarsLength) return;
-		vitrinaCarousel();
-		vitrinaShow();
-	}, 2000);
+		if (!tovars.length) return;
+		tovars = owlCatalogRemoveJunk();
+		if (!tovars.length) {
+			if (className == 'vitrina') $('[class*="vitrina"]').remove();
+			clearInterval(int);
+			return;
+		}
+		owlCatalogCarousel();
+		owlCatalogNavButtons();
+		owlCatalogLazyLoadChanged();
+		clearInterval(int);
+	}, 100);
 
-	/* показываем витрину */
-	function vitrinaShow() {
-		vitrinaBlocks.css('opacity', 0).show();
-		showed = true;
-		var int = setInterval(
-			function () {
-				clearInterval(int);
-				owlNavButtons(catalog);
-				owlLazyLoadChanged(catalog);
-				setTimeout(function () {
-					vitrinaBlocks.css('opacity', 1);
-				}, 500);
-			}, 100
-		);
+	/**
+	 * удаляем все ненужное, возвращаем товары
+	 */
+	function owlCatalogRemoveJunk() {
+		//удаляем сепараторы
+		catalog.find('.t-store__grid-separator').remove();
+		//если витрина, удаляем купленные
+		if (className == 'vitrina') {
+			tovars.each(function () {
+				var tovar = $(this);
+				if (!tovar.find('.js-store-prod-sold-out').length) return;
+				tovar.remove();
+			});
+		}
+		//вовращаем количество товаров
+		return catalog.find('.js-store-grid-cont .js-product');
 	}
-	/* удаляем с витрины ненужное */
-	function vitrinaRemoveJunk() {
-		/* сепараторы */
-		owlRemoveSeparators(catalog);
-		/* распроданный товар */
-		tovars.each(function () {
-			var tovar = $(this);
-			if (!tovar.find('.js-store-prod-sold-out').length) return;
-			tovar.remove();
-			tovarsLength--;
-		});
-	}
-	/* карусель */
-	function vitrinaCarousel() {
+	/**
+	 * применяем owlCarousel
+	 */
+	function owlCatalogCarousel() {
 		var onScreen = 1;
 		if ($(window).width() > 550) onScreen++;
 		if ($(window).width() > 850) onScreen++;
-		if (onScreen > 1 && catalog.find('.js-store-grid-cont .js-product').length == 2) catalog.addClass('twoItems');
+		if (onScreen > 1 && tovars.length == 2) catalog.addClass('twoItems');
 		catalog.find('.js-store-grid-cont').owlCarousel({
-			items: (tovarsLength > onScreen ? onScreen : tovarsLength),
+			items: (tovars.length > onScreen ? onScreen : tovars.length),
 			margin: 30,
-			loop: false,
-			nav: tovarsLength > onScreen,
+			loop: className == 'vitrina' ? false : true,
+			nav: tovars.length > onScreen,
 			dots: false,
 		});
 	}
-}
+	/**
+	 * кнопки навигации в карусели
+	 */
+	function owlCatalogNavButtons() {
+		var navButtons = catalog.find('.owl-nav:not(.disabled)');
+		if (!navButtons.length) return;
+		catalog.find('.owl-nav').css({ 'top': (catalog.find('.t-store__card__bgimg').height() / 2) + 'px' });
+	}
 
-/**
- * убираем сепаратары из карусели
- */
-function owlRemoveSeparators(catalog) {
-	catalog.find('.t-store__grid-separator').remove();
-}
-
-/**
- * кнопки навигации в карусели
- */
-function owlNavButtons(catalog) {
-	var navButtons = catalog.find('.owl-nav:not(.disabled)');
-	if (!navButtons.length) return;
-	catalog.find('.owl-nav').css({ 'top': (catalog.find('.t-store__card__bgimg').height() / 2) + 'px' });
-}
-
-/**
- * литсание карусели и lazy load картинок
- */
-function owlLazyLoadChanged(catalog) {
-	catalog.find('.js-product-img').each(function () {
-		$(this).css('background-image', 'url(' + $(this).data('original') + ')');
-	});
+	/**
+	 * литсание карусели и lazy load картинок
+	 */
+	function owlCatalogLazyLoadChanged() {
+		catalog.find('.js-product-img').each(function () {
+			$(this).css('background-image', 'url(' + $(this).data('original') + ')');
+		});
+	}
 }

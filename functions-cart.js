@@ -3,7 +3,8 @@
  */
 function cart() {
 	var int = setInterval(function () {
-		if (!isTovarsFromDBLoaded()) return;
+		if (!tovarsFromDBReady) return;
+		console.log('start_cart');
 		if (!$('.t706__cartwin-content').length) return;
 		if (!cartEnabled[site]) {
 			$('.t706').remove();
@@ -316,7 +317,7 @@ function cartDelivery() {
 			});
 			if (!daysClosed) return;
 			var dateList = [];
-			for (var i = 0; i < daysClosed; i++) {
+			for (var i = 0; i <= daysClosed; i++) {
 				var futureDate = new Date(dates['today']);
 				futureDate.setDate(dates['today'].getDate() + i);
 				dateList.push(futureDate.getFullYear() + '-' + (futureDate.getMonth() + 1) + '-' + futureDate.getDate());
