@@ -178,7 +178,7 @@ function arrayOfValuesFromDB(data, field) {
 getTovarsFromDB();
 function getTovarsFromDB() {
 	var queries = {
-		'id': ['hidden', 'vitrina', 'dopnik', 'paid_delivery', 'multiple_prices', 'allowed_today'],
+		'id': ['hidden', 'dopnik', 'paid_delivery', 'multiple_prices', 'allowed_today'],
 		'idValue': ['hours_to_produce', 'date_to_open', 'days_to_close'],
 		'card_type': ['no', 'text', 'image']
 	};
@@ -186,6 +186,19 @@ function getTovarsFromDB() {
 	$.each(queries['id'], function (i, e) {
 		getFromDB('TildaTovarsFromDB&tovars=' + e + '&site=' + site, function (data) {
 			tovarsFromDB[e] = arrayOfValuesFromDB(data, 'id');
+		});
+	});
+	//витрина
+	getFromDB('TildaTovarsFromDB&tovars=vitrina_id&site=' + site, function (data) {
+		tovarsFromDB['vitrina'] = [];
+		if (!Array.isArray(data)) return data;
+		$.each(data, function (i, e) {
+			if (e['vitrina_id'].includes(',')) {
+				var idsSplit = e['vitrina_id'].split(',');
+				tovarsFromDB['vitrina'].push(...idsSplit.map(id => parseInt(id)));
+			} else {
+				tovarsFromDB['vitrina'].push(parseInt(e['vitrina_id']));
+			}
 		});
 	});
 	//получаем айдишники товаров по типам карточек

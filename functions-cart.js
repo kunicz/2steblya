@@ -409,7 +409,7 @@ function cartDelivery() {
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			tovars.each(function () {
-				allow = tovarsFromDB['allowed_today'].includes(getTovarInCartId($(this))) ? true : false;
+				allow = [...tovarsFromDB['allowed_today'], ...tovarsFromDB['vitrina']].includes(getTovarInCartId($(this))) ? true : false;
 				if (!allow) return false;
 			});
 			if (todayUrl()) allow = true;
