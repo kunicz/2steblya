@@ -21,7 +21,6 @@ function product() {
 			if (!catalogs.length) return;
 			catalogs.each(function () {
 				var catalog = $(this);
-				//запускаем функции каталога (в том числе и мутатор, который следит за изменениями)
 				productCatalogFunctions(catalog);
 			});
 			clearInterval(int);
@@ -222,8 +221,9 @@ function productPrices(tovar, catalog) {
 	 * добавляем товарам класс, который отвечает за "цена от"
 	 */
 	function multiplePrices() {
-		if (!isTovarsFromDBEmpty('multiple_prices') && !tovarsFromDB['multiple_prices'].includes(getTovarId(tovar))) return;
+		if (!isTovarsFromDBEmpty('fixed_price') && tovarsFromDB['fixed_price'].includes(getTovarId(tovar))) return; //если товар в бд помечен как товар с фиксированной ценой
 		if (tovar.find('[data-edition-option-id="' + productFormat[site] + '"] select option').length < 2) return; //если формат остался только один, например, остальное раскупили
+		//также класс не применяется к тем товарам, у которых изначально в тильде нет ценовых вариантов
 		tovar.addClass('multiplePrices');
 	}
 
@@ -646,22 +646,26 @@ function isVitrina(catalog) {
  * делаем каталог товаров каруселью
  */
 function owlCatalog(catalog, className) {
-	var tovars;
 	catalog.addClass('uc-' + className + '__catalog').addClass('owlCatalog');
+	var tovars;
+	var maxWaitTime = 10000;  // 10 секунд проверяем наличие товаров в каталоге
+	var elapsedTime = 0;
+	var intervalTime = 100;
 	var int = setInterval(function () {
+		elapsedTime += intervalTime;
 		tovars = catalog.find('.js-store-grid-cont .js-product');
-		if (!tovars.length) return;
-		tovars = owlCatalogRemoveJunk();
-		if (!tovars.length) {
-			if (className == 'vitrina') $('[class*="vitrina"]').remove();
+		if (tovars.length) {
+			tovars = owlCatalogRemoveJunk();
+			if (!tovars.length) return;
 			clearInterval(int);
-			return;
+			owlCatalogCarousel();
+			owlCatalogNavButtons();
+			owlCatalogLazyLoadChanged();
+			if (className != 'vitrina') return;
+			$('[class*="vitrina"]').show();
 		}
-		owlCatalogCarousel();
-		owlCatalogNavButtons();
-		owlCatalogLazyLoadChanged();
-		clearInterval(int);
-	}, 100);
+		if (elapsedTime >= maxWaitTime) clearInterval(int);
+	}, intervalTime);
 
 	/**
 	 * удаляем все ненужное, возвращаем товары

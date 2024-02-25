@@ -193,7 +193,7 @@ function arrayOfValuesFromDB(data, field) {
 function getTovarsFromDBPromise() {
 	var promises = [];
 	var queries = {
-		'id': ['hidden', 'dopnik', 'paid_delivery', 'multiple_prices', 'allowed_today'],
+		'id': ['hidden', 'dopnik', 'paid_delivery', 'allowed_today', 'fixed_price'],
 		'idValue': ['hours_to_produce', 'date_to_open', 'days_to_close'],
 		'card_type': ['no', 'text', 'image']
 	};
@@ -266,7 +266,7 @@ function afterGetFromDB() {
 	return new Promise((resolve, reject) => {
 		//витринные товары получают свойства своих родителей
 		//добавляем витринные товары в массивы, где есть и родительские товары
-		var vitrinaParams = ['multiple_prices', 'card_type_no', 'card_type_text', 'card_type_image'];
+		var vitrinaParams = ['fixed_price', 'card_type_no', 'card_type_text', 'card_type_image'];
 		for (var id in tovarsFromDB['vitrina_parents']) {
 			vitrinaParams.forEach(param => {
 				if (tovarsFromDB[param].includes(tovarsFromDB['vitrina_parents'][id])) tovarsFromDB[param].push(parseInt(id));
