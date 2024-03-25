@@ -16,8 +16,10 @@
 	}
 
 	&-nav {
+		display: none;
+
 		&.disabled {
-			display: none;
+			display: none !important;
 		}
 
 		width: 100%;

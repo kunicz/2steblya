@@ -22,6 +22,19 @@ function product() {
 			catalogs.each(function () {
 				var catalog = $(this);
 				productCatalogFunctions(catalog);
+				//иногда по непонятным причинам не отрабатывает мутатор при загрузке каталогке, из-за чего товары находятся визуально в чечной загрузке (скрыты с прелоадером)
+				//все-таки принудительно надо пробежаться по товарам, и накатить на них все наши функции
+				setTimeout(function () {
+					$.each(catalogs, function () {
+						var catalog = $(this);
+						var tovars = catalog.find('.js-store-grid-cont .js-product');
+						if (!tovars.length) return;
+						tovars.each(function () {
+							productCatalogTovarFunctions($(this), catalog);
+						});
+						window.dispatchEvent(new Event('resize'));
+					});
+				}, 1000);
 			});
 			clearInterval(int);
 		}
@@ -46,6 +59,7 @@ function productTovarFunctions(tovar) {
 	productButton(tovar);
 	productOnPhoto(tovar);
 	productCartDisabled(tovar);
+	productHideDisabledFormatOption(tovar);
 	productShow(tovar);
 }
 
@@ -277,7 +291,32 @@ function productCartDisabled(tovar) {
  * переносим плашку в первый слайд
  */
 function productPlashka(tovar) {
-	tovar.find('.t-store__card__mark-wrapper').appendTo(tovar.find('.t-store__card__bgimg'));
+	var plashka = tovar.find('.t-store__card__mark-wrapper');
+	if (!plashka.length) {
+		var text = [];
+		var data = {
+			'random_sostav': {
+				'2steblya': 'букет, чтоб не париться с выбором',
+				'staytruefloers': 'состав на вкус флориста'
+			},
+			'select_gamma': {
+				'2steblya': 'можно выбрать гамму',
+				'staytruefloers': 'можно выбрать гамму'
+			},
+			'select_color': {
+				'2steblya': 'можно выбрать цвет',
+				'staytruefloers': 'можно выбрать цвет'
+			},
+		}
+		for (var key in data) {
+			if (!data.hasOwnProperty(key)) continue;
+			if (!tovarsFromDB[key].includes(getTovarId(tovar))) continue;
+			text.push(data[key][site]);
+		}
+		if (text.length) plashka = $('<div class="t-store__card__mark-wrapper"><div class="t-store__card__mark">' + text.join(', ') + '</div></div>');
+	}
+	if (!plashka.length) return;
+	plashka.appendTo(tovar.find('.t-store__card__bgimg'));
 }
 
 /**
@@ -603,10 +642,18 @@ function productSoldOut(tovar, catalog) {
 }
 
 /**
+ * скрываем недоступные к продаже форматы в выпадающем списке
+ */
+function productHideDisabledFormatOption(tovar) {
+	tovar.find('[data-edition-option-id="' + productFormat[site] + '"] option[disabled]').hide();
+}
+/**
  * получаем текст карточки из селекта "текст карточки"
  */
 function getTovarCardText(tovar) {
 	var val = tovar.find('.js-product-option:last').find('select').val();
+	//перечеркнутый текст
+	val = val.replace(/\*s\*(.*?)\*s\*/g, '<s>$1</s>');
 	return val ? val.split('*br*').join('<br>') : '';
 }
 
@@ -706,15 +753,66 @@ function owlCatalog(catalog, className) {
 	function owlCatalogNavButtons() {
 		var navButtons = catalog.find('.owl-nav:not(.disabled)');
 		if (!navButtons.length) return;
-		catalog.find('.owl-nav').css({ 'top': (catalog.find('.t-store__card__bgimg').height() / 2) + 'px' });
+		setTimeout(function () {
+			navButtons.show().css({ 'top': (catalog.find('.t-store__card__bgimg').height() / 2) + 'px' });
+		}, 1000);
 	}
 
 	/**
-	 * литсание карусели и lazy load картинок
+	 * листание карусели и lazy load картинок
 	 */
 	function owlCatalogLazyLoadChanged() {
 		catalog.find('.js-product-img').each(function () {
 			$(this).css('background-image', 'url(' + $(this).data('original') + ')');
 		});
 	}
+}
+
+/**
+ * каталог новинок
+ * подгружаем из базы товары, которые считаются новыми и в каталоге удаляем всех, кроме них, а также расставляем их по дате создания
+ */
+function newCatalog(block) {
+	$tovarsFromDbPromise = new Promise((resolve, reject) => {
+		$.ajax({
+			url: 'https://php.2steblya.ru/ajax.php?script=Tilda_tovars_from_DB&tovars=new&site=' + site,
+			crossDomain: true,
+			type: 'GET',
+			success: function (data) {
+				var first = data.slice(0, 1);
+				if (first == '{' || first == '[') {
+					resolve(JSON.parse(data));
+				} else {
+					resolve(data);
+				}
+			},
+			error: function (error) {
+				reject(error);
+			}
+		});
+	});
+	$tovarsFromDbPromise.
+		then(idsFromDb => {
+			var int = setInterval(function () {
+				var products = block.find('.js-product.loaded');
+				if (!products.length) return;
+				clearInterval(int);
+				var productsCont = products.parent();
+				var productsMap = {};
+				products.each(function () {
+					productsMap[$(this).attr('data-product-gen-uid')] = $(this).clone();
+				});
+				productsCont.empty();
+				for (var i = 0; i < idsFromDb.length; i++) {
+					if (i == 15) break;
+					if (!productsMap[idsFromDb[i].id]) continue;
+					productsCont.append(productsMap[idsFromDb[i].id]);
+				}
+				block.find('.t-store__load-more-btn-wrap').remove();
+				owlCatalog(block, 'new');
+			}, 100);
+		}).
+		catch(error => {
+			console.error('Error fetching data:', error);
+		});
 }

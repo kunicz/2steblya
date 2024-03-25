@@ -207,6 +207,7 @@ function cartDelivery() {
 			addDisclaimer();
 			dateToOpen();
 			daysToClose();
+			//notWorkingDates();
 			specialDates();
 			allowToday();
 			vitrinaOnlyTwoDays();
@@ -334,6 +335,13 @@ function cartDelivery() {
 			});
 		}
 
+		function notWorkingDates() {
+			if (!notWorkingDatesList.length) return;
+			$.each(notWorkingDatesList, function (i, date) {
+				$('.t706 .t_datepicker__day-cell[data-picker="' + date + '"]').addClass('t_datepicker__day-cell--disabled').addClass('t_datepicker__day-cell--notWorking').text('❌');
+			});
+		}
+
 		/* перебираем все ячейки календаря в поисках особенных дат */
 		function specialDates() {
 			$('.t706 .t_datepicker__day-cell').each(function () {
@@ -351,7 +359,6 @@ function cartDelivery() {
 		 */
 		function applySpecialDate(specialDate, faded) {
 			var allow = false;
-			var hasAllowedTovar = false;
 			var allowedTovars = [];
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
@@ -359,19 +366,18 @@ function cartDelivery() {
 			//если такие товары есть в корзине,
 			tovars.each(function () {
 				var allowedTovar = isAllowed($(this));
-				if (allowedTovar) hasAllowedTovar = true;
+				if (allowedTovar) allow = true;
 				allowedTovars.push(allowedTovar);
 			});
-			if (!hasAllowedTovar) return;
 			//вторичный цикл, если товаров в корзине больше одного
 			//проверяем, есть ли помимо разрешенного(ых) еще и допники
-			allow = true;
 			if (tovars.length > 1) {
 				tovars.each(function () {
 					var id = getTovarInCartId($(this));
 					if (allowedTovars.includes(id)) return;
 					if (isDopnik(id)) return;
 					allow = false;
+					return false;
 				});
 			}
 			if (allow) return;
@@ -385,13 +391,14 @@ function cartDelivery() {
 			datePicker.find('[data-picker$="-' + specialDate['m'] + '-' + specialDate['d'] + '"]').hide().after(zaglushka);
 
 			//проверяем, находится ли товар в массиве товаров специальной даты
-			//пока что этот массив объявляется в globals.js, но надо переработать его в БД
 			function isAllowed(tovar) {
 				var id = getTovarInCartId(tovar);
 				// исключения (exclude)
 				if (specialDate[site]['exclude'].includes(id)) return id;
 				// цены (minPrice)
 				if (getTovarInCartPrice(tovar) >= specialDate[site]['minPrice']) return id;
+				//если товар с витрины
+				if (!isTovarsFromDBEmpty('vitrina') && tovarsFromDB['vitrina'].includes(id)) return id;
 				return false;
 			}
 			//проверяем, может ли этот товар быть сопуткой
@@ -467,6 +474,7 @@ function cartDelivery() {
 			for (var i = 0; i < intervalField.length; i++) {
 				$(intervalField[i]).attr('disabled', false).parent().css('opacity', 1);
 			}
+			//disableOpt(1);
 			if (!dates['selected-0']) return;
 			if (dates['selected-0'].toDateString() == dates['tomorrow-0'].toDateString()) tomorrowDeliveryInterval();
 			if (dates['selected-0'].toDateString() == dates['today-0'].toDateString()) todayDeliveryInterval();
