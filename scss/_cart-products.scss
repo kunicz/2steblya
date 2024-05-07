@@ -26,11 +26,15 @@ $donats: (
 	&-title {
 		text-align: left;
 
-		@include if('stf') {
-			font-weight: 400;
-
-			& a {
+		& a {
+			@include if('stf') {
+				font-weight: 400;
 				font-size: calc($text-font-size + 2px);
+			}
+
+			@include if('gvozdisco') {
+				font-size: 18px;
+				font-family: $heading-font !important;
 			}
 		}
 

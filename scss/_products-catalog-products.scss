@@ -14,11 +14,28 @@
 		}
 	}
 
+	&__textwrapper {
+		@include if('gvozdisco') {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			width: 100%;
+		}
+	}
+
 	//заголовок
 	&__title {
 		@include if('stf') {
 			font-size: calc($text-font-size + 2px) !important;
 			font-weight: 400;
+		}
+
+		@include if('gvozdisco') {
+			font-size: $text-font-size !important;
+			background-color: $primary-color;
+			display: inline-block;
+			width: auto;
+			padding: 5px 10px;
 		}
 	}
 
@@ -34,6 +51,16 @@
 	}
 
 	//цена
+	&__price-wrapper {
+		@include if('gvozdisco') {
+			background-color: $primary-color;
+			display: inline-block;
+			padding: 0 10px;
+			width: auto;
+			margin: 5px 0;
+		}
+	}
+
 	&__price,
 	&__price_old {
 		@include if('stf') {
@@ -43,24 +70,20 @@
 	}
 
 	&__price_old {
-		opacity: .5;
 		margin: 0 10px;
 
 		& * {
 			font-size: 14px;
+			color: rgba($contrprimary-color, .5)
 		}
 	}
 
 	&__price {
 		.multiplePrices &:not(&_old) &-value::before {
-
 			content: 'от ';
 			font-weight: 300;
 			opacity: .5;
-
-			@include if('2steblya') {
-				font-size: 14px;
-			}
+			font-size: 14px;
 		}
 	}
 

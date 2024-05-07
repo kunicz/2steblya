@@ -29,6 +29,11 @@
 			background: $secondary-color;
 		}
 
+		@include if('gvozdisco') {
+			color: $primary-color;
+			background: $secondary-color;
+		}
+
 		@include if('stf') {
 			color: $contrprimary-color;
 			background-color: rgba($contrprimary-color, .1);
@@ -96,6 +101,11 @@
 		padding: 1px 4px;
 
 		@include if('2steblya') {
+			color: $primary-color;
+			background-color: rgba($primary-color, .1);
+		}
+
+		@include if('gvozdisco') {
 			color: $primary-color;
 			background-color: rgba($primary-color, .1);
 		}

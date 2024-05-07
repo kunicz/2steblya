@@ -46,11 +46,23 @@
 			@include if('stf') {
 				font-size: 32px !important;
 			}
+
+			@include if('gvozdisco') {
+				padding: 5px 10px 5px 0;
+				display: inline-block;
+				background-color: $primary-color;
+			}
 		}
 
 		//цена
 		&__price-wrapper {
 			margin-bottom: 18px;
+
+			@include if('gvozdisco') {
+				padding: 5px 10px 5px 0;
+				display: inline-block;
+				background-color: $primary-color;
+			}
 		}
 
 		&__price {
@@ -82,11 +94,7 @@
 		//дополнительный текст
 		&__text-dop {
 			margin-top: 30px;
-
-			@include if('2steblya') {
-				font-size: .8em !important;
-			}
-
+			font-size: .8em !important;
 			opacity: .5 !important;
 		}
 

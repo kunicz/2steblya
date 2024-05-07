@@ -5,12 +5,17 @@ $ratio: 0px;
 	$ratio: 2px;
 }
 
+@include if('gvozdisco') {
+	$ratio: 2px;
+}
+
 $form-text-size: calc($text-font-size - $ratio);
 $description-text-size: calc($form-text-size - $ratio);
 $description-text-opacity: .5;
 
 $cartIncompleteCheck: (
 	'2steblya':1675967313188,
+	'gvozdisco':1675967313188,
 	'stf':'000'
 );
 
@@ -19,6 +24,7 @@ $cartIncompleteCheck: (
 	text-align: left;
 
 	* {
+		font-family: $text-font;
 		font-size: $form-text-size;
 	}
 
@@ -120,10 +126,18 @@ $cartIncompleteCheck: (
 	//сообщение после отправки
 	.js-successbox {
 		@include if('2steblya') {
-			background-image: url('https://static.tildacdn.com/tild6439-3035-4936-a639-646335656438/noMoney.gif');
+			background-image: url(https://static.tildacdn.com/tild6439-3035-4936-a639-646335656438/noMoney.gif);
 
 			&::before {
 				content: 'ну, кака бычна';
+			}
+		}
+
+		@include if('gvozdisco') {
+			background-image: url(https://static.tildacdn.com/tild3162-3135-4033-b961-313662613862/noMoney.gif);
+
+			&::before {
+				content: 'ну, как обычно';
 			}
 		}
 

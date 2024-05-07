@@ -4,7 +4,6 @@
 function cart() {
 	var int = setInterval(function () {
 		if (!tovarsFromDBReady) return;
-		console.log('start_cart');
 		if (!$('.t706__cartwin-content').length) return;
 		if (!cartEnabled[site]) {
 			$('.t706').remove();
@@ -47,6 +46,7 @@ function cartFunctions() {
 	cartHideOtkudaUznal();
 	cartHtmlEntities();
 	cartLovixlube();
+	cartO4ki();
 	cartSuccess();
 }
 
@@ -135,6 +135,7 @@ function cartPlusMinusItems() {
 function cartDopsReminder() {
 	var data = {
 		'2steblya': 'хош добавить <a href="/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%9F%D0%9E%D0%94%D0%90%D0%A0+%D0%9E%D0%A7%D0%9A%D0%98&tfc_div=:::">подар очек</a> к букету? а што насчёт <a href="https://2steblya.ru/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%92%D0%90%D0%97%D0%AB&tfc_div=:::">вазы</a>?',
+		'gvozdisco': '',
 		'staytrueflowers': ''
 	}
 	if (site != '2steblya') return;
@@ -166,7 +167,9 @@ function cartDelivery() {
 			execute();
 		}, 60000);
 		function execute() {
-			dates['today'] = new Date();
+			moment.tz.setDefault("Europe/Moscow");
+			dates['today'] = moment().toDate();
+			//dates['today'] = new Date();
 			dates['today-0'] = new Date(); dates['today-0'].setHours(0, 0, 0, 0);
 			dates['tomorrow-0'] = new Date(); dates['tomorrow-0'].setDate(dates['today-0'].getDate() + 1); dates['tomorrow-0'].setHours(0, 0, 0, 0);
 		}
@@ -213,7 +216,7 @@ function cartDelivery() {
 			vitrinaOnlyTwoDays();
 			dateField.attr('disabled', true);
 			executed = true;
-		}, 50);
+		}, 100);
 
 		/** 
 		 * клик на дате в календаре
@@ -235,7 +238,9 @@ function cartDelivery() {
 		});
 
 		/**
-		 * обнуляем дату доставки: если корзина закрывается
+		 * обнуляем дату доставки:
+		 * если корзина закрывается
+		 * если удаляется товар
 		 */
 		$('body').on('click', '.t706__close-button,.t706__product-del', function () {
 			dateField.val('');
@@ -262,7 +267,7 @@ function cartDelivery() {
 		 * закрываем дни до даты, указанной в товаре (в бд)
 		 */
 		function dateToOpen() {
-			if (isTovarsFromDBEmpty('date_to_open')) return;
+			if (!tovarsFromDB['date_to_open'].length) return;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			var dateOpen = dates['tomorrow-0'];
@@ -277,6 +282,7 @@ function cartDelivery() {
 						dateOpen = tovarDate;
 						var disclaimerData = {
 							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
+							'gvozdisco': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
 							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff)
 						}
 						$('.t_datepicker__disclaimer').text(disclaimerData[site]);
@@ -285,7 +291,7 @@ function cartDelivery() {
 			});
 			if (dateOpen <= dates['tomorrow-0']) return;
 			var dateList = [];
-			var currentDate = new Date(dates['tomorrow-0']);
+			var currentDate = dates['tomorrow-0'];
 			while (currentDate <= dateOpen) {
 				var formattedDate = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 				dateList.push(formattedDate);
@@ -298,7 +304,7 @@ function cartDelivery() {
 		 * закрываем количество дней, указанное в товаре (в бд) от сегодняшней
 		 */
 		function daysToClose() {
-			if (isTovarsFromDBEmpty('days_to_close')) return;
+			if (!tovarsFromDB['days_to_close'].length) return;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			var daysClosed = 0;
@@ -310,6 +316,7 @@ function cartDelivery() {
 						daysClosed = tovarDays;
 						var disclaimerData = {
 							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
+							'gvozdisco': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
 							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed)
 						}
 						$('.t_datepicker__disclaimer').text(disclaimerData[site]);
@@ -319,12 +326,13 @@ function cartDelivery() {
 			if (!daysClosed) return;
 			var dateList = [];
 			for (var i = 0; i <= daysClosed; i++) {
-				var futureDate = new Date(dates['today']);
+				var futureDate = dates['today'];
 				futureDate.setDate(dates['today'].getDate() + i);
 				dateList.push(futureDate.getFullYear() + '-' + (futureDate.getMonth() + 1) + '-' + futureDate.getDate());
 			}
 			disableDates(dateList);
 		}
+
 		/**
 		 * закрываем дату в каледнаре
 		 */
@@ -398,12 +406,11 @@ function cartDelivery() {
 				// цены (minPrice)
 				if (getTovarInCartPrice(tovar) >= specialDate[site]['minPrice']) return id;
 				//если товар с витрины
-				if (!isTovarsFromDBEmpty('vitrina') && tovarsFromDB['vitrina'].includes(id)) return id;
+				if (tovarsFromDB['vitrina'].includes(id)) return id;
 				return false;
 			}
 			//проверяем, может ли этот товар быть сопуткой
 			function isDopnik(id) {
-				if (isTovarsFromDBEmpty('dopnik')) return false;
 				return tovarsFromDB['dopnik'].includes(id);
 			}
 		}
@@ -412,7 +419,6 @@ function cartDelivery() {
 		 * открываем продажу на сегодня
 		 */
 		function allowToday() {
-			if (isTovarsFromDBEmpty('allowed_today')) return;
 			var allow = false;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
@@ -420,9 +426,12 @@ function cartDelivery() {
 				allow = [...tovarsFromDB['allowed_today'], ...tovarsFromDB['vitrina']].includes(getTovarInCartId($(this))) ? true : false;
 				if (!allow) return false;
 			});
+			tovars.each(function () {
+				if (['корзилла'].includes($(this).find('.t706__product-title__option:first > div:first').text().trim())) allow = false;
+			});
 			if (todayUrl()) allow = true;
 			if (!allow) return;
-			//if (dates['today'].getHours() >= 22) return;
+			if (dates['today'].getHours() >= 20) return;
 			$('.t706 .t_datepicker__today').removeClass('t_datepicker__day-cell--disabled');
 
 			function todayUrl() {
@@ -432,7 +441,7 @@ function cartDelivery() {
 				var currentDay = String(date.getDate()).padStart(2, '0');
 				var currentMonth = String(date.getMonth() + 1).padStart(2, '0');
 				var currentYear = date.getFullYear();
-				var hash = CryptoJS.MD5(currentDay + '' + currentMonth + '' + currentYear).toString();
+				var hash = CryptoJS.MD5(currentDay + '-' + currentMonth + '-' + currentYear).toString();
 				if (cookie != hash) return false;
 				return true;
 			}
@@ -441,7 +450,7 @@ function cartDelivery() {
 		 * витрина только на сегодня и завтра
 		 */
 		function vitrinaOnlyTwoDays() {
-			if (isTovarsFromDBEmpty('vitrina')) return;
+			if (!tovarsFromDB['vitrina'].length) return;
 			var onlyToday = false;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
@@ -452,6 +461,7 @@ function cartDelivery() {
 			if (!onlyToday) return;
 			var data = {
 				'2steblya': 'с ветрины только щас или завтро',
+				'gvozdisco': 'с витрины только на сегодня или на завтра',
 				'staytrueflowers': 'с витрины только на сегодня или на завтра'
 			};
 			$('.t706 .t_datepicker__day-cell').addClass('t_datepicker__day-cell--disabled');
@@ -485,7 +495,7 @@ function cartDelivery() {
 		 * утренняя доставка на завтра с вечера (после 18 часов) невозможна
 		 */
 		function tomorrowDeliveryInterval() {
-			if (dates['today'].getHours() >= 18) disableOpt(1);
+			if (dates['today'].getHours() >= 20) disableOpt(1);
 		}
 
 		/**
@@ -494,27 +504,31 @@ function cartDelivery() {
 		 * в этот массив собраны все товары с флагом allowed_today=1 и vitrina=1
 		 */
 		function todayDeliveryInterval() {
-			if (isTovarsFromDBEmpty('allowed_today')) return;
-			var hour = dates['today'].getHours();
+			$('#dostavka-interval input').each(function (i, e) {
+				const matches = $(this).val().match(/(\d{2}):\d{2}/g);
+				const hours = matches.map(match => parseInt(match.substring(0, 2), 10));
+				if (dates['today'].getHours() > hours[0] && dates['today'].getHours() <= hours[1]) disableOpt(i + 1);
+			});
+			disableOpt(1);
+			/*var hour = dates['today'].getHours();
 			var tovars = $('.t706__product');
 			var startHour = 6;
 			tovars.each(function () {
 				var tovarId = getTovarInCartId($(this));
 				if (!tovarsFromDB['allowed_today'].includes(tovarId)) return;
-				if (isTovarsFromDBEmpty('hours_to_produce')) return;
+				if (!tovarsFromDB['hours_to_produce'].length) return;
 				if (!Object.keys(tovarsFromDB['hours_to_produce']).includes(tovarId)) return;
 				startHour -= tovarsFromDB['hours_to_produce'][tovarId];
 			});
 			for (i = 1; i <= 4; i++) {
 				if (hour >= startHour + 4 * i) disableOpt(i); //за два часа до истечения интервала
 			}
-			disableOpt(1);
+			disableOpt(1);*/
 		}
 		function disableOpt(i) {
-			i--;
-			$(intervalField[i]).attr('disabled', true).parent().css('opacity', .3);
-			if ($(intervalField[i]).is(':checked')) {
-				$(intervalField[i + 1]).trigger('click');
+			$(intervalField[i - 1]).attr('disabled', true).parent().css('opacity', .3);
+			if ($(intervalField[i - 1]).is(':checked')) {
+				$(intervalField[i]).trigger('click');
 			}
 		}
 	}
@@ -525,6 +539,7 @@ function cartDelivery() {
 	function telegramLinkInDateFieldDescription() {
 		var data = {
 			'2steblya': ['телегу', 'https://t.me/dva_steblya'],
+			'gvozdisco': ['телеграм', 'https://t.me/dva_steblya'],
 			'staytrueflowers': ['телеграм', 'https://t.me/staytrueflowers']
 		}
 		var descr = $('#dostavka-date .t-input-subtitle');
@@ -532,6 +547,7 @@ function cartDelivery() {
 		descr.html(html);
 	}
 }
+
 /**
  * обрабатываем галочку для доставки в зажопинск
  */
@@ -561,6 +577,7 @@ function cartDonat() {
 	if (tovars.length > 1) return;
 	var data = {
 		'2steblya': 857613433221,
+		'gvozdisco': '',
 		'staytrueflowers': ''
 	}
 	if (getTovarInCartId(tovars.eq(0)) != data[site]) return;
@@ -570,8 +587,8 @@ function cartDonat() {
 	cartDonatDate();
 
 	function cartDonatComment() {
-		$('#florist-comment > label').text('восторги и благодарности');
-		$('[name="florist-comment"]').attr('placeholder', 'мы готовы впитывать');
+		$('#comment-florist > label').text('восторги и благодарности');
+		$('[name="comment-florist"]').attr('placeholder', 'мы готовы впитывать');
 	}
 	function cartDonatDate() {
 		if ($('[name="dostavka-date"]').val()) return;
@@ -645,6 +662,10 @@ function cartImportantFields() {
 			'чтобы не мурыжить тебя в телеге, лучше',
 			'заполнить всю инфу сразу'
 		],
+		'gvozdisco': [
+			'чтобы нам не пришлось потревожить тебя в телеграме, лучше',
+			'указать дополнительные данные'
+		],
 		'staytrueflowers': [
 			'чтобы нам не пришлось потревожить вас в телеграме, лучше',
 			'указать дополнительные данные'
@@ -689,7 +710,7 @@ function cartLovixlube() {
  * платная доставка, если в корзине только эти товары
  */
 function cartPayedDeliveryForOnlyDops() {
-	if (isTovarsFromDBEmpty('dopnik')) return;
+	if (!tovarsFromDB['dopnik'].length) return;
 	var onlyDops = false;
 	var tovars = $('.t706__product');
 	if (!tovars.length) return;
@@ -706,8 +727,9 @@ function cartPayedDeliveryForOnlyDops() {
 	$('#adres-zazhopinsk').show();
 	deliveryPriceInterval(true);
 }
+
 /**
- * платный/бесплатный интервад доставки
+ * платный/бесплатный интервал доставки
  * последний вариант игнорируется, так как он всегда платный (с 22 до 8)
  */
 function deliveryPriceInterval(action) {
@@ -748,6 +770,13 @@ function cartFormValidationTexts() {
 			'а вдруг разбудим?',                     	//delivery interval
 			//'применяй или удаляй'						//promocode
 		],
+		'gvozdisco': [
+			'пожалуйста, укажи свое имя',				//name
+			'пожалуйста, укажи свой номер телефона',	//phone
+			'пожалуйста, укажи свой ник в телеграм',	//telegram
+			'пожалуйста, укажи дату доставки',			//delivery date
+			'пожалуйста, укажи интервал доставки'		//delivery interval 
+		],
 		'staytrueflowers': [
 			'пожалуйста, укажите ваше имя',				//name
 			'пожалуйста, укажите ваш номер телефона',	//phone
@@ -785,7 +814,7 @@ function cartAdresPoluchatelya() {
 	 */
 	function wrapAdresFields() {
 		$(adresSmall.join(',')).wrapAll('<div id="adresDataSmall" />').wrapAll('<div />'); //разместим покомпактее
-		$('#adres-poluchatelya-street,#adresDataSmall,#courier-comment').wrapAll('<div />').wrapAll('<div id="adresData" />'); //обернем весь адрес в див 
+		$('#adres-poluchatelya-street,#adresDataSmall,#comment-courier').wrapAll('<div />').wrapAll('<div id="adresData" />'); //обернем весь адрес в див 
 	}
 }
 
@@ -800,7 +829,7 @@ function cartHerZnaetPoluchatelya() {
 	}
 	herZnaet.on('change', function () {
 		$('#adresData').toggle(!$(this).is(':checked'));
-		$('.t706 [name="courier-comment"]').val('').trigger('change');
+		$('.t706 [name="comment-courier"]').val('').trigger('change');
 		$('.t706 .adresInput').each(function () {
 			$(this).val('');
 		});
@@ -819,6 +848,7 @@ function cartProductOptionsInOneLine() {
 			case 'накинуть пятихатку':
 			case 'накинуть сотен':
 			case 'эвкалипт ннада':
+			case 'эвкалипт':
 			case 'добавить 1000':
 			case 'добавить 500':
 			case 'добавить 100':
@@ -870,6 +900,7 @@ function cartErrorsMessageOnClick() {
 			} else {
 				var errorTitle = {
 					'2steblya': 'ЧТО-ТО НЕ ТОГО. ПЕРЕПРОВЕРЬ!',
+					'gvozdisco': 'ФОРМА СОДЕРЖИТ ОШИБКИ',
 					'staytrueflowers': 'ФОРМА СОДЕРЖИТ ОШИБКИ'
 				}
 				var errorTime;
@@ -884,6 +915,7 @@ function cartErrorsMessageOnClick() {
 					btn.text(btnText);
 				}, errorTime);
 			}
+			console.log(errorFields.get(0));
 		}, 400);
 	});
 }
@@ -918,6 +950,7 @@ function cartFormIncomplete() {
 function cartIncompleteRemoveRequired() {
 	var data = {
 		'2steblya': '1675967313188',
+		'gvozdisco': '1675967313188',
 		'staytrueflowers': ''
 	}
 	$('.t706 [data-input-lid="' + data[site] + '"] input').removeAttr('data-tilda-req');
@@ -933,6 +966,9 @@ function cartYaCounterId() {
 			case '2steblya':
 				if (typeof yaCounter89315640 !== 'undefined') counter = yaCounter89315640;
 				break;
+			case 'gvozdisco':
+				if (typeof yaCounter97065108 !== 'undefined') counter = yaCounter97065108;
+				break;
 			case 'staytrueflowers':
 				if (typeof yaCounter85909890 !== 'undefined') counter = yaCounter85909890;
 				break;
@@ -946,13 +982,16 @@ function cartYaCounterId() {
  * на средних экранах иконка корзины не наезжает на меню
  */
 function cartIconUponHeader() {
-	if (site != '2steblya') return;
 	if (document.location.href.indexOf('tproduct') > -1) return;
 	if ($(window).width() > 980 && $(window).width() < 1370) {
 		var cartIcon = $('.t706__carticon');
-		var headerHeight = 110;
+		var data = {
+			'2steblya': 110,
+			'gvozdisco': 140,
+			'staytrueflowers': 0
+		}
 		setInterval(function () {
-			cartIcon.toggleClass('uponHeader', $(window).scrollTop() <= headerHeight);
+			cartIcon.toggleClass('uponHeader', $(window).scrollTop() <= data[site]);
 		}, 50);
 	}
 }
@@ -966,7 +1005,7 @@ function cartOnlyOneTovar() {
 	if (!tovars.length) return;
 	tovars.each(function () {
 		var id = getTovarInCartId($(this));
-		if (!isTovarsFromDBEmpty('vitrina') && !tovarsFromDB['vitrina'].includes(id)) return;
+		if (!tovarsFromDB['vitrina'].includes(id)) return;
 		if (id == nitakoi[site]) return; //НИТАКОЙ
 		$(this).children('.t706__product-plusminus').empty();
 	});
@@ -1041,7 +1080,7 @@ function cartPromocode() {
  */
 function cartSetCookies() {
 	cartCookie('zakazchik', ['name-zakazchika', 'phone-zakazchika', 'messenger-zakazchika']);
-	cartCookie('adres-poluchatelya', ['adres-poluchatelya-street', 'adres-poluchatelya-dom', 'adres-poluchatelya-kvartira', 'adres-poluchatelya-korpus', 'adres-poluchatelya-stroenie', 'adres-poluchatelya-podezd', 'adres-poluchatelya-etazh', 'adres-poluchatelya-domofon', 'courier-comment', 'adres-poluchatelya-city']);
+	cartCookie('adres-poluchatelya', ['adres-poluchatelya-street', 'adres-poluchatelya-dom', 'adres-poluchatelya-kvartira', 'adres-poluchatelya-korpus', 'adres-poluchatelya-stroenie', 'adres-poluchatelya-podezd', 'adres-poluchatelya-etazh', 'adres-poluchatelya-domofon', 'comment-courier', 'adres-poluchatelya-city']);
 	function cartCookie(cookieName, fields) {
 		var inputs = [];
 		$.each(fields, function (i, id) {
@@ -1063,7 +1102,7 @@ function cartSetCookies() {
  */
 function cartUseCookies() {
 	cartCookie('zakazchik', ['name-zakazchika', 'phone-zakazchika', 'messenger-zakazchika'], [0, 1], 'вспомнить меня');
-	cartCookie('adres-poluchatelya', ['adres-poluchatelya-street', 'adres-poluchatelya-dom', 'adres-poluchatelya-kvartira', 'adres-poluchatelya-korpus', 'adres-poluchatelya-stroenie', 'adres-poluchatelya-podezd', 'adres-poluchatelya-etazh', 'adres-poluchatelya-domofon', 'courier-comment', 'adres-poluchatelya-city'], [0, 1], 'как в прошлый раз');
+	cartCookie('adres-poluchatelya', ['adres-poluchatelya-street', 'adres-poluchatelya-dom', 'adres-poluchatelya-kvartira', 'adres-poluchatelya-korpus', 'adres-poluchatelya-stroenie', 'adres-poluchatelya-podezd', 'adres-poluchatelya-etazh', 'adres-poluchatelya-domofon', 'comment-courier', 'adres-poluchatelya-city'], [0, 1], 'как в прошлый раз');
 	function cartCookie(cookieName, fields, requiredFields, btnText) {
 		var cookie = Cookies.get(cookieName);
 		if (!cookie) return;
@@ -1097,6 +1136,88 @@ function cartHideOtkudaUznal() {
 	$('#otkuda-uznal-o-nas').remove();
 }
 
+function cartO4ki() {
+	if (site != 'gvozdisco') return;
+
+	var o4ki = {
+		free: null,
+		paid: null
+	};
+
+	$('.t-store__prod-popup__btn[href="#order"]').on('click', function () {
+		setTimeout(function () {
+			if (!o4ki.free) addO4ki(false);
+		}, 200);
+	});
+
+	setInterval(function () {
+		o4kiPrice();
+		var tovars = $('.t706__product:not(.listenO4ki)');
+		tovars.each(function () {
+			$(this).addClass('listenO4ki');
+			if ($(this).find('.t706__product-title a').text() != 'ДУРАЦКИЕ ОЧКИ') return;
+			if (!$(this).find('.t706__cartwin-prodamount-price').length) {
+				o4ki.free = $(this);
+				o4ki.free.find('a').attr('href', '/glasses');
+				o4ki.free.on('click', '.t706__product-minus img,.t706__product-plus img', function (e) {
+					e.stopPropagation();
+					var parent = $(e.target).parents('.t706__product-plusminus');
+					var isPlus = e.target.src.includes('plus.svg');
+					var quantity = parseInt(parent.children('.t706__product-quantity').text());
+					if (quantity == 2 && isPlus) {
+						addO4ki(true);
+						setTimeout(function () {
+							cartProductOptionsInOneLine();
+						}, 200);
+					} else {
+						if (o4ki.paid) o4ki.paid.find('.t706__product-' + (isPlus ? 'plus' : 'minus')).trigger('click');
+						if (quantity < 2) o4ki.paid == null;
+						if (quantity <= 1) o4ki.free = null;
+					}
+				});
+			} else {
+				o4ki.paid = $(this);
+				//o4ki.paid.hide();
+			}
+			//удалить бесплатные очки
+			if (o4ki.free) {
+				o4ki.free.on('click', '.t706__product-del', function () {
+					o4ki.free = null;
+					setTimeout(function () {
+						if (o4ki.paid) o4ki.paid.find('.t706__product-del').trigger('click');
+						o4ki.paid = null;
+					}, 100);
+				});
+			}
+		});
+		//удаляем очки и закрываем корзину, если нет букетов
+		if ((tovars.length == 2 && o4ki.paid && o4ki.free) || (tovars.length == 1 && o4ki.free)) {
+			o4ki.free.find('.t706__product-del').trigger('click');
+		}
+		//иконка "количество товаров в корзине"
+		let productsCount = window.tcart.products.reduce((acc, product) => {
+			if (product.name !== 'ДУРАЦКИЕ ОЧКИ' || !product.price) {
+				acc += product.quantity;
+			}
+			return acc;
+		}, 0);
+		$('.t706__carticon-counter').text(productsCount);
+	}, 100);
+
+	function o4kiPrice() {
+		if (o4ki.paid && o4ki.free) {
+			o4ki.free.find('.t706__product-amount').html(o4ki.paid.find('.t706__product-amount').html());
+		} else if (o4ki.free && !o4ki.paid) {
+			o4ki.free.find('.t706__product-amount').html('фри');
+		}
+	}
+
+	function addO4ki(payed) {
+		var id = payed ? 151584762682 : 839716392002;
+		$('.uc-catalogO4ki .js-product[data-product-uid="' + id + '"] a[href="#order"]').eq(0).trigger('click');
+	}
+}
+
 /**
  * добавляем текст в js-succesbox
  * этот текст виден только тем, у кого не сработала Юкасса
@@ -1105,6 +1226,7 @@ function cartSuccess() {
 	var succesbox = $('.t706 .js-successbox');
 	var data = {
 		'2steblya': 'заказ оформлен успешно, но похоже Юкасса тупит и не хочет, штоб твои денюжки потекли к нам рекой<br><br>напиши нам в <a href="https://t.me/dva_steblya">телегу</a>, расскажи, что вот такая оказия случилась, и мы скинем тебе новую нормальную ссыклу на оплат очку',
+		'gvozdisco': 'твой заказ оформлен, но мы не смогли перенаправить тебя на оплату заказа в Юкассе.<br><br>Напиши нам в <a href="https://t.me/gvozdisco">телеграм</a>, и мы вышлем тебе новую рабочую ссылку на оплату.',
 		'staytrueflowers': 'Ваш заказ оформлен, но мы не смогли перенаправить вас на оплату заказа в Юкассе.<br><br>Напишите нам в <a href="https://t.me/staytrueflowers">телеграм</a>, и мы вышлем вам новую рабочую ссылку на оплату.'
 	}
 	succesbox.addClass('hidden').attr('data-success-message', data[site]);

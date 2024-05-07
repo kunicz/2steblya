@@ -48,6 +48,11 @@
 			font-weight: 100 !important;
 		}
 
+		@include if('gvozdisco') {
+			font-size: 24px;
+			font-family: $heading-font !important
+		}
+
 		@include max(640) {
 			text-align: center;
 		}

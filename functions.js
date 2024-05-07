@@ -15,7 +15,8 @@ $(document).ready(function () {
 function redirectHome() {
 	var data = {
 		'2steblya': ['page28196964'],
-		'staytrueflowers': []
+		'staytrueflowers': [],
+		'gvozdisco': [],
 	}
 	$.each(data[site], function (i, e) {
 		if (document.location.href.indexOf(e) > -1) {
@@ -42,6 +43,7 @@ function formValidationTexts(form, texts = []) {
 	form.find('.t-submit').on('click', function () {
 		var data = {
 			'2steblya': 'укажи по брацки',
+			'gvozdisco': 'надо заполнить поле',
 			'staytrueflowers': 'данное поле должно быть заполнено'
 		}
 		var int = setInterval(function () {
@@ -60,6 +62,7 @@ function formValidationTexts(form, texts = []) {
 function headerMenu() {
 	var data = {
 		'2steblya': 'rec469639590',
+		'gvozdisco': 'rec736788412',
 		'staytrueflowers': 'rec496423452,#rec496387058'
 	}
 	var menu = $('#' + data[site]);
@@ -130,6 +133,7 @@ function footer() {
 	function footerCopyrightYear() {
 		var startYear = {
 			'2steblya': null,
+			'gvozdisco': 2024,
 			'staytrueflowers': 2021
 		}
 		if (!startYear[site]) return;
@@ -146,6 +150,12 @@ function footer() {
  * РАБОТЫ С БД
  */
 tovarsFromDB = {
+	'666': [],
+	'777': [],
+	'888': [],
+	'999': [],
+	'1000': [],
+	'1111': [],
 	'allowed_today': [],
 	'card_type_image': [],
 	'card_type_text': [],
@@ -154,6 +164,7 @@ tovarsFromDB = {
 	'days_to_close': {},
 	'hours_to_produce': {},
 	'dopnik': [],
+	'mono': [],
 	'fixed_price': [],
 	'hidden': [],
 	'paid_delivery': [],
@@ -169,7 +180,7 @@ getAllTovarsFromDB()
 	.then(data => {
 		data.forEach(tovar => {
 			//id
-			['allowed_today', 'dopnik', 'fixed_price', 'hidden', 'paid_delivery', 'random_sostav', 'select_color', 'select_gamma'].forEach(e => {
+			['allowed_today', 'dopnik', 'mono', 'fixed_price', 'hidden', 'paid_delivery', 'random_sostav', 'select_color', 'select_gamma'].forEach(e => {
 				if (!parseInt(tovar[e])) return;
 				tovarsFromDB[e].push(parseInt(tovar.id));
 			});
@@ -178,6 +189,9 @@ getAllTovarsFromDB()
 				if (!parseInt(tovar[e])) return;
 				tovarsFromDB[e][tovar.id] = ['date_to_open'].includes(e) ? tovar[e] : parseInt(tovar[e]);
 			});
+			//type
+			if (tovarsFromDB[tovar.type] == undefined) tovarsFromDB[tovar.type] = [];
+			tovarsFromDB[tovar.type].push(parseInt(tovar.id));
 			//card_type
 			tovarsFromDB['card_type_' + tovar.card_type].push(parseInt(tovar.id));
 			//vitrina
@@ -200,15 +214,15 @@ getAllTovarsFromDB()
 function getAllTovarsFromDB() {
 	return new Promise((resolve, reject) => {
 		$.ajax({
-			url: 'https://php.2steblya.ru/ajax.php?script=Tilda_tovars_from_DB&tovars=all&site=' + site,
+			url: 'https://php.2steblya.ru/ajax.php?script=Tilda_products_from_DB&products=all&site=' + site,
 			crossDomain: true,
 			type: 'GET',
 			success: function (data) {
-				var first = data.slice(0, 1);
-				if (first == '{' || first == '[') {
-					resolve(JSON.parse(data));
+				data = JSON.parse(data);
+				if (data.success) {
+					resolve(data.fromDB);
 				} else {
-					resolve(data);
+					reject();
 				}
 			},
 			error: function (error) {
@@ -216,16 +230,6 @@ function getAllTovarsFromDB() {
 			}
 		});
 	});
-}
-
-/**
- * проверка на наличие товаров из бд по ключу
- */
-function isTovarsFromDBEmpty(field) {
-	if (tovarsFromDB[field] === undefined) return true;
-	if (Array.isArray(tovarsFromDB[field]) && !tovarsFromDB[field].length) return true;
-	if (typeof tovarsFromDB[field] === 'object' && !Object.keys(tovarsFromDB[field]).length) return true;
-	return false;
 }
 
 

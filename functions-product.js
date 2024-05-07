@@ -4,7 +4,6 @@
 function product() {
 	var int = setInterval(function () {
 		if (!tovarsFromDBReady) return;
-		console.log('start_product');
 		if (window.location.pathname.includes('/tproduct/')) {
 			/* страница продукта /tproduct/... */
 			productLogoInHeader();
@@ -52,6 +51,8 @@ function productTovarFunctions(tovar) {
 	productHideEmptyText(tovar);
 	productAddAdditionalText(tovar);
 	productFlowersSeason(tovar);
+	productFlowersMono(tovar);
+	productPodpiska(tovar);
 	productCharcs(tovar);
 	productBlackFriday(tovar);
 	productSoldOut(tovar);
@@ -170,6 +171,7 @@ function productCatalogMenu(catalog) {
 		function renameAll() {
 			var data = {
 				'2steblya': 'ALL',
+				'gvozdisco': 'ВСЕ',
 				'staytrueflowers': 'ВСЕ'
 			}
 			$('.t-store__parts-switch-btn-all').text(data[site]);
@@ -216,7 +218,6 @@ function productCatalogMutationObserver(catalog) {
  */
 function productHideVitrinaDuplicate(tovar, catalog) {
 	if (isVitrina(catalog)) return;
-	if (isTovarsFromDBEmpty('vitrina')) return;
 	$.each(tovarsFromDB['vitrina'], function (i, id) {
 		if (getTovarId(tovar) != id) return;
 		tovar.hide();
@@ -235,7 +236,7 @@ function productPrices(tovar, catalog) {
 	 * добавляем товарам класс, который отвечает за "цена от"
 	 */
 	function multiplePrices() {
-		if (!isTovarsFromDBEmpty('fixed_price') && tovarsFromDB['fixed_price'].includes(getTovarId(tovar))) return; //если товар в бд помечен как товар с фиксированной ценой
+		if (tovarsFromDB['fixed_price'].includes(getTovarId(tovar))) return; //если товар в бд помечен как товар с фиксированной ценой
 		if (tovar.find('[data-edition-option-id="' + productFormat[site] + '"] select option').length < 2) return; //если формат остался только один, например, остальное раскупили
 		//также класс не применяется к тем товарам, у которых изначально в тильде нет ценовых вариантов
 		tovar.addClass('multiplePrices');
@@ -271,6 +272,10 @@ function productCartDisabled(tovar) {
 		'2steblya': [
 			'а как купить?',
 			'сорян, мы зашиваемся и пока прием заказов заказан. но если у вас очень важное дело, то напишите нам в <a href="https://t.me/dva_steblya" target="blank">телегу</a>, че-нить придумаем<'
+		],
+		'gvozdisco': [
+			'А как купить?',
+			'К сожалению, в данный момент прием заказов закрыт. но ты всегда можешь <a href="https://t.me/gvozdisco">написать нам</a>, и мы обязательно постараемся тебе помочь.'
 		],
 		'staytrueflowers': [
 			'А как купить?',
@@ -325,9 +330,11 @@ function productPlashka(tovar) {
 function productBomjPlashka(tovar, catalog) {
 	if (site != '2steblya') return;
 	if (getTovarPrice(tovar) > Object.keys(productPriceLevels[site])[0]) return;
+	if (tovarsFromDB[888].includes(getTovarId(tovar))) return;
 	tovar.addClass('bomj');
 	var data = {
 		'2steblya': 'бомжетный',
+		'gvozdisco': 'бюджетный',
 		'staytrueflowers': 'бюджетный'
 	}
 	var plashka = $('<div class="bomjPlashka">' + data[site] + '</div>');
@@ -342,9 +349,8 @@ function productBomjPlashka(tovar, catalog) {
  * кнопка "купить"
  */
 function productButton(tovar) {
-	if (site == '2steblya' && getTovarId(tovar) == 857613433221) { //донатошная
-		$('.js-store-prod-popup-buy-btn-txt').text('ЗАДОНАТИТЬ!');
-	}
+	if (!tovarsFromDB[1111].includes(getTovarId(tovar))) return;
+	$('.js-store-prod-popup-buy-btn-txt').text('ЗАДОНАТИТЬ!');
 }
 
 /**
@@ -376,9 +382,16 @@ function productOnPhoto(tovar) {
 		var photos = [];
 		for (var i = 0; i < product.editions.length; i++) {
 			if (!product.editions[i].img) continue;
-			photos.push([product.editions[i][productFormat[site]], product.editions[i].img]);
+			const match = product.editions[i][productFormat[site]].match(/(.+?)\sх\d+\sдоставки/);
+			const m = match ? match[1] : product.editions[i][productFormat[site]];
+			photos.push([m, product.editions[i].img]);
 			sizes.push(product.editions[i][productFormat[site]]);
 		}
+		sizes = sizes.map(str => {
+			var match = str.match(/(.+?)\sх\d+\sдоставки/);
+			return match ? match[1] : str;
+		});
+		sizes = [...new Set(sizes)];
 		if (!photos.length) return;
 		var i = 0;
 		tovar.find('.t-slds__main .t-slds__bgimg').each(function (j, e) {
@@ -417,6 +430,10 @@ function productFlowersSeason(tovar) {
 				'пион': 'если сезон пионов (' + flowersSeasons['пион'] + ') закончилса, то мы поставим вместо их кросивые пивоно видные розы',
 				'георгина': 'если сезон георгин (' + flowersSeasons['георгина'] + ') закончилса, то мы поставим вместо их кросивые розы'
 			},
+			'gvozdisco': {
+				'пион': '',
+				'георгина': ''
+			},
 			'staytrueflowers': {
 				'пион': '',
 				'георгина': ''
@@ -429,10 +446,52 @@ function productFlowersSeason(tovar) {
 }
 
 /**
+ * текст для подписок
+ */
+function productPodpiska(tovar) {
+	if (!tovarsFromDB['666'].includes(getTovarId(tovar))) return;
+	//порядок торговых предложений
+	var select = tovar.find('.js-product-edition-option[data-edition-option-id="фор мат"] select');
+	var options = select.find('option');
+	$(options).each(function (index) {
+		// Индекс текущей опции в новом порядке
+		var newIndex = [1, 0, 3, 2, 5, 4][index];
+		// Ищем опцию с соответствующим значением и перемещаем её в конец списка
+		$(this).insertAfter(select.children('option:eq(' + newIndex + ')'));
+	});
+	select.children('option:first').prop('selected', true);
+	var changeEvent = new Event('change');
+	select.get(0).dispatchEvent(changeEvent);
+
+	//текст-описание
+	$data = {
+		'2steblya': 'подпис очка - это цветочеки для дома. каждую недельку разные! можно зоказать себе, можно в подарок<br><br>букептеки могут приезджать с тематической карт очкой, а могут просто сами по себе красивые без всего<br><br>карточки:<ul><li>от тайнова поклонника - будут любовные записки</li><li>мем недели - картинка для увеселения</li><li>без карточки - просто цветочки пришлем</li><li>без айдентики - даже о себе нигде не напишем</li></ul>',
+		'gvozdisco': '',
+		'staytrueflowers': ''
+	}
+	var block = tovar.find('.js-store-prod-all-text');
+	block.html(block.html() + '<br><br>' + $data[site]);
+}
+
+/**
+ * текст для моно букетов
+ */
+function productFlowersMono(tovar) {
+	if (!tovarsFromDB['mono'].includes(getTovarId(tovar))) return;
+	$data = {
+		'2steblya': 'цветочики вкуснее с эвкалиптом. мы рекомен дуем:<br>1 эвкалипт к букетусикам<br>2 эвкалипта к букетикам и букетам<br>3 эвкалипта к букетищам и прочим корзинам',
+		'gvozdisco': 'цветочки лучше с эвкалиптом. мы рекомен дуем:<br>1 эвкалипт к букетусикам<br>2 эвкалипта к букетикам и букетам<br>3 эвкалипта к букетищам и прочим корзинам',
+		'staytrueflowers': ''
+	}
+	var block = tovar.find('.js-store-prod-all-text');
+	block.html(block.html() + '<br><br>' + $data[site]);
+}
+
+/**
  * скрываем товары, которые должны быть скрыты
  */
 function productsTotHide(tovar) {
-	if (!isTovarsFromDBEmpty('hidden') && !tovarsFromDB['hidden'].includes(getTovarId(tovar))) return;
+	if (!tovarsFromDB['hidden'].includes(getTovarId(tovar))) return;
 	tovar.prev('.t-clear').addBack().hide();
 }
 
@@ -440,12 +499,17 @@ function productsTotHide(tovar) {
  * заменяем картинку "наша карточка" на текстовый аналог
  */
 function productReplaceCardImgWithText(tovar, catalog) {
-	if (!isCardToBeReplaced(tovar)) {
+	if (tovarsFromDB['card_type_no'].includes(getTovarId(tovar))) {
+		tovar.addClass('noCard');
+		return;
+	}
+	if (!tovarsFromDB['card_type_text'].includes(getTovarId(tovar))) {
 		removeSelect(catalog);
 		return;
 	}
 	var data = {
 		'2steblya': '<p>«здесь может быть ваша реклама»</p><p>или какой хочешь текст,</p><p>решать тебе</p>',
+		'gvozdisco': '<p>здесь мы разместим твое пожелание или поздравление</p>',
 		'staytrueflowers': '<p>здесь мы разместим ваше пожелание или поздравление</p>'
 	}
 	var card = tovar.find(catalog ? '.t-store__card__bgimg_second' : '.t-slds__item[data-slide-index="2"]');
@@ -471,15 +535,6 @@ function productReplaceCardImgWithText(tovar, catalog) {
 	function removeSelect(catalog) {
 		if (catalog) return;
 		tovar.find('.js-product-option:last').remove();
-	}
-
-	/**
-	 * если товару не надо подменять карточку
-	 */
-	function isCardToBeReplaced(tovar) {
-		if (!isTovarsFromDBEmpty('card_type_no') && tovarsFromDB['card_type_no'].includes(getTovarId(tovar))) tovar.addClass('noCard');
-		if (!isTovarsFromDBEmpty('card_type_text') && tovarsFromDB['card_type_text'].includes(getTovarId(tovar))) return true;
-		return false;
 	}
 }
 
@@ -519,11 +574,13 @@ function productAddAdditionalText(tovar) {
 		'2steblya': [
 			857613433221 // донатошная
 		],
+		'gvozdisco': [],
 		'staytrueflowers': []
 	}
 	if (noTextProducts[site].includes(getTovarId(tovar))) return;
 	var data = {
 		'2steblya': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов<br>к букетам с айдентикой также прилагается карт очка и сосабельный петушок',
+		'gvozdisco': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов<br>к букетам с айдентикой также прилагается карточка и очечи',
 		'staytrueflowers': 'к каждому букету прилагается карточка с его названием, состав, порошок для продления жизни цветов. и леденец для настроения :-)<br><br>ВАЖНО: про <a href="/substitute" target="_blank">замены в букетах</a>'
 	}
 	var div = $('<div class="t-store__prod-popup__text-dop"></div>');
@@ -546,6 +603,7 @@ function productCharcs(tovar) {
 function productRemoveCharcs(charcBlock) {
 	var techCharcs = {
 		'2steblya': ['гамма', 'цвет', 'состав'],
+		'gvozdisco': [],
 		'staytrueflowers': []
 	}
 	if (techCharcs[site].includes(charcBlock.children('b').text())) charcBlock.hide();
@@ -568,6 +626,10 @@ function productOptionsReadMore(tovar) {
 		'2steblya': {
 			'фор мат': '/format',
 			'выебри карточку': '/card'
+		},
+		'gvozdisco': {
+			'формат': '/format',
+			'карточка': '/card'
 		},
 		'staytrueflowers': {
 			'формат': '/format',
@@ -651,7 +713,9 @@ function productHideDisabledFormatOption(tovar) {
  * получаем текст карточки из селекта "текст карточки"
  */
 function getTovarCardText(tovar) {
-	var val = tovar.find('.js-product-option:last').find('select').val();
+	var options = tovar.find('.js-product-option');
+	if (!options.length) return '';
+	var val = options.last().find('select').val();
 	//перечеркнутый текст
 	val = val.replace(/\*s\*(.*?)\*s\*/g, '<s>$1</s>');
 	return val ? val.split('*br*').join('<br>') : '';
@@ -775,15 +839,15 @@ function owlCatalog(catalog, className) {
 function newCatalog(block) {
 	$tovarsFromDbPromise = new Promise((resolve, reject) => {
 		$.ajax({
-			url: 'https://php.2steblya.ru/ajax.php?script=Tilda_tovars_from_DB&tovars=new&site=' + site,
+			url: 'https://php.2steblya.ru/ajax.php?script=Tilda_products_from_DB&products=new&site=' + site,
 			crossDomain: true,
 			type: 'GET',
 			success: function (data) {
-				var first = data.slice(0, 1);
-				if (first == '{' || first == '[') {
-					resolve(JSON.parse(data));
+				data = JSON.parse(data);
+				if (data.success) {
+					resolve(data.fromDB);
 				} else {
-					resolve(data);
+					reject();
 				}
 			},
 			error: function (error) {

@@ -9,23 +9,22 @@
 	&__arrow {
 		@include navButton(&+'-left', &+'-right');
 
-		@include if('2steblya') {
-			&-left {
-				left: 5px;
+		&-left {
+			left: 5px;
 
-				&::before {
-					content: '<';
-				}
-			}
-
-			&-right {
-				right: 5px;
-
-				&::before {
-					content: '>';
-				}
+			&::before {
+				content: '<';
 			}
 		}
+
+		&-right {
+			right: 5px;
+
+			&::before {
+				content: '>';
+			}
+		}
+
 	}
 
 	//буллиты

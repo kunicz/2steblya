@@ -98,6 +98,13 @@
 		font-weight: 800 !important;
 	}
 
+	@include if('gvozdisco') {
+		color: $primary-color !important;
+		background-color: $secondary-color !important;
+		border: 0 none !important;
+		font-weight: 800 !important;
+	}
+
 	@include if('stf') {
 		color: $contrprimary-color !important;
 		background-color: $primary-color !important;

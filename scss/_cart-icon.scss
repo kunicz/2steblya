@@ -11,6 +11,10 @@
 
 	&.uponHeader {
 		top: 70px;
+
+		@include if('gvozdisco') {
+			top: 120px
+		}
 	}
 
 	&-wrapper {
@@ -26,5 +30,9 @@
 		box-shadow: none;
 		border-radius: 0;
 		background: none;
+	}
+
+	&-counter {
+		background-color: $secondary-color;
 	}
 }

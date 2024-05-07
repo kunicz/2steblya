@@ -14,20 +14,25 @@
 		padding: 0;
 	}
 
+	background-size: 40%;
+	background-position: center 50px;
+	background-repeat: no-repeat;
+	vertical-align: top;
+	min-height: 300px;
+
+	@media screen and (max-width:960px) {
+		background-size: 80%;
+	}
+
+	@media screen and (max-width:400px) {
+		background-size: 100%;
+	}
+
 	@include if('2steblya') {
 		background-image: url(https://static.tildacdn.com/tild3735-6265-4864-b363-376135393737/laurie.gif);
-		background-size: 40%;
-		background-position: center 50px;
-		background-repeat: no-repeat;
-		vertical-align: top;
-		min-height: 300px;
+	}
 
-		@media screen and (max-width:960px) {
-			background-size: 80%;
-		}
-
-		@media screen and (max-width:400px) {
-			background-size: 100%;
-		}
+	@include if('gvozdisco') {
+		background-image: url(https://static.tildacdn.com/tild3365-6464-4163-b563-343836343539/laurie.gif);
 	}
 }

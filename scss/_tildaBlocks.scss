@@ -3,6 +3,14 @@
 	@include if('stf') {
 		text-align: left !important;
 	}
+
+	@include if('gvozdisco') {
+		.t-text {
+			background-color: $primary-color;
+			padding: 5px 10px;
+			display: inline-block
+		}
+	}
 }
 
 //Прямая речь
@@ -29,6 +37,18 @@
 	img {
 		width: 360px;
 		height: 360px;
+	}
+}
+
+//заголовок 2 уровня
+.t120 {
+	@include if('gvozdisco') {
+		h2 {
+			background-color: $primary-color;
+			padding: 5px 10px;
+			display: inline-block;
+			font-size: 18px;
+		}
 	}
 }
 
@@ -77,14 +97,43 @@
 	}
 }
 
+//заголовки разделов
+.t225 {
+	@include if('gvozdisco') {
+		&__title {
+			background-color: $primary-color;
+			padding: 5px 10px;
+			display: inline-block;
+			font-size: 24px;
+			font-family: $heading-font !important;
+		}
+	}
+}
+
 //Универсальное меню с логотипом слева
 .t228 {
-	background-color: $primary-color;
 	font-weight: 600;
+	background-color: $primary-color;
+
+	@include if('gvozdisco') {
+		@include min(980) {
+			background-color: transparent;
+		}
+	}
+
+	&__list_item {
+		font-size: $text-font-size !important;
+	}
 
 	.t-menu__link-item {
 		color: $contrprimary-color !important;
 		font-size: $text-font-size !important;
+
+		@include if('gvozdisco') {
+			padding: 5px 10px;
+			background-color: $primary-color;
+			line-height: 2.3em;
+		}
 	}
 
 	.t-sociallinks__svg {
@@ -96,6 +145,14 @@
 
 //Колонки с цифрами в кружочках
 .t502 {
+	@include if('gvozdisco') {
+
+		&__title,
+		&__blockdescr {
+			background-color: $primary-color;
+			padding: 10px
+		}
+	}
 
 	&__circle {
 		font-size: 0 !important;
@@ -150,6 +207,12 @@
 .t585 {
 	&__trigger-button {
 		cursor: pointer;
+
+		@include if('gvozdisco') {
+			padding: 10px;
+			background-color: $primary-color;
+			margin: 0 0 15px 0;
+		}
 	}
 
 	&__header {
@@ -179,12 +242,25 @@
 		}
 	}
 
+	&__text {
+		@include if('gvozdisco') {
+			background-color: $primary-color;
+			padding: 5px 10px;
+		}
+	}
+
 	&__img {
 		max-width: 100px;
 		max-height: 100px;
 		margin-left: auto;
 		margin-right: auto;
 		border-radius: 50%;
+	}
+
+	&__icon {
+		@include if('gvozdisco') {
+			right: 10px;
+		}
 	}
 
 	&__icon &__lines svg>g {
@@ -207,6 +283,13 @@
 		background-color: $secondary-color !important;
 	}
 
+}
+
+//Картинка и текст в колонках
+.t688 {
+	& * {
+		opacity: 1 !important;
+	}
 }
 
 //Лента инстаграм
