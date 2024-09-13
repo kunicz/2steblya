@@ -150,28 +150,29 @@ function footer() {
  * РАБОТЫ С БД
  */
 tovarsFromDB = {
-	'666': [],
-	'777': [],
-	'888': [],
-	'999': [],
-	'1000': [],
-	'1111': [],
+	'000': [],	//транспортирочное
+	'666': [],	//подписка
+	'777': [],	//исключительно витринный
+	'888': [],	//допник
+	'999': [],	//нитакой как все (букет со свободной ценой)
+	'1000': [],	//индпошив (персональный букет)
+	'1111': [],	//донат
 	'allowed_today': [],
+	'not_allowed': [],
 	'card_type_image': [],
 	'card_type_text': [],
 	'card_type_no': [],
 	'date_to_open': {},
 	'days_to_close': {},
-	'hours_to_produce': {},
-	'dopnik': [],
-	'mono': [],
+	'evkalipt': [],
 	'fixed_price': [],
 	'hidden': [],
 	'paid_delivery': [],
 	'random_sostav': [],
 	'select_color': [],
 	'select_gamma': [],
-	'vitrina': []
+	'vitrina': [],
+	'video_preview': {}
 }
 /**
  * получаем все данные о товарах из БД, и обрабатываем эти данные, формируя массив всей нужной информации для использования на сайте
@@ -180,18 +181,28 @@ getAllTovarsFromDB()
 	.then(data => {
 		data.forEach(tovar => {
 			//id
-			['allowed_today', 'dopnik', 'mono', 'fixed_price', 'hidden', 'paid_delivery', 'random_sostav', 'select_color', 'select_gamma'].forEach(e => {
+			['dopnik', 'evkalipt', 'fixed_price', 'hidden', 'paid_delivery', 'random_sostav', 'select_color', 'select_gamma'].forEach(e => {
 				if (!parseInt(tovar[e])) return;
 				tovarsFromDB[e].push(parseInt(tovar.id));
 			});
-			//id+value
-			['hours_to_produce', 'days_to_close', 'date_to_open'].forEach(e => {
+			//id allowed
+			if (tovar.allowed_today == 1) tovarsFromDB['allowed_today'].push(parseInt(tovar.id));
+			if (tovar.allowed_today == -1) tovarsFromDB['not_allowed'].push(parseInt(tovar.id));
+			//id+value (строковые)
+			['date_to_open', 'video_preview'].forEach(e => {
+				if (!tovar[e]) return;
+				tovarsFromDB[e][tovar.id] = tovar[e];
+			});
+			//id+value (числовые)
+			['days_to_close'].forEach(e => {
 				if (!parseInt(tovar[e])) return;
-				tovarsFromDB[e][tovar.id] = ['date_to_open'].includes(e) ? tovar[e] : parseInt(tovar[e]);
+				tovarsFromDB[e][tovar.id] = parseInt(tovar[e]);
 			});
 			//type
-			if (tovarsFromDB[tovar.type] == undefined) tovarsFromDB[tovar.type] = [];
-			tovarsFromDB[tovar.type].push(parseInt(tovar.id));
+			if (tovar.type) {
+				if (tovarsFromDB[tovar.type] == undefined) tovarsFromDB[tovar.type] = [];
+				tovarsFromDB[tovar.type].push(parseInt(tovar.id));
+			}
 			//card_type
 			tovarsFromDB['card_type_' + tovar.card_type].push(parseInt(tovar.id));
 			//vitrina

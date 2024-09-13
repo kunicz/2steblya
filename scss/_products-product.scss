@@ -69,6 +69,7 @@
 			color: $contrprimary-color !important;
 
 			&_old {
+				color: $contrprimary-color !important;
 				opacity: .5;
 				margin: 0 10px;
 
@@ -96,6 +97,11 @@
 			margin-top: 30px;
 			font-size: .8em !important;
 			opacity: .5 !important;
+
+			a {
+				color: $contrprimary-color !important;
+				text-decoration: underline !important;
+			}
 		}
 
 		//кнопка

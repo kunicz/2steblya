@@ -1,0 +1,62 @@
+.uc {
+	&-telegrams {
+		li:nth-child(2) a {
+			position: relative;
+
+			&::before {
+				content: '';
+				display: block;
+				width: 30px;
+				height: 30px;
+				position: absolute;
+				bottom: -10px;
+				right: -10px;
+				background-size: contain;
+				background-image: url(https://static.tildacdn.com/tild6265-3230-4461-b062-343364643636/write.png);
+			}
+		}
+	}
+
+	&-projectsBanners {
+		.t688 {
+			&__col {
+				padding: 0;
+				width: 100%;
+				max-width: unset;
+				float: none;
+			}
+
+			&__textwrapper {
+				display: none;
+			}
+
+			&__img {
+				background-size: contain;
+				opacity: 1 !important;
+			}
+
+			&__img-separator {
+				padding-top: 36.09%;
+
+				@include max(960) {
+					padding-top: 95.61%;
+				}
+			}
+		}
+
+		.owl-nav {
+			display: block;
+			top: 50%;
+
+			@include max(960) {
+				.owl-prev {
+					left: 10px
+				}
+
+				.owl-next {
+					right: 10px
+				}
+			}
+		}
+	}
+}

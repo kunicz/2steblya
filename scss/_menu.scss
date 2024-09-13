@@ -2,6 +2,13 @@
 
 	//мобилки
 	&-mobile {
+		@include min(980) {
+			&__menucontent_hidden {
+				display: block !important;
+				opacity: 1 !important;
+			}
+		}
+
 		@include max(980) {
 			background-color: transparent !important;
 			z-index: 10000 !important;

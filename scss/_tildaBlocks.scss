@@ -246,6 +246,7 @@
 		@include if('gvozdisco') {
 			background-color: $primary-color;
 			padding: 5px 10px;
+			text-align: center
 		}
 	}
 

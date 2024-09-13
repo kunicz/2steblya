@@ -1,4 +1,27 @@
 #lovixlube[data-input-lid="1688065007506"] .t-input-block {
+	border: 2px solid #bf3a71;
+	padding: 10px;
+	position: relative;
+	border-radius: 0 !important;
+
+	span.logo {
+		content: '';
+		display: block;
+		width: 90px;
+		height: 19px;
+		background-color: #bf3a71;
+		position: absolute;
+		top: -20px;
+		right: -2px;
+		background-image: url(https://static.tildacdn.com/tild3439-3130-4633-b939-633166343033/svakom.jpg);
+		background-position: center;
+		background-size: contain;
+		background-repeat: no-repeat;
+	}
+}
+
+/*
+#lovixlube[data-input-lid="1688065007506"] .t-input-block {
 	border: 2px solid #cd0007;
 	padding: 10px;
 	position: relative;
@@ -18,23 +41,5 @@
 		background-size: contain;
 		background-repeat: no-repeat;
 	}
-
-	/*& .t-checkbox__indicator {
-		margin-right: 135px;
-
-		&::after {
-			content: '';
-			display: inline-block;
-			vertical-align: middle;
-			margin-left: 40px;
-			transform: translateY(-5px);
-			width: 110px;
-			height: 30px;
-			background-color: #cd0007;
-			background-image: url(https://static.tildacdn.com/tild3564-6333-4361-a536-393732306436/lovixLube.jpg);
-			background-position: center;
-			background-size: contain;
-			background-repeat: no-repeat;
-		}
-	}*/
 }
+	*/

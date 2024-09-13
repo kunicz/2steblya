@@ -136,6 +136,7 @@ function cartDopsReminder() {
 	var data = {
 		'2steblya': 'хош добавить <a href="/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%9F%D0%9E%D0%94%D0%90%D0%A0+%D0%9E%D0%A7%D0%9A%D0%98&tfc_div=:::">подар очек</a> к букету? а што насчёт <a href="https://2steblya.ru/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%92%D0%90%D0%97%D0%AB&tfc_div=:::">вазы</a>?',
 		'gvozdisco': '',
+		'dorogobogato': '',
 		'staytrueflowers': ''
 	}
 	if (site != '2steblya') return;
@@ -267,7 +268,7 @@ function cartDelivery() {
 		 * закрываем дни до даты, указанной в товаре (в бд)
 		 */
 		function dateToOpen() {
-			if (!tovarsFromDB['date_to_open'].length) return;
+			if (!Object.keys(tovarsFromDB['date_to_open']).length) return;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			var dateOpen = dates['tomorrow-0'];
@@ -283,6 +284,7 @@ function cartDelivery() {
 						var disclaimerData = {
 							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
 							'gvozdisco': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
+							'dorogobogato': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
 							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff)
 						}
 						$('.t_datepicker__disclaimer').text(disclaimerData[site]);
@@ -304,7 +306,7 @@ function cartDelivery() {
 		 * закрываем количество дней, указанное в товаре (в бд) от сегодняшней
 		 */
 		function daysToClose() {
-			if (!tovarsFromDB['days_to_close'].length) return;
+			if (!Object.keys(tovarsFromDB['days_to_close']).length) return;
 			var tovars = $('.t706__product');
 			if (!tovars.length) return;
 			var daysClosed = 0;
@@ -317,6 +319,7 @@ function cartDelivery() {
 						var disclaimerData = {
 							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
 							'gvozdisco': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
+							'dorogobogato': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
 							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed)
 						}
 						$('.t_datepicker__disclaimer').text(disclaimerData[site]);
@@ -411,7 +414,7 @@ function cartDelivery() {
 			}
 			//проверяем, может ли этот товар быть сопуткой
 			function isDopnik(id) {
-				return tovarsFromDB['dopnik'].includes(id);
+				return tovarsFromDB['888'].includes(id);
 			}
 		}
 
@@ -462,6 +465,7 @@ function cartDelivery() {
 			var data = {
 				'2steblya': 'с ветрины только щас или завтро',
 				'gvozdisco': 'с витрины только на сегодня или на завтра',
+				'dorogobogato': 'с витрины только на сегодня или на завтра',
 				'staytrueflowers': 'с витрины только на сегодня или на завтра'
 			};
 			$('.t706 .t_datepicker__day-cell').addClass('t_datepicker__day-cell--disabled');
@@ -484,7 +488,7 @@ function cartDelivery() {
 			for (var i = 0; i < intervalField.length; i++) {
 				$(intervalField[i]).attr('disabled', false).parent().css('opacity', 1);
 			}
-			//disableOpt(1);
+			//disableOpt(0);
 			if (!dates['selected-0']) return;
 			if (dates['selected-0'].toDateString() == dates['tomorrow-0'].toDateString()) tomorrowDeliveryInterval();
 			if (dates['selected-0'].toDateString() == dates['today-0'].toDateString()) todayDeliveryInterval();
@@ -495,7 +499,7 @@ function cartDelivery() {
 		 * утренняя доставка на завтра с вечера (после 18 часов) невозможна
 		 */
 		function tomorrowDeliveryInterval() {
-			if (dates['today'].getHours() >= 20) disableOpt(1);
+			if (dates['today'].getHours() >= 20) disableOpt(0);
 		}
 
 		/**
@@ -505,31 +509,15 @@ function cartDelivery() {
 		 */
 		function todayDeliveryInterval() {
 			$('#dostavka-interval input').each(function (i, e) {
-				const matches = $(this).val().match(/(\d{2}):\d{2}/g);
-				const hours = matches.map(match => parseInt(match.substring(0, 2), 10));
-				if (dates['today'].getHours() > hours[0] && dates['today'].getHours() <= hours[1]) disableOpt(i + 1);
+				const hours = $(this).val().match(/(\d{2}):\d{2}/g).map(match => parseInt(match.substring(0, 2), 10));
+				const hoursToProduce = 2;
+				if (!i) disableOpt(i);
+				if (dates['today'].getHours() > hours[0] && dates['today'].getHours() >= (hours[1] - hoursToProduce)) disableOpt(i);
 			});
-			disableOpt(1);
-			/*var hour = dates['today'].getHours();
-			var tovars = $('.t706__product');
-			var startHour = 6;
-			tovars.each(function () {
-				var tovarId = getTovarInCartId($(this));
-				if (!tovarsFromDB['allowed_today'].includes(tovarId)) return;
-				if (!tovarsFromDB['hours_to_produce'].length) return;
-				if (!Object.keys(tovarsFromDB['hours_to_produce']).includes(tovarId)) return;
-				startHour -= tovarsFromDB['hours_to_produce'][tovarId];
-			});
-			for (i = 1; i <= 4; i++) {
-				if (hour >= startHour + 4 * i) disableOpt(i); //за два часа до истечения интервала
-			}
-			disableOpt(1);*/
 		}
 		function disableOpt(i) {
-			$(intervalField[i - 1]).attr('disabled', true).parent().css('opacity', .3);
-			if ($(intervalField[i - 1]).is(':checked')) {
-				$(intervalField[i]).trigger('click');
-			}
+			$(intervalField[i]).attr('disabled', true).parent().css('opacity', .3);
+			if ($(intervalField[i]).is(':checked') && intervalField[i + 1]) $(intervalField[i + 1]).trigger('click');
 		}
 	}
 
@@ -540,6 +528,7 @@ function cartDelivery() {
 		var data = {
 			'2steblya': ['телегу', 'https://t.me/dva_steblya'],
 			'gvozdisco': ['телеграм', 'https://t.me/dva_steblya'],
+			'dorogobogato': ['телеграм', 'https://t.me/dva_steblya'],
 			'staytrueflowers': ['телеграм', 'https://t.me/staytrueflowers']
 		}
 		var descr = $('#dostavka-date .t-input-subtitle');
@@ -578,6 +567,7 @@ function cartDonat() {
 	var data = {
 		'2steblya': 857613433221,
 		'gvozdisco': '',
+		'dorogobogato': '',
 		'staytrueflowers': ''
 	}
 	if (getTovarInCartId(tovars.eq(0)) != data[site]) return;
@@ -663,11 +653,15 @@ function cartImportantFields() {
 			'заполнить всю инфу сразу'
 		],
 		'gvozdisco': [
-			'чтобы нам не пришлось потревожить тебя в телеграме, лучше',
+			'чтобы нам не пришлось тревожить тебя в телеграме, лучше',
+			'указать дополнительные данные'
+		],
+		'dorogobogato': [
+			'чтобы нам не пришлось тревожить тебя в телеграме, лучше',
 			'указать дополнительные данные'
 		],
 		'staytrueflowers': [
-			'чтобы нам не пришлось потревожить вас в телеграме, лучше',
+			'чтобы нам не пришлось тревожить вас в телеграме, лучше',
 			'указать дополнительные данные'
 		]
 	}
@@ -703,19 +697,19 @@ function cartHtmlEntities() {
  * добавляем ссылку на страницу в поле Lovixlube
  */
 function cartLovixlube() {
-	$('#lovixlube[data-input-lid="1688065007506"] .t-input-block').append('<a href="/14feb" />');
+	$('#lovixlube[data-input-lid="1688065007506"] .t-input-block').append('<span class="logo"></span>');
 }
 
 /**
  * платная доставка, если в корзине только эти товары
  */
 function cartPayedDeliveryForOnlyDops() {
-	if (!tovarsFromDB['dopnik'].length) return;
+	if (!tovarsFromDB['888'].length) return;
 	var onlyDops = false;
 	var tovars = $('.t706__product');
 	if (!tovars.length) return;
 	tovars.each(function () {
-		onlyDops = tovarsFromDB['dopnik'].includes(getTovarInCartId($(this))) ? true : false;
+		onlyDops = tovarsFromDB['888'].includes(getTovarInCartId($(this))) ? true : false;
 		if (!onlyDops) return false;
 	});
 	if (!onlyDops) {
@@ -771,6 +765,13 @@ function cartFormValidationTexts() {
 			//'применяй или удаляй'						//promocode
 		],
 		'gvozdisco': [
+			'пожалуйста, укажи свое имя',				//name
+			'пожалуйста, укажи свой номер телефона',	//phone
+			'пожалуйста, укажи свой ник в телеграм',	//telegram
+			'пожалуйста, укажи дату доставки',			//delivery date
+			'пожалуйста, укажи интервал доставки'		//delivery interval 
+		],
+		'dorogobogato': [
 			'пожалуйста, укажи свое имя',				//name
 			'пожалуйста, укажи свой номер телефона',	//phone
 			'пожалуйста, укажи свой ник в телеграм',	//telegram
@@ -901,6 +902,7 @@ function cartErrorsMessageOnClick() {
 				var errorTitle = {
 					'2steblya': 'ЧТО-ТО НЕ ТОГО. ПЕРЕПРОВЕРЬ!',
 					'gvozdisco': 'ФОРМА СОДЕРЖИТ ОШИБКИ',
+					'dorogobogato': 'ФОРМА СОДЕРЖИТ ОШИБКИ',
 					'staytrueflowers': 'ФОРМА СОДЕРЖИТ ОШИБКИ'
 				}
 				var errorTime;
@@ -951,6 +953,7 @@ function cartIncompleteRemoveRequired() {
 	var data = {
 		'2steblya': '1675967313188',
 		'gvozdisco': '1675967313188',
+		'dorogobogato': '',
 		'staytrueflowers': ''
 	}
 	$('.t706 [data-input-lid="' + data[site] + '"] input').removeAttr('data-tilda-req');
@@ -967,6 +970,9 @@ function cartYaCounterId() {
 				if (typeof yaCounter89315640 !== 'undefined') counter = yaCounter89315640;
 				break;
 			case 'gvozdisco':
+				if (typeof yaCounter97065108 !== 'undefined') counter = yaCounter97065108;
+				break;
+			case 'dorogobogato':
 				if (typeof yaCounter97065108 !== 'undefined') counter = yaCounter97065108;
 				break;
 			case 'staytrueflowers':
@@ -988,6 +994,7 @@ function cartIconUponHeader() {
 		var data = {
 			'2steblya': 110,
 			'gvozdisco': 140,
+			'dorogobogato': 0,
 			'staytrueflowers': 0
 		}
 		setInterval(function () {
@@ -1171,13 +1178,13 @@ function cartO4ki() {
 						}, 200);
 					} else {
 						if (o4ki.paid) o4ki.paid.find('.t706__product-' + (isPlus ? 'plus' : 'minus')).trigger('click');
-						if (quantity < 2) o4ki.paid == null;
+						if (quantity < 2) o4ki.paid = null;
 						if (quantity <= 1) o4ki.free = null;
 					}
 				});
 			} else {
 				o4ki.paid = $(this);
-				//o4ki.paid.hide();
+				o4ki.paid.hide();
 			}
 			//удалить бесплатные очки
 			if (o4ki.free) {
@@ -1226,7 +1233,8 @@ function cartSuccess() {
 	var succesbox = $('.t706 .js-successbox');
 	var data = {
 		'2steblya': 'заказ оформлен успешно, но похоже Юкасса тупит и не хочет, штоб твои денюжки потекли к нам рекой<br><br>напиши нам в <a href="https://t.me/dva_steblya">телегу</a>, расскажи, что вот такая оказия случилась, и мы скинем тебе новую нормальную ссыклу на оплат очку',
-		'gvozdisco': 'твой заказ оформлен, но мы не смогли перенаправить тебя на оплату заказа в Юкассе.<br><br>Напиши нам в <a href="https://t.me/gvozdisco">телеграм</a>, и мы вышлем тебе новую рабочую ссылку на оплату.',
+		'gvozdisco': 'твой заказ оформлен, но мы не смогли перенаправить тебя на оплату заказа в Юкассе.<br><br>Напиши нам в <a href="https://t.me/dva_steblya">телеграм</a>, и мы вышлем тебе новую рабочую ссылку на оплату',
+		'dorogobogato': 'твой заказ оформлен, но мы не смогли перенаправить тебя на оплату заказа в Юкассе.<br><br>Напиши нам в <a href="https://t.me/dva_steblya">телеграм</a>, и мы вышлем тебе новую рабочую ссылку на оплату',
 		'staytrueflowers': 'Ваш заказ оформлен, но мы не смогли перенаправить вас на оплату заказа в Юкассе.<br><br>Напишите нам в <a href="https://t.me/staytrueflowers">телеграм</a>, и мы вышлем вам новую рабочую ссылку на оплату.'
 	}
 	succesbox.addClass('hidden').attr('data-success-message', data[site]);
