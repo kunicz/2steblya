@@ -34,7 +34,6 @@ function cartFunctions() {
 	cartAdresPoluchatelya();
 	cartHerZnaetPoluchatelya();
 	cartCountItems();
-	cartPlusMinusItems();
 	cartDopsReminder();
 	cartPreventCloseOnOverlayClick();
 	cartErrorsMessageOnClick();
@@ -103,7 +102,7 @@ function cartHide() {
 function cartInputContainersClasses() {
 	$('.t706 .t-input-group').find('input,textarea,select').each(function () {
 		var name = $(this).attr('name');
-		$(this).parents('.t-input-group').attr('id', name.replace('tildaspec-mask-', ''));
+		if (name) $(this).parents('.t-input-group').attr('id', name.replace('tildaspec-mask-', ''));
 	});
 }
 
@@ -113,21 +112,14 @@ function cartInputContainersClasses() {
 function cartCountItems() {
 	var oldVal;
 	setInterval(function () {
-		var products = $('.t706__cartwin-products').children();
+		var products = $('.t706__product');
 		if (oldVal == products.length) return;
 		cartDynamicFunctions();
 		oldVal = products.length;
-	}, 1);
+	}, 500);
 }
 
-/**
- * количество штук одного товара
- */
-function cartPlusMinusItems() {
-	$('.t706').on('click', '.t706__product-plus,.t706__product-minus', function () {
-		cartDynamicFunctions();
-	});
-}
+
 
 /**
  * напоминалка о допах после товаров
@@ -135,6 +127,7 @@ function cartPlusMinusItems() {
 function cartDopsReminder() {
 	var data = {
 		'2steblya': 'хош добавить <a href="/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%9F%D0%9E%D0%94%D0%90%D0%A0+%D0%9E%D0%A7%D0%9A%D0%98&tfc_div=:::">подар очек</a> к букету? а што насчёт <a href="https://2steblya.ru/catalog?tfc_quantity[643365612]=y&tfc_storepartuid[643365612]=%D0%92%D0%90%D0%97%D0%AB&tfc_div=:::">вазы</a>?',
+		'2steblya_white': '',
 		'gvozdisco': '',
 		'dorogobogato': '',
 		'staytrueflowers': ''
@@ -149,7 +142,6 @@ function cartDopsReminder() {
 function cartDelivery() {
 	var dates = {};
 	var dateField = $('.t706 [name="dostavka-date"]');
-	var intervalField = $('.t706 [name="dostavka-interval"]');
 
 	dateField.prop('readonly', true);
 
@@ -199,7 +191,7 @@ function cartDelivery() {
 		var datePicker;
 		var executed = false;
 		setInterval(function () {
-			datePicker = $('.t706 .t_datepicker__inner');
+			datePicker = $('.t_datepicker__inner');
 			if (!datePicker.length) return;
 			if (datePicker.is(':hidden')) {
 				dateField.attr('disabled', false);
@@ -211,7 +203,7 @@ function cartDelivery() {
 			addDisclaimer();
 			dateToOpen();
 			daysToClose();
-			//notWorkingDates();
+			notWorkingDates();
 			specialDates();
 			allowToday();
 			vitrinaOnlyTwoDays();
@@ -222,7 +214,7 @@ function cartDelivery() {
 		/** 
 		 * клик на дате в календаре
 		 */
-		$('body').on('click', '.t706 .t_datepicker__day-cell:not(.t_datepicker__past)', function () {
+		$('body').on('click', '.t_datepicker__day-cell:not(.t_datepicker__past)', function () {
 			setTimeout(function () {
 				dateField.change();
 			}, 100);
@@ -231,10 +223,10 @@ function cartDelivery() {
 		/** 
 		 * календарь должен быть обработан, если сменился месяц или год
 		 */
-		$('body').on('click', '.t706 .t_datepicker__arrow', function () {
+		$('body').on('click', '.t_datepicker__arrow', function () {
 			executed = false;
 		});
-		$('body').on('change', '.t706 .t_datepicker__header select', function () {
+		$('body').on('change', '.t_datepicker__header select', function () {
 			executed = false;
 		});
 
@@ -260,7 +252,7 @@ function cartDelivery() {
 		 */
 		function addDisclaimer() {
 			$('.t_datepicker__disclaimer').remove();
-			var body = $('.t706 .t_datepicker__body');
+			var body = $('.t_datepicker__body');
 			$('<div class="t_datepicker__disclaimer" style="width:' + body.width() + 'px"></div>').insertAfter(body);
 		}
 
@@ -283,6 +275,7 @@ function cartDelivery() {
 						dateOpen = tovarDate;
 						var disclaimerData = {
 							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
+							'2steblya_white': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
 							'gvozdisco': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
 							'dorogobogato': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff),
 							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + datesDiff + ' ' + getRussianDaysWord(datesDiff)
@@ -318,11 +311,12 @@ function cartDelivery() {
 						daysClosed = tovarDays;
 						var disclaimerData = {
 							'2steblya': 'штоб смастерить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
+							'2steblya_white': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
 							'gvozdisco': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
 							'dorogobogato': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed),
 							'staytrueflowers': 'чтобы подготовить ' + getTovarInCartTitle(tovar) + ', нам надо как минимум ' + daysClosed + ' ' + getRussianDaysWord(daysClosed)
 						}
-						$('.t_datepicker__disclaimer').text(disclaimerData[site]);
+						$('.t_datepicker__disclaimer').html(disclaimerData[site]);
 					}
 				});
 			});
@@ -342,25 +336,35 @@ function cartDelivery() {
 		function disableDates(dateList) {
 			if (!dateList.length) return;
 			$.each(dateList, function (i, date) {
-				$('.t706 .t_datepicker__day-cell[data-picker="' + date + '"]').addClass('t_datepicker__day-cell--disabled');
+				$('.t_datepicker__day-cell[data-picker="' + date + '"]').addClass('t_datepicker__day-cell--disabled');
 			});
 		}
 
 		function notWorkingDates() {
 			if (!notWorkingDatesList.length) return;
+			var disclaimerData = {
+				'2steblya': 'если очень-очень надо в праздники, <a target="blank" href="https://t.me/dva_steblya">пешите</a>, обкашляем',
+				'2steblya_white': 'если очень-очень надо в праздники, <a target="blank" href="https://t.me/flowerswithbenefits">пешите</a>, договоримся',
+				'gvozdisco': 'в праздничные даты не работаем',
+				'dorogobogato': 'в праздничные даты не работаем',
+				'staytrueflowers': 'в праздничные даты не работаем'
+			}
 			$.each(notWorkingDatesList, function (i, date) {
-				$('.t706 .t_datepicker__day-cell[data-picker="' + date + '"]').addClass('t_datepicker__day-cell--disabled').addClass('t_datepicker__day-cell--notWorking').text('❌');
+				$('.t_datepicker__day-cell[data-picker="' + date + '"]').addClass('t_datepicker__day-cell--disabled').addClass('t_datepicker__day-cell--notWorking').text('❌');
 			});
+			$('.t_datepicker__disclaimer').html(disclaimerData[site]);
 		}
 
 		/* перебираем все ячейки календаря в поисках особенных дат */
 		function specialDates() {
-			$('.t706 .t_datepicker__day-cell').each(function () {
+			$('.t_datepicker__day-cell').each(function () {
 				var cell = $(this);
 				var date = cell.attr('data-picker').match(/\d{4}\-(\d{1,})\-(\d{1,})/);
 				var faded = (cell.is('.t_datepicker__next-month') || cell.is('.t_datepicker__previous-month') || cell.is('.t_datepicker__day-cell--disabled'));
 				$.each(specialDatesList, function (i, specialDate) {
-					if (specialDate['d'] == date[2] && specialDate['m'] == date[1]) applySpecialDate(specialDate, faded);
+					if (specialDate['d'] == date[2] && specialDate['m'] == date[1]) {
+						applySpecialDate(specialDate, faded);
+					}
 				});
 			});
 		}
@@ -409,7 +413,7 @@ function cartDelivery() {
 				// цены (minPrice)
 				if (getTovarInCartPrice(tovar) >= specialDate[site]['minPrice']) return id;
 				//если товар с витрины
-				if (tovarsFromDB['vitrina'].includes(id)) return id;
+				if (tovarsFromDB['vitrina'].includes(id) || tovarsFromDB['777'].includes(id)) return id;
 				return false;
 			}
 			//проверяем, может ли этот товар быть сопуткой
@@ -435,7 +439,7 @@ function cartDelivery() {
 			if (todayUrl()) allow = true;
 			if (!allow) return;
 			if (dates['today'].getHours() >= 20) return;
-			$('.t706 .t_datepicker__today').removeClass('t_datepicker__day-cell--disabled');
+			$('.t_datepicker__today').removeClass('t_datepicker__day-cell--disabled');
 
 			function todayUrl() {
 				var cookie = Cookies.get('buytoday');
@@ -464,12 +468,13 @@ function cartDelivery() {
 			if (!onlyToday) return;
 			var data = {
 				'2steblya': 'с ветрины только щас или завтро',
+				'2steblya_white': 'с витрины только на сегодня или на завтра',
 				'gvozdisco': 'с витрины только на сегодня или на завтра',
 				'dorogobogato': 'с витрины только на сегодня или на завтра',
 				'staytrueflowers': 'с витрины только на сегодня или на завтра'
 			};
-			$('.t706 .t_datepicker__day-cell').addClass('t_datepicker__day-cell--disabled');
-			$('.t706 .t_datepicker__today').add($('.t706 .t_datepicker__today').next()).removeClass('t_datepicker__day-cell--disabled').attr('title', data[site]);
+			$('.t_datepicker__day-cell').addClass('t_datepicker__day-cell--disabled');
+			$('.t_datepicker__today').add($('.t_datepicker__today').next()).removeClass('t_datepicker__day-cell--disabled').attr('title', data[site]);
 		}
 	}
 
@@ -477,47 +482,178 @@ function cartDelivery() {
 	 * интервал доставки
 	 */
 	function deliveryInterval() {
-		setInterval(function () {
-			$('#dostavka-interval').toggle(dateField.val() ? true : false);
-		}, 100);
+		const $block = $('#dostavka-interval');
+		const $blockSpecialDates = $('#dostavka_interval_specialDates');
+		const initialIntervalOptions = {
+			common: $block.find('label'),
+			special: $blockSpecialDates.find('label'),
+		}
+		const today = new Date();
+		const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1); tomorrow.setHours(0, 0, 0, 0);
+		const nowHour = today.getHours();
+		let specialDate;
+		let selectedDate;
+		let $intervalOptions;
+		let isToday;
+		let isTomorrow;
 
-		/**
-		 * если меняется дата или меняется интервал
-		 */
-		$('body').on('change', intervalField.selector + ',' + dateField.selector, function () {
-			for (var i = 0; i < intervalField.length; i++) {
-				$(intervalField[i]).attr('disabled', false).parent().css('opacity', 1);
+		$block.hide();
+		$blockSpecialDates.hide();
+
+		dateField.on('change', function () {
+			const val = $(this).val();
+			if (val) {
+				const p = dateField.val().split('-');
+				selectedDate = new Date(+p[0], p[1] - 1, +p[2]);
+				onChange();
+				$block.show();
+			} else {
+				selectedDate = null;
+				$block.hide();
 			}
-			//disableOpt(0);
-			if (!dates['selected-0']) return;
-			if (dates['selected-0'].toDateString() == dates['tomorrow-0'].toDateString()) tomorrowDeliveryInterval();
-			if (dates['selected-0'].toDateString() == dates['today-0'].toDateString()) todayDeliveryInterval();
+		});
+		$block.find('input').on('change', function () {
+			onChange();
 		});
 
 		/**
-		 * доставка завтра
-		 * утренняя доставка на завтра с вечера (после 18 часов) невозможна
+		 * получает корректный набор опций интервалов для выбранной даты c идентификаторами
+		 * @returns {jquery} - набор labels c инпутами
 		 */
-		function tomorrowDeliveryInterval() {
-			if (dates['today'].getHours() >= 20) disableOpt(0);
+		function getIntervalOptions() {
+			const $options = initialIntervalOptions[specialDate ? 'special' : 'common'];
+			setOptionsIds();
+			return $options;
+
+			/**
+			 * добавляет id опциям интервалов
+			 */
+			function setOptionsIds() {
+				$options.each((_, o) => {
+					const $o = $(o);
+					const val = $o.children('input').val();
+
+					if (val.startsWith('к точному времени')) {
+						$o.attr('id', 'precise');
+						return;
+					}
+					if (val.startsWith('как можно скорее')) {
+						$o.attr('id', 'asap');
+						return;
+					}
+					const match = val.match(/^с (\d{2}):(\d{2}) до (\d{2}):(\d{2})/);
+					if (match) {
+						const from = match[1]; // Часы начала
+						const to = match[3];   // Часы конца
+						$o.attr('id', `interval${from}-${to}`);
+					}
+				});
+			}
+		}
+
+		function onChange() {
+			if (!selectedDate) return;
+
+			specialDate = specialDatesList.find(date => date.d === selectedDate.getDate() && date.m === selectedDate.getMonth() + 1);
+			isToday = selectedDate.toDateString() === today.toDateString();
+			isTomorrow = selectedDate.toDateString() === tomorrow.toDateString();
+			$intervalOptions = getIntervalOptions();
+
+			$intervalOptions.each((_, o) => {
+				const $o = $(o);
+				toggleEnable($o, true); // изначально сключаем все
+				toggleAsap($o); // показываем / не показываем asap
+				todayIntervalOptions($o); // отключаем для сегодня
+				tomorrowIntervalOptions($o); // отключаем для завтра
+			});
+			ifNoSelection();
+			$block.find('.t-radio__wrapper-delivery').html('').append($intervalOptions);
+
+
+			function toggleAsap($o) {
+				if ($o.is('#asap')) {
+					$o.css('display', isToday ? 'table' : 'none');
+				}
+			}
+
+			function ifNoSelection() {
+				if (!isToday && $('#asap input').is(':checked')) $('#interval16-20 input').trigger('click');
+			}
+
+			function todayIntervalOptions($o) {
+				if (!isToday) return;
+
+				const hoursToProduce = 1.5;
+				const hoursToDeliver = 1.5;
+				const hours = getHours($o);
+
+				if (!hours) return; // Пропускаем, если время не найдено
+
+				const [startHour, endHour] = hours;
+
+				// Если текущее время < 10:00, отключаем все интервалы, которые начинаются до 12:00
+				if (nowHour < 10 && startHour < 12) {
+					toggleEnable($o, false);
+				}
+
+				// Отключаем варианты, если уже поздно начинать готовку и доставку
+				if (nowHour >= (endHour - hoursToProduce - hoursToDeliver)) {
+					toggleEnable($o, false);
+				}
+
+				//отключаем asap
+				if (nowHour > 22 && $o.is('#asap')) {
+					toggleEnable($o, false);
+				}
+			}
+
+			function tomorrowIntervalOptions($o) {
+				if (!isTomorrow) return;
+
+				const hours = getHours($o);
+
+				if (!hours) return; // Пропускаем, если время не найдено
+				if (nowHour <= 19) return; // Если текущее время 19:00 или раньше — ничего не отключаем
+
+				const [startHour] = hours;
+
+				// Отключаем интервалы, которые начинаются до 12:00
+				if (startHour < 12) {
+					toggleEnable($o, false);
+				}
+			}
+
+			/**
+			 * Извлекает часы начала и конца из строки значения инпута
+			 * @param {jquery} $o - $(label)
+			 * @returns {number[]|null} [startHour, endHour] или null, если формат неправильный
+			 */
+			function getHours($o) {
+				const id = $o.attr('id');
+				if (!id) return null;
+				const match = id.match(/^interval(\d+)-(\d+)$/);
+				return match ? [parseInt(match[1], 10), parseInt(match[2], 10)] : null;
+			}
 		}
 
 		/**
-		 * доставка сегодня
-		 * на сегодня можно заказать только товары из tovarsFromDB['allowed_today']
-		 * в этот массив собраны все товары с флагом allowed_today=1 и vitrina=1
+		 * делает доступной/недоступной опуию интервала
+		 * если опция отключается, переводит выбор на другоую опцию
+		 * @param {jquery} $input - чекбокс интервала
+		 * @param {bool} toggle
 		 */
-		function todayDeliveryInterval() {
-			$('#dostavka-interval input').each(function (i, e) {
-				const hours = $(this).val().match(/(\d{2}):\d{2}/g).map(match => parseInt(match.substring(0, 2), 10));
-				const hoursToProduce = 2;
-				if (!i) disableOpt(i);
-				if (dates['today'].getHours() > hours[0] && dates['today'].getHours() >= (hours[1] - hoursToProduce)) disableOpt(i);
-			});
-		}
-		function disableOpt(i) {
-			$(intervalField[i]).attr('disabled', true).parent().css('opacity', .3);
-			if ($(intervalField[i]).is(':checked') && intervalField[i + 1]) $(intervalField[i + 1]).trigger('click');
+		function toggleEnable($option, toggle) {
+			const $input = $option.children('input');
+			$input.prop('disabled', !toggle);
+			$option.css('opacity', toggle ? 1 : .3);
+			if (toggle) return;
+
+			if ($input.is(':checked')) {
+				const $next = $option.closest('label').next().find('input');
+				if ($next.length) {
+					$next.trigger('click');
+				}
+			}
 		}
 	}
 
@@ -527,6 +663,7 @@ function cartDelivery() {
 	function telegramLinkInDateFieldDescription() {
 		var data = {
 			'2steblya': ['телегу', 'https://t.me/dva_steblya'],
+			'2steblya_white': ['телеграм', 'https://t.me/flowerswithbenefits'],
 			'gvozdisco': ['телеграм', 'https://t.me/dva_steblya'],
 			'dorogobogato': ['телеграм', 'https://t.me/dva_steblya'],
 			'staytrueflowers': ['телеграм', 'https://t.me/staytrueflowers']
@@ -566,6 +703,7 @@ function cartDonat() {
 	if (tovars.length > 1) return;
 	var data = {
 		'2steblya': 857613433221,
+		'2steblya_white': '',
 		'gvozdisco': '',
 		'dorogobogato': '',
 		'staytrueflowers': ''
@@ -652,6 +790,10 @@ function cartImportantFields() {
 			'чтобы не мурыжить тебя в телеге, лучше',
 			'заполнить всю инфу сразу'
 		],
+		'2steblya_white': [
+			'чтобы нам не пришлось тревожить вас в телеграме, лучше',
+			'указать дополнительные данные'
+		],
 		'gvozdisco': [
 			'чтобы нам не пришлось тревожить тебя в телеграме, лучше',
 			'указать дополнительные данные'
@@ -666,7 +808,7 @@ function cartImportantFields() {
 		]
 	}
 	var lastImportant = $('#dostavka-interval');
-	lastImportant.nextAll().not(':last').hide().addClass('unimportantField');
+	lastImportant.nextAll().not(':last').addClass('unimportantField');
 	var parts = [
 		'<div class="t-input-group t-input-group_cb" id="unimportantTrigger">',
 		'<div class="t-input-title t-descr t-descr_md">' + data[site][0] + '</div>',
@@ -681,7 +823,7 @@ function cartImportantFields() {
 	btn.insertAfter(lastImportant);
 	btn.on('change', 'input', function () {
 		cartIncompleteRemoveRequired(); // удаляем атрибут "обязательное поле" у поля cartIncomplete 
-		btn.nextAll().not(':last').toggle($(this).is(':checked'));
+		btn.nextAll().not(':last').removeClass('unimportantField');
 		$('#unimportantTrigger').remove();
 	});
 }
@@ -708,18 +850,27 @@ function cartPayedDeliveryForOnlyDops() {
 	var onlyDops = false;
 	var tovars = $('.t706__product');
 	if (!tovars.length) return;
+
 	tovars.each(function () {
-		onlyDops = tovarsFromDB['888'].includes(getTovarInCartId($(this))) ? true : false;
+		onlyDops = tovarsFromDB['888'].includes(getTovarInCartId($(this)));
 		if (!onlyDops) return false;
 	});
+
+	const $dostavkaInterval = $('#dostavka-interval');
+
 	if (!onlyDops) {
 		$('#adres-zazhopinsk input').prop('checked', false);
 		$('#adres-zazhopinsk').hide();
-		deliveryPriceInterval(false);
-		return;
+
+		// Откатываем цену только если раньше был режим "только допники"
+		if ($dostavkaInterval.hasClass('onlyDops')) {
+			deliveryPriceInterval(false); // Откатываем цены
+			$dostavkaInterval.removeClass('onlyDops'); // Убираем класс
+		}
+	} else {
+		$dostavkaInterval.addClass('onlyDops'); // Устанавливаем класс, если только допники
+		deliveryPriceInterval(true);
 	}
-	$('#adres-zazhopinsk').show();
-	deliveryPriceInterval(true);
 }
 
 /**
@@ -727,12 +878,57 @@ function cartPayedDeliveryForOnlyDops() {
  * последний вариант игнорируется, так как он всегда платный (с 22 до 8)
  */
 function deliveryPriceInterval(action) {
-	//action - true/false (increase/decrease)
-	$('#dostavka-interval label:not(:last) input').attr('data-delivery-price', action ? $('.t706 [name="dostavka-price"]').val() : '');
-	var selectedInterval = $('input[data-delivery-price]:checked');
-	$('input[data-delivery-price]:last').trigger('click');
+	const block = $('#dostavka-interval');
+	const deliveryPrice = +$('.t706 [name="dostavka-price"]').val() || 0;
+	const selectedInterval = $('input[name="dostavka-interval"]:checked');
+	const isOnlyDops = block.hasClass('onlyDops'); // Проверяем наличие класса
+	const isOnlyDopsUpgraded = block.hasClass('onlyDopsUpgraded');
+
+	block.find('label input').each(function () {
+		const $input = $(this);
+		const $label = $input.closest('label');
+
+		// Найти текстовую ноду после всех дочерних элементов (input, div и т.д.)
+		const textNode = $label.contents().filter(function () {
+			return this.nodeType === 3 && this.nodeValue.trim() !== ''; // Текстовая нода без пустых значений
+		}).last(); // Берем последнюю текстовую ноду
+
+		// Получаем текущую цену
+		const currentPrice = +$input.attr('data-delivery-price') || 0;
+
+		if (action) {
+			if (isOnlyDopsUpgraded) return;
+
+			$input.attr('data-delivery-price', currentPrice + deliveryPrice);
+			block.addClass('upgraded');
+		} else {
+			if (!isOnlyDops) return;
+
+			$input.attr('data-delivery-price', currentPrice - deliveryPrice);
+			block.removeClass('upgraded');
+		}
+
+		// Обновляем текст внутри label
+		const updatedPrice = +$input.attr('data-delivery-price') || 0;
+		let originalText = textNode.text().replace(/\(\+\d+ р\.\)/, '').trim(); // Удаляем старую цену
+		const newText = updatedPrice > 0 ? `${originalText} (+${updatedPrice} р.)` : originalText;
+
+		textNode[0].nodeValue = newText; // Меняем только текст, а не весь label
+
+		// Обновляем value у input
+		const newValue = updatedPrice > 0 ? `${newText} = ${updatedPrice}` : newText;
+		$input.attr('value', newValue);
+
+	});
+
+	// Переключение радио-баттонов для пересчета корзины
+	const otherRadio = $('#dostavka-interval label input').not(selectedInterval).first();
+	otherRadio.trigger('click');
 	selectedInterval.trigger('click');
 }
+
+
+
 
 /**
  * поля обязательные если cartExpanded
@@ -758,11 +954,18 @@ function cartFormValidationTexts() {
 		'2steblya': [
 			'ну не-е-е-е...',                       	//name
 			'скинь телефончик, а?',                 	//phone
-			//'судью на мыло. но на какое?',            //email
+			'судью на мыло. но на какое?',            	//email
 			'а куда фотку букета выслать?',         	//telegram
 			'ты календарь... переверни...',         	//delivery date
 			'а вдруг разбудим?',                     	//delivery interval
 			//'применяй или удаляй'						//promocode
+		],
+		'2steblya_white': [
+			'пожалуйста, укажи свое имя',				//name
+			'пожалуйста, укажи свой номер телефона',	//phone
+			'пожалуйста, укажи свой ник в телеграм',	//telegram
+			'пожалуйста, укажи дату доставки',			//delivery date
+			'пожалуйста, укажи интервал доставки'		//delivery interval 
 		],
 		'gvozdisco': [
 			'пожалуйста, укажи свое имя',				//name
@@ -901,6 +1104,7 @@ function cartErrorsMessageOnClick() {
 			} else {
 				var errorTitle = {
 					'2steblya': 'ЧТО-ТО НЕ ТОГО. ПЕРЕПРОВЕРЬ!',
+					'2steblya_white': 'ФОРМА СОДЕРЖИТ ОШИБКИ',
 					'gvozdisco': 'ФОРМА СОДЕРЖИТ ОШИБКИ',
 					'dorogobogato': 'ФОРМА СОДЕРЖИТ ОШИБКИ',
 					'staytrueflowers': 'ФОРМА СОДЕРЖИТ ОШИБКИ'
@@ -917,7 +1121,6 @@ function cartErrorsMessageOnClick() {
 					btn.text(btnText);
 				}, errorTime);
 			}
-			console.log(errorFields.get(0));
 		}, 400);
 	});
 }
@@ -952,6 +1155,7 @@ function cartFormIncomplete() {
 function cartIncompleteRemoveRequired() {
 	var data = {
 		'2steblya': '1675967313188',
+		'2steblya_white': '1737898771773',
 		'gvozdisco': '1675967313188',
 		'dorogobogato': '',
 		'staytrueflowers': ''
@@ -968,6 +1172,9 @@ function cartYaCounterId() {
 		switch (site) {
 			case '2steblya':
 				if (typeof yaCounter89315640 !== 'undefined') counter = yaCounter89315640;
+				break;
+			case '2steblya_white':
+				if (typeof yaCounter99731274 !== 'undefined') counter = yaCounter99731274;
 				break;
 			case 'gvozdisco':
 				if (typeof yaCounter97065108 !== 'undefined') counter = yaCounter97065108;
@@ -993,6 +1200,7 @@ function cartIconUponHeader() {
 		var cartIcon = $('.t706__carticon');
 		var data = {
 			'2steblya': 110,
+			'2steblya_white': 110,
 			'gvozdisco': 140,
 			'dorogobogato': 0,
 			'staytrueflowers': 0
@@ -1233,6 +1441,7 @@ function cartSuccess() {
 	var succesbox = $('.t706 .js-successbox');
 	var data = {
 		'2steblya': 'заказ оформлен успешно, но похоже Юкасса тупит и не хочет, штоб твои денюжки потекли к нам рекой<br><br>напиши нам в <a href="https://t.me/dva_steblya">телегу</a>, расскажи, что вот такая оказия случилась, и мы скинем тебе новую нормальную ссыклу на оплат очку',
+		'2steblya_white': 'твой заказ оформлен, но мы не смогли перенаправить тебя на оплату заказа в Юкассе.<br><br>Напиши нам в <a href="https://t.me/flowerswithbenefits">телеграм</a>, и мы вышлем тебе новую рабочую ссылку на оплату',
 		'gvozdisco': 'твой заказ оформлен, но мы не смогли перенаправить тебя на оплату заказа в Юкассе.<br><br>Напиши нам в <a href="https://t.me/dva_steblya">телеграм</a>, и мы вышлем тебе новую рабочую ссылку на оплату',
 		'dorogobogato': 'твой заказ оформлен, но мы не смогли перенаправить тебя на оплату заказа в Юкассе.<br><br>Напиши нам в <a href="https://t.me/dva_steblya">телеграм</a>, и мы вышлем тебе новую рабочую ссылку на оплату',
 		'staytrueflowers': 'Ваш заказ оформлен, но мы не смогли перенаправить вас на оплату заказа в Юкассе.<br><br>Напишите нам в <a href="https://t.me/staytrueflowers">телеграм</a>, и мы вышлем вам новую рабочую ссылку на оплату.'

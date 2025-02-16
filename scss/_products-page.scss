@@ -30,6 +30,10 @@
 					background-image: url(https://static.tildacdn.com/tild3065-3561-4565-b164-313930356635/whiteLogoTrim.png);
 				}
 
+				@include if('2steblya_white') {
+					background-image: url(https://static.tildacdn.com/tild6639-3039-4132-b434-323162333131/_2steblya___.png);
+				}
+
 				@include if('stf') {
 					background-image: url(https://static.tildacdn.com/tild3932-6161-4664-b130-613137393138/white.png);
 				}

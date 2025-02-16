@@ -4,6 +4,21 @@
 	@import 'cart-products';
 	@import 'cart-form';
 	@import 'cart-form-donat';
+
+	.t-datepicker {
+		&__wrapper {
+			max-width: unset;
+		}
+
+		&__icon {
+			@include if('stf') {
+				opacity: .2;
+			}
+		}
+	}
 }
 
 @import 'cart-form-incomplete';
+
+//datepicker - переехало просто в body
+@import 'cart-form-datepicker';

@@ -1,6 +1,11 @@
 //.js-product
 .t-slds {
 
+	//карточка
+	&__item[data-slide-index="2"] {
+		background-color: $color-2;
+	}
+
 	//кнопки навигации
 	&__arrow_wrapper {
 		margin: 0 7px;
@@ -35,7 +40,7 @@
 
 		@at-root #{selector-replace(&,'.js-product','.js-product:not(.noCard)')} {
 			&:nth-child(2) {
-				background: $secondary-color;
+				background: $color-2;
 
 				&::after {
 					content: 'карт очка';
@@ -51,7 +56,7 @@
 					top: 50%;
 					left: 50%;
 					transform: translate(-50%, -50%);
-					color: $primary-color;
+					color: $color-1;
 				}
 
 				.t-slds__bgimg {
@@ -64,7 +69,7 @@
 	//видео
 	&__play_icon {
 		g g {
-			fill: $secondary-color;
+			fill: $color-2;
 		}
 	}
 }

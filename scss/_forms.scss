@@ -2,13 +2,18 @@
 
 	.t-radio__indicator,
 	.t-checkbox__indicator {
-		background: $contrprimary-color;
+		background: $color-0;
 		border: 0 none;
 		box-sizing: content-box;
 
 		@include if('stf') {
-			background: $primary-color;
-			border: 1px solid rgba($contrprimary-color, .2);
+			background: $color-1;
+			border: 1px solid rgba($color-0, .2);
+		}
+
+		@include if('2steblya_white') {
+			background: $color-1;
+			border: 1px solid rgba($color-0, .2);
 		}
 
 		border-radius: 5%;
@@ -19,7 +24,7 @@
 		opacity: 1;
 
 		&::after {
-			background: $secondary-color;
+			background: $color-2;
 			border-radius: 0;
 			width: 20px;
 			height: 20px;
@@ -51,7 +56,7 @@
 		}
 
 		&-text {
-			color: $secondary-color;
+			color: $color-2;
 			font-size: $text-font-size;
 			font-weight: 300;
 		}
@@ -65,7 +70,7 @@
 		.t-radio__wrapper,
 		.t-select,
 		.uploadcare-widget {
-			border: 1px solid $secondary-color;
+			border: 1px solid $color-2;
 
 			@include if('2steblya') {
 				border: 0 none !important;
@@ -78,7 +83,7 @@
 	}
 
 	.t-input-error {
-		color: $secondary-color;
+		color: $color-2;
 		font-size: $text-font-size;
 		font-weight: 300;
 	}
@@ -92,8 +97,8 @@
 
 	//сообщение после отправки
 	.js-successbox {
-		background-color: $primary-color;
-		color: $contrprimary-color !important;
+		background-color: $color-1;
+		color: $color-0 !important;
 
 		@include if('2steblya') {
 			background-image: url(https://static.tildacdn.com/tild3336-3465-4761-b837-303532313734/zaebca.jpg);
@@ -121,7 +126,7 @@
 		}
 
 		a {
-			color: $secondary-color !important;
+			color: $color-2 !important;
 		}
 
 		&::before {

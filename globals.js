@@ -9,6 +9,7 @@ var tovarsFromDBReady = false;
  */
 var cartEnabled = {
 	'2steblya': true,
+	'2steblya_white': true,
 	'gvozdisco': true,
 	'staytrueflowers': true
 }
@@ -18,6 +19,7 @@ var cartEnabled = {
  */
 var cartExpanded = {
 	'2steblya': false,
+	'2steblya_white': false,
 	'gvozdisco': false,
 	'staytrueflowers': true
 }
@@ -27,6 +29,16 @@ var cartExpanded = {
  */
 var productPriceLevels = {
 	'2steblya': {
+		9000: ['букетусик', 'сердечко', 'кастрюлька', 'яичко'],
+		12000: ['букетик', 'сердце', 'кастрюля', 'ящичек', 'яйцо', 'аквариумчик', 'формочка для запекания'],
+		16000: ['букет', 'кастрюлища', 'горшок', 'ящик', 'аквариум', 'форма для запекания'],
+		20000: ['букетище', 'корзиночка'],
+		25000: ['коробка', 'корзинка'],
+		35000: ['корзина'],
+		50000: ['букет-гигант', 'корзинища'],
+		100000: ['корзилла']
+	},
+	'2steblya_white': {
 		7000: ['букетусик', 'сердечко', 'кастрюлька', 'яичко'],
 		12000: ['букетик', 'сердце', 'кастрюля', 'ящичек', 'яйцо', 'аквариумчик', 'формочка для запекания'],
 		16000: ['букет', 'кастрюлища', 'горшок', 'ящик', 'аквариум', 'форма для запекания'],
@@ -63,6 +75,7 @@ var productPriceLevels = {
  */
 var productFormat = {
 	'2steblya': 'фор мат',
+	'2steblya_white': 'размер',
 	'gvozdisco': 'формат',
 	'staytrueflowers': 'формат'
 }
@@ -72,6 +85,7 @@ var productFormat = {
  */
 var minPrice = {
 	'2steblya': 0,
+	'2steblya_white': 0,
 	'gvozdisco': 0,
 	'staytrueflowers': 0
 }
@@ -81,6 +95,7 @@ var minPrice = {
  */
 var nitakoi = {
 	'2steblya': '105671635591',
+	'2steblya_white': '',
 	'gvozdisco': '',
 	'staytrueflowers': '400814140661'
 }
@@ -98,31 +113,55 @@ var flowersSeasons = {
  */
 var specialDatesList = [
 	{
-		'd': 14,
-		'm': 2,
+		d: 13,
+		m: 2,
 		'2steblya': {
-			'minPrice': 10000,
-			'exclude': [
+			minPrice: 7000,
+			exclude: []
+		},
+		'2steblya_white': {
+			minPrice: 7000,
+			exclude: []
+		},
+		'gvozdisco': {
+			minPrice: 7000,
+			exclude: []
+		},
+		'staytrueflowers': {
+			minPrice: 7000,
+			exclude: []
+		}
+	},
+	{
+		d: 14,
+		m: 2,
+		'2steblya': {
+			minPrice: 12000,
+			exclude: [
 				652864682431, //пупырка
 				663441383001, //суп
 				748114270281 //powerbanka
 			]
 		},
-		'staytrueflowers': {
-			'minPrice': 10000,
-			'exclude': []
+		'2steblya_white': {
+			minPrice: 10000,
+			exclude: []
+		},
+		'gvozdisco': {
+			minPrice: 10000,
+			exclude: []
 		},
 		'staytrueflowers': {
-			'minPrice': 7500,
-			'exclude': []
+			minPrice: 7500,
+			exclude: []
 		}
 	},
 	{
-		'd': 6,
-		'm': 3,
+		d: 6,
+		m: 3,
 		'2steblya': {
-			'minPrice': 10000,
-			'exclude': [
+			minPrice: 10000,
+			exclude: [
 				560426289201, //мимоза
 				154316318491, //любюлютики
 				748114270281, //powerbanka
@@ -132,21 +171,25 @@ var specialDatesList = [
 				561739979091 //простата
 			],
 		},
+		'2steblya_white': {
+			minPrice: 16000,
+			exclude: []
+		},
 		'gvozdisco': {
-			'minPrice': 10000,
-			'exclude': []
+			minPrice: 10000,
+			exclude: []
 		},
 		'staytrueflowers': {
-			'minPrice': 10000,
-			'exclude': []
+			minPrice: 10000,
+			exclude: []
 		}
 	},
 	{
-		'd': 7,
-		'm': 3,
+		d: 7,
+		m: 3,
 		'2steblya': {
-			'minPrice': 10000,
-			'exclude': [
+			minPrice: 16000,
+			exclude: [
 				560426289201, //мимоза
 				154316318491, //любюлютики
 				748114270281, //powerbanka
@@ -156,21 +199,25 @@ var specialDatesList = [
 				561739979091 //простата
 			],
 		},
+		'2steblya_white': {
+			minPrice: 10000,
+			exclude: []
+		},
 		'gvozdisco': {
-			'minPrice': 10000,
-			'exclude': []
+			minPrice: 10000,
+			exclude: []
 		},
 		'staytrueflowers': {
-			'minPrice': 10000,
-			'exclude': []
+			minPrice: 10000,
+			exclude: []
 		}
 	},
 	{
-		'd': 8,
-		'm': 3,
+		d: 8,
+		m: 3,
 		'2steblya': {
-			'minPrice': 10000,
-			'exclude': [
+			minPrice: 10000,
+			exclude: [
 				560426289201, //мимоза
 				154316318491, //любюлютики
 				748114270281, //powerbanka
@@ -180,19 +227,27 @@ var specialDatesList = [
 				561739979091 //простата
 			],
 		},
+		'2steblya_white': {
+			minPrice: 10000,
+			exclude: []
+		},
 		'gvozdisco': {
-			'minPrice': 10000,
-			'exclude': []
+			minPrice: 10000,
+			exclude: []
 		},
 		'staytrueflowers': {
-			'minPrice': 10000,
-			'exclude': []
+			minPrice: 10000,
+			exclude: []
 		}
 	}
 ];
 
+//например: 2025-1-1, 2025-10-6, 2025-8-25
 var notWorkingDatesList = [
-	'2024-3-10'
+	'2024-12-31',
+	'2025-1-1',
+	'2025-1-2',
+	'2025-1-3',
 ];
 
 /**
@@ -200,6 +255,7 @@ var notWorkingDatesList = [
  */
 var promocodeType = {
 	'2steblya': 'all',
+	'2steblya_white': 'all',
 	'gvozdisco': 'all',
 	'staytrueflowers': 'individual'
 }
@@ -209,6 +265,7 @@ var promocodeType = {
  */
 var promocodeTovars = {
 	'2steblya': [],
+	'2steblya_white': [],
 	'gvozdisco': [],
 	'staytrueflowers': []
 }

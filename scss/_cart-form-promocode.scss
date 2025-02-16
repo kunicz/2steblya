@@ -16,7 +16,7 @@
 		}
 
 		.t-text {
-			color: $contrprimary-color;
+			color: $color-0;
 			opacity: 0;
 
 			&.showed {
@@ -27,8 +27,8 @@
 
 	&__btn {
 		line-height: 56px !important;
-		color: $primary-color !important;
-		background: $secondary-color !important;
+		color: $color-1 !important;
+		background: $color-2 !important;
 		line-height: 56px;
 	}
 }

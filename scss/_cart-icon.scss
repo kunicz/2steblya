@@ -1,9 +1,13 @@
 &__carticon {
-	background-color: $primary-color;
+	background-color: $color-1;
 	z-index: 2001;
 	padding: 0;
 	top: 0;
 	right: 0;
+
+	@include if('stf') {
+		display: none;
+	}
 
 	@include min(980) {
 		padding: 20px;
@@ -33,6 +37,11 @@
 	}
 
 	&-counter {
-		background-color: $secondary-color;
+		background-color: $color-2;
+
+		@include if('2steblya_white') {
+			bottom: 27px !important;
+			right: 0 !important;
+		}
 	}
 }

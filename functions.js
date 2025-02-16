@@ -15,6 +15,7 @@ $(document).ready(function () {
 function redirectHome() {
 	var data = {
 		'2steblya': ['page28196964'],
+		'2steblya_white': [],
 		'staytrueflowers': [],
 		'gvozdisco': [],
 	}
@@ -43,6 +44,7 @@ function formValidationTexts(form, texts = []) {
 	form.find('.t-submit').on('click', function () {
 		var data = {
 			'2steblya': 'укажи по брацки',
+			'gvozdisco': 'заполни поле',
 			'gvozdisco': 'надо заполнить поле',
 			'staytrueflowers': 'данное поле должно быть заполнено'
 		}
@@ -62,6 +64,7 @@ function formValidationTexts(form, texts = []) {
 function headerMenu() {
 	var data = {
 		'2steblya': 'rec469639590',
+		'2steblya_white': 'rec856423841',
 		'gvozdisco': 'rec736788412',
 		'staytrueflowers': 'rec496423452,#rec496387058'
 	}
@@ -126,6 +129,7 @@ function externalLinks() {
  */
 function footer() {
 	footerCopyrightYear();
+	writeMeButton();
 
 	/**
 	 * корректный год в подвале в копирайтах
@@ -133,6 +137,7 @@ function footer() {
 	function footerCopyrightYear() {
 		var startYear = {
 			'2steblya': null,
+			'2steblya_white': null,
 			'gvozdisco': 2024,
 			'staytrueflowers': 2021
 		}
@@ -140,6 +145,31 @@ function footer() {
 		var f = $('.uc-footerCopyright [field="text"]');
 		var currentYear = new Date().getFullYear();
 		f.text(f.text().replace(startYear[site], startYear[site] + '-' + currentYear));
+	}
+
+	function writeMeButton() {
+		const href = 'href^="https://t.me"';
+		const $btn = $(`.t393__submit[${href}]`);
+		if (!$btn.length) return;
+
+		const $originalParent = $btn.parent();
+		const $menuParent = $('.t228__centerside');
+
+		let $svg = $(`.t228 a[${href}] svg`);
+		if ($svg.length) {
+			$svg = $svg.clone().attr('class', '').css({ 'margin-right': '12px' }).prependTo($btn);
+			if (site === '2steblya_white') {
+				$svg.find('path').attr('fill', '#fff');
+			}
+		}
+
+		placeButton();
+		$(window).on('resize', placeButton);
+
+		function placeButton() {
+			const isMobile = $(window).width() < 981;
+			$btn.appendTo(isMobile ? $menuParent : $originalParent);
+		}
 	}
 }
 
@@ -165,6 +195,7 @@ tovarsFromDB = {
 	'date_to_open': {},
 	'days_to_close': {},
 	'evkalipt': [],
+	'painted': [],
 	'fixed_price': [],
 	'hidden': [],
 	'paid_delivery': [],
@@ -172,6 +203,8 @@ tovarsFromDB = {
 	'select_color': [],
 	'select_gamma': [],
 	'vitrina': [],
+	'photos': {},
+	'razdel': {},
 	'video_preview': {}
 }
 /**
@@ -181,7 +214,7 @@ getAllTovarsFromDB()
 	.then(data => {
 		data.forEach(tovar => {
 			//id
-			['dopnik', 'evkalipt', 'fixed_price', 'hidden', 'paid_delivery', 'random_sostav', 'select_color', 'select_gamma'].forEach(e => {
+			['dopnik', 'evkalipt', 'fixed_price', 'hidden', 'paid_delivery', 'random_sostav', 'select_color', 'select_gamma', 'painted'].forEach(e => {
 				if (!parseInt(tovar[e])) return;
 				tovarsFromDB[e].push(parseInt(tovar.id));
 			});
@@ -197,6 +230,11 @@ getAllTovarsFromDB()
 			['days_to_close'].forEach(e => {
 				if (!parseInt(tovar[e])) return;
 				tovarsFromDB[e][tovar.id] = parseInt(tovar[e]);
+			});
+			//id+value (json)
+			['photos', 'razdel'].forEach(e => {
+				if (!tovar[e]) return;
+				tovarsFromDB[e][tovar.id] = JSON.parse(tovar[e]);
 			});
 			//type
 			if (tovar.type) {

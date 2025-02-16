@@ -6,7 +6,7 @@
 
 	@include if('gvozdisco') {
 		.t-text {
-			background-color: $primary-color;
+			background-color: $color-1;
 			padding: 5px 10px;
 			display: inline-block
 		}
@@ -44,7 +44,7 @@
 .t120 {
 	@include if('gvozdisco') {
 		h2 {
-			background-color: $primary-color;
+			background-color: $color-1;
 			padding: 5px 10px;
 			display: inline-block;
 			font-size: 18px;
@@ -101,7 +101,7 @@
 .t225 {
 	@include if('gvozdisco') {
 		&__title {
-			background-color: $primary-color;
+			background-color: $color-1;
 			padding: 5px 10px;
 			display: inline-block;
 			font-size: 24px;
@@ -113,7 +113,7 @@
 //Универсальное меню с логотипом слева
 .t228 {
 	font-weight: 600;
-	background-color: $primary-color;
+	background-color: $color-1;
 
 	@include if('gvozdisco') {
 		@include min(980) {
@@ -126,19 +126,31 @@
 	}
 
 	.t-menu__link-item {
-		color: $contrprimary-color !important;
+		color: $color-0 !important;
 		font-size: $text-font-size !important;
+
+		@include if('2steblya_white') {
+			@include min(980) {
+				padding: 5px 10px;
+				text-transform: uppercase;
+				font-size: calc($text-font-size + 4px) !important;
+				color: $color-1 !important;
+				background-color: $color-0;
+				line-height: 2.3em;
+			}
+		}
 
 		@include if('gvozdisco') {
 			padding: 5px 10px;
-			background-color: $primary-color;
+			background-color: $color-1;
 			line-height: 2.3em;
 		}
+
 	}
 
 	.t-sociallinks__svg {
 		path {
-			fill: $contrprimary-color;
+			fill: $color-0;
 		}
 	}
 }
@@ -149,7 +161,7 @@
 
 		&__title,
 		&__blockdescr {
-			background-color: $primary-color;
+			background-color: $color-1;
 			padding: 10px
 		}
 	}
@@ -210,7 +222,7 @@
 
 		@include if('gvozdisco') {
 			padding: 10px;
-			background-color: $primary-color;
+			background-color: $color-1;
 			margin: 0 0 15px 0;
 		}
 	}
@@ -244,7 +256,7 @@
 
 	&__text {
 		@include if('gvozdisco') {
-			background-color: $primary-color;
+			background-color: $color-1;
 			padding: 5px 10px;
 			text-align: center
 		}
@@ -271,17 +283,21 @@
 	&__icon-hover &__lines {
 		g g {
 			@include if('2steblya') {
-				stroke: $contrprimary-color;
+				stroke: $color-0;
 			}
 
 			@include if('stf') {
-				stroke: $primary-color;
+				stroke: $color-1;
 			}
 		}
 	}
 
 	&__icon-hover &__circle {
-		background-color: $secondary-color !important;
+		background-color: $color-2 !important;
+
+		@include if('2steblya_white') {
+			border-radius: 0;
+		}
 	}
 
 }
@@ -309,7 +325,7 @@
 			box-sizing: border-box;
 			font-size: 14px;
 			line-height: 1.5;
-			color: $contrprimary-color;
+			color: $color-0;
 			font-family: $card-font;
 			font-weight: 300;
 			padding: 0 20px;
@@ -352,11 +368,11 @@
 		@include btn;
 
 		&.t-active {
-			background-color: $secondary-color !important;
-			border-color: $secondary-color !important;
+			background-color: $color-2 !important;
+			border-color: $color-2 !important;
 
 			* {
-				color: $primary-color !important;
+				color: $color-1 !important;
 				opacity: 1;
 			}
 		}
@@ -378,8 +394,8 @@
 		@include btn;
 
 		&::after {
-			color: $primary-color;
-			background-color: $secondary-color;
+			color: $color-1;
+			background-color: $color-2;
 			font-weight: 400;
 			font-family: $text-font-size;
 			font-size: 12px;
@@ -408,15 +424,16 @@
 .t985 .t-search-widget {
 	&__blockinput {
 		border: 0 none !important;
-		background-color: $contrprimary-color;
+		background: none;
+
 	}
 
 	&__header {
-		background-color: $primary-color;
+		background-color: $color-1;
 	}
 
 	&__close-icon path {
-		stroke: $contrprimary-color;
+		stroke: $color-0;
 	}
 
 	&__clear-icon {
@@ -427,7 +444,7 @@
 			opacity: .5;
 
 			& path {
-				stroke: $contrprimary-color;
+				stroke: $color-0;
 			}
 		}
 	}
@@ -450,7 +467,7 @@
 	}
 
 	&__popup {
-		background-color: $primary-color;
+		background-color: $color-1;
 	}
 
 	&__result_product-price {
@@ -458,13 +475,13 @@
 	}
 
 	&__pagination-active {
-		background-color: $secondary-color;
+		background-color: $color-2;
 	}
 
 	&__pagination-next,
 	&__pagination-prev {
 		path {
-			stroke: $contrprimary-color;
+			stroke: $color-0;
 		}
 	}
 }
@@ -476,8 +493,8 @@
 
 		&_active {
 			svg path {
-				stroke: $secondary-color;
-				fill: $secondary-color
+				stroke: $color-2;
+				fill: $color-2
 			}
 		}
 	}
@@ -486,15 +503,15 @@
 		border-radius: 5px;
 
 		@include if('2steblya') {
-			background-color: $secondary-color;
+			background-color: $color-2;
 		}
 
 		@include if('stf') {
-			background-color: $contrprimary-color;
+			background-color: $color-0;
 		}
 
 		& * {
-			color: $primary-color;
+			color: $color-1;
 		}
 
 		&-text {
@@ -556,13 +573,13 @@
 	.t-text {
 
 		@include if('2steblya') {
-			font-weight: 600;
-			color: $secondary-color;
+			font-weight: 600 !important;
+			color: $color-2;
 		}
 
 		@include if('stf') {
-			font-weight: 400;
-			color: $secondary-color;
+			font-weight: 400 !important;
+			color: $color-2;
 		}
 	}
 }

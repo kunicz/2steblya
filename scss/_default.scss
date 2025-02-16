@@ -1,7 +1,7 @@
 @import '!mixins';
 
 body {
-	background-color: $primary-color;
+	background-color: $color-1;
 	background-image: none;
 }
 
@@ -19,4 +19,4 @@ body {
 @import 'imageViewer';
 @import 'owlCarousel';
 @import 'products-catalog-owl';
-@import 'products-catalog-vitrina';
+@import 'products-catalog-custom';

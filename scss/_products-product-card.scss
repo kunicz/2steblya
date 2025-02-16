@@ -1,12 +1,9 @@
 //.js-product
 .t-store__card__bgimg_second {
-	background-color: $secondary-color;
+	background-color: $color-2;
 	background-repeat: no-repeat;
 	background-position: center;
-
-	@include if('2steblya') {
-		background-size: contain;
-	}
+	background-size: contain;
 
 	@include if('stf') {
 		background-size: cover;
@@ -15,7 +12,7 @@
 
 .card {
 	background-image: none !important;
-	background-color: $secondary-color;
+	background-color: $color-2;
 	box-sizing: border-box;
 	display: inline-flex !important;
 	justify-content: center;
@@ -35,11 +32,11 @@
 
 		* {
 			@include if('2steblya') {
-				color: $primary-color !important;
+				color: $color-1 !important;
 			}
 
 			@include if('stf') {
-				color: $contrprimary-color !important;
+				color: $color-0 !important;
 			}
 		}
 
@@ -53,6 +50,13 @@
 			margin-top: -40px;
 
 			@include if('2steblya') {
+				margin-bottom: 40px;
+				height: 80px;
+				width: 80px;
+				background-image: url('https://static.tildacdn.com/tild6362-6133-4632-b864-646561666131/logo-rect-transparen.png');
+			}
+
+			@include if('2steblya_white') {
 				margin-bottom: 40px;
 				height: 80px;
 				width: 80px;
@@ -85,16 +89,21 @@
 	//навзание букета
 	&__title {
 		margin-top: 20px;
-		line-height: 1 !important;
+		line-height: 1;
 
 		@include if('2steblya') {
 			font-weight: 900;
-			font-size: 1.9em !important;
+			font-size: 1.9em;
+		}
+
+		@include if('2steblya_white') {
+			font-weight: 600;
+			font-size: 1.9em;
 		}
 
 		@include if('stf') {
 			font-weight: 600;
-			font-size: 1.3em !important;
+			font-size: 1.3em;
 		}
 
 		@include max(460) {
@@ -109,12 +118,12 @@
 
 		//длинный текст в карточке
 		$long_card_text_ids: 221040427501,
-		233731803531,
-		528542038451,
-		833291444381,
-		602273240301,
-		810453377781,
-		163944901201; // тамара ильинишна
+			233731803531,
+			528542038451,
+			833291444381,
+			602273240301,
+			810453377781,
+			163944901201; // тамара ильинишна
 
 		@each $id in $long_card_text_ids {
 			$data: '[data-product-gen-uid="#{$id}"]';
@@ -132,7 +141,7 @@
 		font-size: .8em !important;
 
 		p {
-			border-bottom: 1px solid rgba($primary-color, .1);
+			border-bottom: 1px solid rgba($color-1, .1);
 			white-space: nowrap;
 		}
 	}

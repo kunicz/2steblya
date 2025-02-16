@@ -37,7 +37,7 @@ $menu_costumized: (
 		}
 
 		a {
-			color: $contrprimary-color !important;
+			color: $color-0 !important;
 		}
 
 		@mixin menu_item_with_icon($url) {
@@ -96,8 +96,8 @@ $menu_costumized: (
 		background-position: 10px center;
 		background-repeat: no-repeat;
 		cursor: pointer;
-		background-color: $primary-color;
-		color: $contrprimary-color;
+		background-color: $color-1;
+		color: $color-0;
 		font-family: $text-font;
 		font-size: $text-font-size;
 		font-weight: 300;
@@ -244,7 +244,7 @@ $menu_costumized: (
 				border: 0 none;
 				width: 10px;
 				height: 10px;
-				background-color: $secondary-color;
+				background-color: $color-2;
 				top: 3px;
 				left: 3px;
 				transform: none;
@@ -293,7 +293,7 @@ $menu_costumized: (
 
 			&::after {
 				content: 'до: ';
-				color: $contrprimary-color;
+				color: $color-0;
 				font-size: 18px;
 			}
 		}
@@ -399,7 +399,7 @@ $menu_costumized: (
 	&__reset {
 		display: none !important;
 		padding: 6px 20px 9px 20px !important;
-		background-color: $secondary-color;
+		background-color: $color-2;
 		border-radius: 5px !important;
 		border: 0 none !important;
 		line-height: 1.4 !important;

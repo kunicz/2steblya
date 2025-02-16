@@ -28,31 +28,25 @@
 	left: 0;
 
 	.t-store__card__mark {
-		@include plashka(auto, 0, 0, auto, $primary-color, $secondary-color, 900);
+		@include plashka(auto, 0, 0, auto, $color-1, $color-2, 700);
 	}
 }
 
 //карточка к букету
 &:not(.noCard) .t-store__card__bgimg_second::after {
-	@include plashka(0, auto, auto, 0, $contrprimary-color, $primary-color, 300);
-
-	@include if('stf') {
-		font-size: $text-font-size - 6px;
-		font-weight: 400;
-	}
-
+	@include plashka(0, auto, auto, 0, $color-0, $color-1, 500);
 	content: 'карточка к букету';
 }
 
 
 //бомжетный
 .bomjPlashka {
-	@include plashka(0, 0, auto, auto, $primary-color, $secondary-color, 900);
+	@include plashka(0, 0, auto, auto, $color-1, $color-2, 700);
 }
 
 //на фото
 .photoPlashka {
-	@include plashka(0, auto, auto, 0, $primary-color, $secondary-color, 900);
+	@include plashka(0, auto, auto, 0, $color-1, $color-2, 700);
 }
 
 &:not(.bomj) .bomjPlashka {

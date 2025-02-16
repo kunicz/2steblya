@@ -2,32 +2,42 @@
 
 //узнать больше
 .product__optionReadMore {
+	@include btn;
 
-	border-radius: 50%;
-	background-color: $secondary-color;
-	font-weight: 300;
-	display: inline-block;
-	width: 24px;
-	height: 24px;
-	line-height: 24px;
+	font-size: 12px !important;
+	font-weight: 400 !important;
+	white-space: nowrap;
+	padding: 10px 15px;
+	height: auto;
 	vertical-align: middle;
 	text-align: center;
-	margin: 6px 0 0 10px;
+	margin-left: 10px;
 	position: absolute;
 
+	@include max(980) {
+		position: static;
+		margin-top: 10px;
+	}
+
 	@include if('2steblya') {
-		color: $contrprimary-color !important;
+		color: $color-0 !important;
+		font-family: $heading-font;
+	}
+
+	@include if('2steblya_white') {
+		color: $color-1 !important;
 		font-family: $heading-font;
 	}
 
 	@include if('gvozdisco') {
-		font-family: $text-font;
-		color: $contrprimary-color !important;
-		font-weight: 900;
+		color: $color-0 !important;
+		font-size: 14px !important;
+		padding: 9px 15px;
+		text-transform: lowercase;
 	}
 
 	@include if('stf') {
-		color: $primary-color !important;
+		color: $color-1 !important;
 		font-family: $heading-font;
 	}
 

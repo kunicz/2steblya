@@ -22,14 +22,15 @@
 				height: 100vh !important;
 				top: 0 !important;
 				position: fixed !important;
-				background-color: $primary-color;
+				background-color: $color-1;
 			}
 
 			&__container {
-				background: $primary-color;
+				background: $color-1;
 				min-height: 60px !important;
 				width: 60px;
 				padding: 20px 16px !important;
+
 			}
 
 			&__text {
@@ -40,5 +41,5 @@
 }
 
 .t-menuwidgeticons__icon-counter {
-	background-color: $secondary-color !important;
+	background-color: $color-2 !important;
 }

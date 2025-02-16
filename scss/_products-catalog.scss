@@ -10,7 +10,7 @@
 &__empty-part-msg {
 	&-wrapper {
 		border: 0 none;
-		color: $contrprimary-color;
+		color: $color-0;
 		padding: 0;
 	}
 
@@ -29,6 +29,10 @@
 	}
 
 	@include if('2steblya') {
+		background-image: url(https://static.tildacdn.com/tild3735-6265-4864-b363-376135393737/laurie.gif);
+	}
+
+	@include if('2steblya_white') {
 		background-image: url(https://static.tildacdn.com/tild3735-6265-4864-b363-376135393737/laurie.gif);
 	}
 

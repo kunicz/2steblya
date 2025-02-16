@@ -12,7 +12,7 @@ $donats: (
 	}
 
 	* {
-		color: $contrprimary-color;
+		color: $color-0;
 		font-size: $text-font-size;
 		opacity: 1;
 		text-align: left;
@@ -25,10 +25,16 @@ $donats: (
 	//название товара
 	&-title {
 		text-align: left;
+		font-weight: 600 !important;
 
 		& a {
+			@include if('2steblya_white') {
+				font-weight: 400 !important;
+				font-size: calc($text-font-size + 2px);
+			}
+
 			@include if('stf') {
-				font-weight: 400;
+				font-weight: 400 !important;
 				font-size: calc($text-font-size + 2px);
 			}
 
@@ -71,7 +77,7 @@ $donats: (
 	}
 
 	&-imgdiv {
-		background-color: $primary-color;
+		background-color: $color-1;
 		border-radius: 0;
 
 		@include max(640) {
@@ -140,20 +146,24 @@ $donats: (
 		margin: 15px 0;
 
 		&__timer {
-			color: $contrprimary-color;
+			color: $color-0;
 
 			&__counter {
 				&__number {
-					color: $contrprimary-color;
+					color: $color-0;
 					text-align: center !important;
 
 					@include if('stf') {
 						font-weight: 100;
 					}
+
+					@include if('2steblya_white') {
+						font-weight: 100;
+					}
 				}
 
 				&__circle circle {
-					stroke: $secondary-color;
+					stroke: $color-2;
 				}
 			}
 		}

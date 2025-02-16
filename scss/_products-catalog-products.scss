@@ -5,11 +5,26 @@
 	float: none;
 	vertical-align: top;
 
+	@include if('2steblya_white') {
+		margin-bottom: 20px;
+	}
+
 	//карточка
 	.card__container {
 		@media screen and (max-width:960px) {
 			& {
 				display: none;
+			}
+		}
+
+		@include if('2steblya_white') {
+			&::before {
+				display: none !important;
+			}
+
+			.card__title {
+				font-size: calc($text-font-size + 8px) !important;
+				font-weight: 600 !important;
 			}
 		}
 	}
@@ -25,6 +40,11 @@
 
 	//заголовок
 	&__title {
+		@include if('2steblya_white') {
+			font-size: calc($text-font-size + 8px) !important;
+			font-weight: 600;
+		}
+
 		@include if('stf') {
 			font-size: calc($text-font-size + 2px) !important;
 			font-weight: 400;
@@ -32,7 +52,7 @@
 
 		@include if('gvozdisco') {
 			font-size: $text-font-size !important;
-			background-color: $primary-color;
+			background-color: $color-1;
 			display: inline-block;
 			width: auto;
 			padding: 5px 10px;
@@ -53,7 +73,7 @@
 	//цена
 	&__price-wrapper {
 		@include if('gvozdisco') {
-			background-color: $primary-color;
+			background-color: $color-1;
 			display: inline-block;
 			padding: 0 10px;
 			width: auto;
@@ -63,6 +83,10 @@
 
 	&__price,
 	&__price_old {
+		@include if('2steblya_white') {
+			font-size: $text-font-size;
+		}
+
 		@include if('stf') {
 			font-size: $text-font-size;
 			font-weight: 100 !important;
@@ -74,7 +98,7 @@
 
 		& * {
 			font-size: 14px;
-			color: rgba($contrprimary-color, .5)
+			color: rgba($color-0, .5)
 		}
 	}
 
@@ -84,6 +108,12 @@
 			font-weight: 300;
 			opacity: .5;
 			font-size: 14px;
+
+			@include if('2steblya_white') {
+				font-size: $text-font-size;
+				font-weight: 600;
+				font-size: 20px;
+			}
 		}
 	}
 
@@ -95,7 +125,7 @@
 			padding-bottom: 110%;
 			position: relative;
 			overflow: hidden;
-			background-color: $primary-color;
+			background-color: $color-1;
 
 			video {
 				position: absolute;
@@ -117,13 +147,17 @@
 		@include max(980) {
 			justify-content: center;
 		}
+
+		@include if('2steblya_white') {
+			display: none;
+		}
 	}
 }
 
 
 //soldOut
 &__sold-out-msg {
-	color: $secondary-color;
+	color: $color-2;
 	font-weight: 600;
 	text-transform: uppercase !important;
 }

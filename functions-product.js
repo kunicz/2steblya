@@ -51,15 +51,18 @@ function productTovarFunctions(tovar) {
 	productHideEmptyText(tovar);
 	productAddAdditionalText(tovar);
 	productFlowersSeason(tovar);
-	productFlowersWithEvkalipt(tovar);
+	productEvkalipt(tovar);
+	productMono(tovar);
 	productPodpiska(tovar);
 	productCharcs(tovar);
 	productBlackFriday(tovar);
 	productSoldOut(tovar);
 	produnctNotAllowed(tovar);
 	//productBomjPlashka(tovar);
-	productButton(tovar);
+	productButtonDonat(tovar);
+	productButtonYandexMetrika(tovar);
 	productOnPhoto(tovar);
+	productNavigateToOptionPhoto(tovar);
 	productCartDisabled(tovar);
 	productHideDisabledFormatOption(tovar);
 	productShow(tovar);
@@ -78,7 +81,7 @@ function productCatalogTovarFunctions(tovar, catalog) {
 	productBomjPlashka(tovar, catalog);
 	productVideoPreview(tovar, catalog);
 	productHideVitrinaDuplicate(tovar, catalog);
-	productsTotHide(tovar);
+	productsToHide(tovar, catalog);
 	productShow(tovar);
 }
 
@@ -174,6 +177,7 @@ function productCatalogMenu(catalog) {
 		function renameAll() {
 			var data = {
 				'2steblya': 'ALL',
+				'2steblya_white': 'ALL',
 				'gvozdisco': 'ВСЕ',
 				'dorogobogato': 'ВСЕ',
 				'staytrueflowers': 'ВСЕ'
@@ -277,6 +281,10 @@ function productCartDisabled(tovar) {
 			'а как купить?',
 			'сорян, мы зашиваемся и пока прием заказов заказан. но если у вас очень важное дело, то напишите нам в <a href="https://t.me/dva_steblya" target="blank">телегу</a>, че-нить придумаем<'
 		],
+		'2steblya_white': [
+			'А как купить?',
+			'К сожалению, в данный момент прием заказов закрыт. но ты всегда можешь <a href="https://t.me/dva_steblya">написать нам</a>, и мы обязательно постараемся тебе помочь.'
+		],
 		'gvozdisco': [
 			'А как купить?',
 			'К сожалению, в данный момент прием заказов закрыт. но ты всегда можешь <a href="https://t.me/dva_steblya">написать нам</a>, и мы обязательно постараемся тебе помочь.'
@@ -310,14 +318,17 @@ function productPlashka(tovar) {
 		var data = {
 			'random_sostav': {
 				'2steblya': 'букет, чтоб не париться с выбором',
+				'2steblya_white': 'состав на вкус флориста',
 				'staytruefloers': 'состав на вкус флориста'
 			},
 			'select_gamma': {
 				'2steblya': 'можно выбрать гамму',
+				'2steblya_white': 'можно выбрать гамму',
 				'staytruefloers': 'можно выбрать гамму'
 			},
 			'select_color': {
 				'2steblya': 'можно выбрать цвет',
+				'2steblya_white': 'можно выбрать цвет',
 				'staytruefloers': 'можно выбрать цвет'
 			},
 		}
@@ -336,12 +347,13 @@ function productPlashka(tovar) {
  * бомжетность
  */
 function productBomjPlashka(tovar, catalog) {
-	if (site != '2steblya') return;
+	if (site != '2steblya' && site != '2steblya_white') return;
 	if (getTovarPrice(tovar) > Object.keys(productPriceLevels[site])[0]) return;
 	if (tovarsFromDB[888].includes(getTovarId(tovar))) return;
 	tovar.addClass('bomj');
 	var data = {
 		'2steblya': 'бомжетный',
+		'2steblya_white': 'бюджетный',
 		'gvozdisco': 'бюджетный',
 		'dorogobogato': 'бюджетный',
 		'staytrueflowers': 'бюджетный'
@@ -373,73 +385,89 @@ function productVideoPreview(tovar, catalog) {
 /**
  * кнопка "купить"
  */
-function productButton(tovar) {
+function productButtonDonat(tovar) {
 	if (!tovarsFromDB[1111].includes(getTovarId(tovar))) return;
 	$('.js-store-prod-popup-buy-btn-txt').text('ЗАДОНАТИТЬ!');
+}
+function productButtonYandexMetrika(tovar) {
+	$('a[href="#order"]').on('click', function () {
+		data = {
+			'id': getTovarSku(tovar),
+			'name': getTovarTitle(tovar),
+			'price': getTovarPrice(tovar),
+			'format': tovar.find('.js-product-edition-option-variants').eq(0).val()
+		}
+		console.log(data);
+		dataLayer.push({
+			'ecommerce': {
+				'currencyCode': 'RUB',
+				'add': {
+					'products': [
+						data
+					]
+				}
+			}
+		});
+	});
 }
 
 /**
  * характеристика "на фото" реально на фото
  */
 function productOnPhoto(tovar) {
-	if (site == 'gvozdisco') {
-		tovar.find('.t-slds__main .t-slds__bgimg').append('<div class="photoPlashka">букетусик</div>');
-	}
-	if (site == '2steblya') {
-		if (productIsPopup()) {
-			popup();
-		} else {
-			page();
-		}
-		function popup() {
-			var xmlhttp = new XMLHttpRequest();
-			xmlhttp.open("GET", tovar.attr('data-product-url'), false);
-			xmlhttp.send();
-			var parser = new DOMParser();
-			apply($(parser.parseFromString(xmlhttp.responseText, "text/html")).find('.t-rec:first > script'));
-		}
-		function page() {
-			apply(tovar.parents('.t-rec').children('script'));
-		}
-		function apply(script) {
-			var product = script.text().match(/var product = (.*)\n/);
-			if (!product) return;
-			if (product.length < 2) return;
-			product = JSON.parse(product[1].slice(0, -1));
-			if (product.editions.length < 2) return;
-			var sizes = [];
-			var photos = [];
-			for (var i = 0; i < product.editions.length; i++) {
-				if (!product.editions[i].img) continue;
-				const match = product.editions[i][productFormat[site]].match(/(.+?)\sх\d+\sдоставки/);
-				const m = match ? match[1] : product.editions[i][productFormat[site]];
-				photos.push([m, product.editions[i].img]);
-				sizes.push(product.editions[i][productFormat[site]]);
-			}
-			sizes = sizes.map(str => {
-				var match = str.match(/(.+?)\sх\d+\sдоставки/);
-				return match ? match[1] : str;
-			});
-			sizes = [...new Set(sizes)];
-			if (!photos.length) return;
-			var i = 0;
-			tovar.find('.t-slds__main .t-slds__bgimg').each(function (j, e) {
-				if (j < 2) return;
-				if (typeof photos[i + 1] !== 'undefined') {
-					if ($(this).attr('data-original') == photos[i + 1][1]) i++;
-				}
-				$(this).append('<div class="photoPlashka">' + photos[i][0] + '</div>');
-			});
-			tovar.find('.t-typography__characteristics').each(function () {
-				if (!$(this).find('b').text() != 'на фото') return;
-				$(this).hide();
-				return false;
-			});
-			var charc = $('<p class="t-typography__characteristics js-store-prod-charcs costumized"></p>');
-			charc.html('<b>на фото</b> ' + sizes.join(', ')).prependTo(tovar.find('.js-store-prod-all-charcs'));
+	const data = tovarsFromDB.photos[getTovarId(tovar)];
+	if (!data || !data.length) return;
+	const naphotoRazmerValues = [];
 
+	tovar.find('.t-slds__main .t-slds__bgimg').each(function () {
+		const dataOriginal = $(this).data('original');
+
+		for (const key in data) {
+			if (data[key].url != dataOriginal) continue;
+			const naphotoRazmer = data[key].naphoto_razmer || '';
+			const naphotoDoptext = data[key].naphoto_doptext || '';
+			const combinedText = [naphotoRazmer, naphotoDoptext].filter(Boolean).join('. ');
+
+			if (combinedText) {
+				const $photoPlashka = $('<div class="photoPlashka"></div>').text(combinedText);
+				$(this).append($photoPlashka);
+			}
+
+			if (data[key].naphoto_razmer) {
+				naphotoRazmerValues.push(data[key].naphoto_razmer);
+			}
+			break;
 		}
+	});
+
+	// Удаляем дубликаты и создаем элемент с уникальными значениями
+	const uniqueNaphotoRazmerValues = [...new Set(naphotoRazmerValues)];
+	if (uniqueNaphotoRazmerValues.length) {
+		const charc = $('<p class="t-typography__characteristics js-store-prod-charcs costumized"></p>');
+		charc.html('<b>на фото</b> ' + uniqueNaphotoRazmerValues.join(', ')).prependTo($('.js-store-prod-all-charcs'));
 	}
+}
+
+/**
+ * переключаем фото, если совпадает доптекст и выбор в селекте 
+ */
+function productNavigateToOptionPhoto(tovar) {
+	const data = tovarsFromDB.photos[getTovarId(tovar)];
+	if (!data || !data.length) return;
+	tovar.find('.js-product-option select').on('change', function () {
+		const selectedValue = $(this).val();
+		let foundIndex = -1;
+
+		for (const key in data) {
+			if (data[key].naphoto_doptext === selectedValue) {
+				foundIndex = key;
+				break;
+			}
+		}
+
+		if (foundIndex == -1) return;
+		tovar.find('.t-slds__bullet').eq(foundIndex).trigger('click');
+	});
 }
 
 /**
@@ -458,6 +486,10 @@ function productFlowersSeason(tovar) {
 			'2steblya': {
 				'пион': 'если сезон пионов (' + flowersSeasons['пион'] + ') закончилса, то мы поставим вместо их кросивые пивоно видные розы',
 				'георгина': 'если сезон георгин (' + flowersSeasons['георгина'] + ') закончилса, то мы поставим вместо их кросивые розы'
+			},
+			'2steblya_white': {
+				'пион': 'если сезон пионов (' + flowersSeasons['пион'] + ') закончился, то мы поставим вместо них кросивые пионовидные розы',
+				'георгина': 'если сезон георгин (' + flowersSeasons['георгина'] + ') закончился, то мы поставим вместо них кросивые розы'
 			},
 			'gvozdisco': {
 				'пион': '',
@@ -483,6 +515,19 @@ function productFlowersSeason(tovar) {
  */
 function productPodpiska(tovar) {
 	if (!tovarsFromDB['666'].includes(getTovarId(tovar))) return;
+	if (getTovarId(tovar) == 185219310892) return;
+
+	//текст-описание
+	$data = {
+		'2steblya': 'подпис очка - это цветочеки для дома. каждую недельку разные! можно зоказать себе, можно в подарок<br><br>букептеки могут приезджать с тематической карт очкой, а могут просто сами по себе красивые без всего<br><br>карточки:<ul><li>от тайнова поклонника - будут любовные записки</li><li>мем недели - картинка для увеселения</li><li>без карточки - просто цветочки пришлем</li><li>без айдентики - даже о себе нигде не напишем</li></ul>',
+		'2steblya_white': '',
+		'gvozdisco': '',
+		'dorogobogato': '',
+		'staytrueflowers': ''
+	}
+	var block = tovar.find('.js-store-prod-all-text');
+	block.html(block.html() + '<br><br>' + $data[site]);
+
 	//порядок торговых предложений
 	var select = tovar.find('.js-product-edition-option[data-edition-option-id="фор мат"] select');
 	var options = select.find('option');
@@ -495,25 +540,16 @@ function productPodpiska(tovar) {
 	select.children('option:first').prop('selected', true);
 	var changeEvent = new Event('change');
 	select.get(0).dispatchEvent(changeEvent);
-
-	//текст-описание
-	$data = {
-		'2steblya': 'подпис очка - это цветочеки для дома. каждую недельку разные! можно зоказать себе, можно в подарок<br><br>букептеки могут приезджать с тематической карт очкой, а могут просто сами по себе красивые без всего<br><br>карточки:<ul><li>от тайнова поклонника - будут любовные записки</li><li>мем недели - картинка для увеселения</li><li>без карточки - просто цветочки пришлем</li><li>без айдентики - даже о себе нигде не напишем</li></ul>',
-		'gvozdisco': '',
-		'dorogobogato': '',
-		'staytrueflowers': ''
-	}
-	var block = tovar.find('.js-store-prod-all-text');
-	block.html(block.html() + '<br><br>' + $data[site]);
 }
 
 /**
  * текст для моно букетов
  */
-function productFlowersWithEvkalipt(tovar) {
+function productEvkalipt(tovar) {
 	if (!tovarsFromDB['evkalipt'].includes(getTovarId(tovar))) return;
 	$data = {
 		'2steblya': 'цветочики вкуснее с эвкалиптом. мы рекомен дуем:<br>1 эвкалипт к букетусикам<br>2 эвкалипта к букетикам и букетам<br>3 эвкалипта к букетищам и прочим корзинам',
+		'2steblya_white': 'цветочки лучше с эвкалиптом. мы рекомендуем:<br>1 эвкалипт к маленьким букетам<br>2 эвкалипта к средним букетам<br>3 эвкалипта к большим букетам',
 		'gvozdisco': 'цветочки лучше с эвкалиптом. мы рекомендуем:<br>1 эвкалипт к букетусикам<br>2 эвкалипта к букетикам и букетам<br>3 эвкалипта к букетищам и прочим корзинам',
 		'dorogobogato': 'цветочки лучше с эвкалиптом. мы рекомендуем:<br>1 эвкалипт к букетусикам<br>2 эвкалипта к букетикам и букетам<br>3 эвкалипта к букетищам и прочим корзинам',
 		'staytrueflowers': ''
@@ -523,9 +559,32 @@ function productFlowersWithEvkalipt(tovar) {
 }
 
 /**
+ * текст для моно букетов
+ */
+function productMono(tovar) {
+	const id = getTovarId(tovar);
+	const razdels = tovarsFromDB['razdel'][id];
+	if (!razdels) return;
+	if (!razdels.includes('МОНО')) return;
+	if (site == '2steblya' && [221040427501, 637495188911, 695336310901, 247137164121].includes(id)) return;
+	$data = {
+		'2steblya': `почему мы не указываем, сколько конкретно цветочков будет в букепте?<br>
+			пушто ихний сезон только начался, цена постоянно меняется(в основном, снижаеца, в конце сезона буит расти), а мы всегда за упрощщение.<br>
+			штоб не пересчитывать цены каждый день, мы прост буим по мере их удешевления вам их <b>побольше</b> в букептеки добавлять и все. по-чесноку, без обманки!<br>
+			и если цвэт не принципеален, выберайте на вкус флориста - выберем <b>самый жир!</b>`,
+		'2steblya_white': '',
+		'gvozdisco': '',
+		'dorogobogato': '',
+		'staytrueflowers': ''
+	}
+	var block = tovar.find('.js-store-prod-all-text');
+	block.html((block.html().trim() ? block.html() + '<br><br>' : '') + $data[site]).show();
+}
+
+/**
  * скрываем товары, которые должны быть скрыты
  */
-function productsTotHide(tovar) {
+function productsToHide(tovar, catalog) {
 	if (!tovarsFromDB['hidden'].includes(getTovarId(tovar))) return;
 	tovar.prev('.t-clear').addBack().hide();
 }
@@ -544,9 +603,10 @@ function productReplaceCardImgWithText(tovar, catalog) {
 	}
 	var data = {
 		'2steblya': '<p>«здесь может быть ваша реклама»</p><p>или какой хочешь текст,</p><p>решать тебе</p>',
-		'gvozdisco': '<p>здесь мы разместим твое пожелание или поздравление</p>',
-		'dorogobogato': '<p>здесь мы разместим твое пожелание или поздравление</p>',
-		'staytrueflowers': '<p>здесь мы разместим ваше пожелание или поздравление</p>'
+		'2steblya_white': '<p>здесь мы разместим ваше</p><p>пожелание или поздравление</p>',
+		'gvozdisco': '',
+		'dorogobogato': '',
+		'staytrueflowers': ''
 	}
 	var card = tovar.find(catalog ? '.t-store__card__bgimg_second' : '.t-slds__item[data-slide-index="2"]');
 	var cardContent = $('<div class="card__container t-text"></div>');
@@ -555,7 +615,7 @@ function productReplaceCardImgWithText(tovar, catalog) {
 		'<div class="card__title">' + cardTitle(tovar) + '</div>',
 		'<div class="card__text">' + getTovarCardText(tovar) + '</div>',
 	]
-	if (site == '2steblya') cardParts.push('<div class="card__your-text">' + data[site] + '</div>');
+	if (site == '2steblya' || site == '2steblya_white') cardParts.push('<div class="card__your-text">' + data[site] + '</div>');
 	cardContent.append(cardParts.join(''));
 	card.addClass('card').html(cardContent);
 	if (!catalog) {
@@ -577,7 +637,8 @@ function productReplaceCardImgWithText(tovar, catalog) {
 		var title = getTovarTitle(tovar);
 		//обожаба болотная
 		if ([821562052022, 434201329362].includes(getTovarId(tovar))) title = 'ОБОЖАБА';
-		return title;
+		//витринные с номерами
+		return title.replace(/\s[#|№]\d+$/, '');
 	}
 }
 
@@ -617,6 +678,7 @@ function productAddAdditionalText(tovar) {
 		'2steblya': [
 			857613433221 // донатошная
 		],
+		'2steblya_white': [],
 		'gvozdisco': [],
 		'dorogobogato': [],
 		'staytrueflowers': []
@@ -624,6 +686,7 @@ function productAddAdditionalText(tovar) {
 	if (noTextProducts[site].includes(getTovarId(tovar))) return;
 	var data = {
 		'2steblya': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов<br>к букетам с айдентикой также прилагается карт очка и сосабельный петушок',
+		'2steblya_white': 'к любому букету прилагается его состав и чудо-порошок для продления жизни цветов<br>в составе могут быть <a href="/substitute" target="_blank">замены</a>',
 		'gvozdisco': 'к любому букету прилагаются бесплатные <a href="/glasees">дурацкие очки</a>',
 		'dorogobogato': '',
 		'staytrueflowers': 'к каждому букету прилагается карточка с его названием, состав, порошок для продления жизни цветов. и леденец для настроения :-)<br><br>ВАЖНО: про <a href="/substitute" target="_blank">замены в букетах</a>'
@@ -648,6 +711,7 @@ function productCharcs(tovar) {
 function productRemoveCharcs(charcBlock) {
 	var techCharcs = {
 		'2steblya': ['гамма', 'цвет', 'состав'],
+		'2steblya_white': ['гамма', 'цвет', 'состав'],
 		'gvozdisco': [],
 		'dorogobogato': [],
 		'staytrueflowers': []
@@ -670,25 +734,30 @@ function productLogoInHeader() {
 function productOptionsReadMore(tovar) {
 	var productOptionsHelpLinks = {
 		'2steblya': {
-			'фор мат': '/format',
-			'выебри карточку': '/card'
+			'фор мат': { url: '/format', text: 'можна попа дробнее?' },
+			'выебри карточку': { url: '/card', text: 'а это шо такое?' }
+		},
+		'2steblya_white': {
+			'формат': { url: '/format', text: 'подробнее о размерах' },
+			'карточка': { url: '/card', text: 'что такое карточка?' }
 		},
 		'gvozdisco': {
-			'формат': '/format',
-			'карточка': '/card'
+			'формат': { url: '/format', text: 'подробнее о форматах' },
+			'карточка': { url: '/card', text: 'что такое карточка?' }
 		},
 		'dorogobogato': {
-			'формат': '/format'
+			'формат': { url: '/format', text: 'подробнее' },
+			'карточка': { url: '/card', text: 'подробнее' }
 		},
 		'staytrueflowers': {
-			'формат': '/format',
-			'карточка': '/card'
+			'формат': { url: '/format', text: '?' },
+			'карточка': { url: '/card', text: '?' }
 		}
 	}
 	tovar.find('.t-product__option-select').each(function () {
 		var href = productOptionsHelpLinks[site][$(this).parent().prev().text()];
 		if (!href) return;
-		$(this).after('<a class="product__optionReadMore" href="' + href + '" onclick="window.open(\'' + href + '\');return false;">?</a>');
+		$(this).after(`<a class="product__optionReadMore" href="${href.url}" onclick="window.open('${href.url}');return false;">${href.text}</a>`);
 	});
 }
 
@@ -796,6 +865,13 @@ function getTovarId(tovar) {
 }
 
 /**
+ * получаем sku
+ */
+function getTovarSku(tovar) {
+	return tovar.find('.js-product-sku').text();
+}
+
+/**
  * получаем текущую цену товара
  */
 function getTovarPrice(tovar) {
@@ -822,12 +898,11 @@ function owlCatalog(catalog, className) {
 	var maxWaitTime = 10000;  // 10 секунд проверяем наличие товаров в каталоге
 	var elapsedTime = 0;
 	var intervalTime = 100;
-	var int = setInterval(function () {
+	var int = setInterval(async function () {
 		elapsedTime += intervalTime;
 		tovars = catalog.find('.js-store-grid-cont .js-product');
 		if (tovars.length) {
-			tovars = owlCatalogRemoveJunk();
-			if (!tovars.length) return;
+			tovars = await owlCatalogRemoveJunk();
 			clearInterval(int);
 			owlCatalogCarousel();
 			owlCatalogNavButtons();
@@ -841,17 +916,23 @@ function owlCatalog(catalog, className) {
 	/**
 	 * удаляем все ненужное, возвращаем товары
 	 */
-	function owlCatalogRemoveJunk() {
+	async function owlCatalogRemoveJunk() {
+		await new Promise(resolve => setTimeout(resolve, 1000));
 		//удаляем сепараторы
 		catalog.find('.t-store__grid-separator').remove();
-		//если витрина, удаляем купленные
-		if (className == 'vitrina') {
-			tovars.each(function () {
-				var tovar = $(this);
-				if (!tovar.find('.js-store-prod-sold-out').length) return;
-				tovar.remove();
-			});
-		}
+		tovars.each(function () {
+			var tovar = $(this);
+			//если витрина, удаляем купленные
+			if (className == 'vitrina' && tovar.find('.js-store-prod-sold-out').length) tovar.remove();
+			//если товар скрыт
+			var conditions = [
+				tovarsFromDB['not_allowed'].includes(getTovarId(tovar)), //в бд отмечен как недоступен
+				tovarsFromDB['hidden'].includes(getTovarId(tovar)), //скрытые товары (нитакой как все, индпошив)
+				tovar.is(':hidden') //скрытые тильдой (закончились)
+			];
+			if (conditions.includes(true)) tovar.remove();
+		});
+
 		//вовращаем количество товаров
 		return catalog.find('.js-store-grid-cont .js-product');
 	}
@@ -896,41 +977,52 @@ function owlCatalog(catalog, className) {
  * каталог новинок
  * подгружаем из базы товары, которые считаются новыми и в каталоге удаляем всех, кроме них, а также расставляем их по дате создания
  */
-function newCatalog(block) {
-	$tovarsFromDbPromise = new Promise((resolve, reject) => {
-		$.ajax({
-			url: 'https://php.2steblya.ru/ajax.php?script=Tilda_products_from_DB&products=new&site=' + site,
-			crossDomain: true,
-			type: 'GET',
-			success: function (data) {
-				data = JSON.parse(data);
-				if (data.success) {
-					resolve(data.fromDB);
-				} else {
-					reject();
-				}
-			},
-			error: function (error) {
-				reject(error);
+function novinkiCatalog(block) {
+	fetch(`https://php.2steblya.ru/ajax.php?script=Tilda_products_from_DB&products=new&site=${site}`)
+		.then(response => {
+			if (!response.ok) {
+				throw new Error(`Ошибка сети: ${response.status} ${response.statusText}`);
 			}
-		});
-	});
-	$tovarsFromDbPromise.
-		then(idsFromDb => {
-			var int = setInterval(function () {
-				var products = block.find('.js-product.loaded');
-				if (!products.length) return;
-				clearInterval(int);
-				var ids = idsFromDb.map(obj => obj.id);
-				products.each(function () {
-					if (!ids.includes($(this).attr('data-product-gen-uid'))) $(this).remove();
-					if (tovarsFromDB['not_allowed'].includes(parseInt($(this).attr('data-product-gen-uid')))) $(this).remove();
-				});
-				block.find('.t-store__load-more-btn-wrap').remove();
-				owlCatalog(block, 'new');
-			}, 100);
-		}).
-		catch(error => {
-			console.error('Error fetching data:', error);
+			return response.json();
+		})
+		.then(data => {
+			if (!data.success) {
+				throw new Error('Ошибка загрузки данных');
+			}
+			return data.fromDB.map(obj => obj.id);
+		})
+		.then(idsFromDb => {
+			let attempts = 0;
+			const maxAttempts = 60;
+
+			const checkProducts = setInterval(() => {
+				attempts++;
+
+				const products = block.find('.js-product.loaded');
+				if (!products.length) {
+					if (attempts >= maxAttempts) {
+						clearInterval(checkProducts);
+					}
+					return;
+				}
+
+				// Фильтруем и удаляем ненужные товары
+				products.filter(function () {
+					const productid = +$(this).attr('data-product-gen-uid');
+					return !idsFromDb.includes(productid) || tovarsFromDB['not_allowed'].includes(productid);
+				}).remove();
+
+				// Если остались товары, запускаем карусель и показываем заголовок
+				if (block.find('.js-product.loaded').length) {
+					block.find('.t-store__load-more-btn-wrap').remove();
+					owlCatalog(block, 'novinki');
+					block.show().prev().show();
+				}
+
+				clearInterval(checkProducts); // Завершаем интервал при успешном выполнении
+			}, 1000);
+		})
+		.catch(error => {
+			console.error('Ошибка при загрузке товаров:', error);
 		});
 }

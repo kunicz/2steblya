@@ -5,6 +5,10 @@ $ratio: 0px;
 	$ratio: 2px;
 }
 
+@include if('2steblya_white') {
+	$ratio: 2px;
+}
+
 @include if('gvozdisco') {
 	$ratio: 2px;
 }
@@ -15,6 +19,7 @@ $description-text-opacity: .5;
 
 $cartIncompleteCheck: (
 	'2steblya':1675967313188,
+	'2steblya_white':1737898771773,
 	'gvozdisco':1675967313188,
 	'stf':'000'
 );
@@ -39,14 +44,14 @@ $cartIncompleteCheck: (
 			opacity: $description-text-opacity;
 
 			a {
-				color: $contrprimary-color !important;
+				color: $color-0 !important;
 				font-size: inherit !important;
 			}
 		}
 	}
 
-	//datepicker
-	@import 'cart-form-datepicker';
+	//datepicker - переехало просто в body
+	//@import 'cart-form-datepicker';
 
 	//промокод
 	@import 'cart-form-promocode';
@@ -78,7 +83,7 @@ $cartIncompleteCheck: (
 	//вспомнить из куки
 	.cartUseCookieBtn {
 		font-family: $card-font;
-		color: $secondary-color !important;
+		color: $color-2 !important;
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -104,6 +109,11 @@ $cartIncompleteCheck: (
 		display: none !important;
 	}
 
+	//unimportantField
+	.unimportantField {
+		display: none;
+	}
+
 	//кнопка
 	.t-form__submit {
 		text-align: center;
@@ -118,7 +128,7 @@ $cartIncompleteCheck: (
 			span {
 				font-size: .7em;
 				font-weight: 400;
-				color: $primary-color;
+				color: $color-1;
 			}
 		}
 	}
@@ -191,11 +201,11 @@ $cartIncompleteCheck: (
 		&-info_label:first-child,
 		&-label {
 			font-size: 0 !important;
-			color: $primary-color;
+			color: $color-1;
 
 			&::before {
 				font-size: 18px !important;
-				color: $contrprimary-color;
+				color: $color-0;
 			}
 		}
 
@@ -213,7 +223,7 @@ $cartIncompleteCheck: (
 
 	a {
 		font-size: $description-text-size;
-		color: $contrprimary-color !important;
+		color: $color-0 !important;
 		opacity: 1;
 	}
 }

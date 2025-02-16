@@ -1,15 +1,22 @@
 //.t706
 &__cartwin {
-	background-color: $primary-color;
+	background-color: $color-1;
 
 	&-close {
-		background-color: $primary-color;
-		position: absolute;
+		background-color: $color-1;
+		position: fixed;
 		top: 5px;
 		right: 5px;
 		z-index: 12 !important;
 
 		@include if('stf') {
+			&-icon {
+				filter: invert(1);
+				opacity: .2;
+			}
+		}
+
+		@include if('2steblya_white') {
 			&-icon {
 				filter: invert(1);
 				opacity: .2;
@@ -28,7 +35,7 @@
 	}
 
 	&-content {
-		background-color: $primary-color;
+		background-color: $color-1;
 		max-width: 750px;
 		padding: 20px;
 		position: relative;
@@ -43,6 +50,7 @@
 
 	&-heading {
 		font-size: 28px;
+		text-transform: uppercase;
 
 		@include if('stf') {
 			font-weight: 100 !important;
@@ -66,12 +74,17 @@
 
 	&-prodamount-wrap {
 		padding-top: 30px;
-		color: $contrprimary-color;
+		color: $color-0;
 		text-align: left;
+		font-weight: 600 !important;
+		text-transform: lowercase;
+
+		@include if('2steblya_white') {
+			font-weight: 300 !important;
+		}
 
 		@include if('stf') {
-			font-weight: 400;
-			text-transform: lowercase;
+			font-weight: 400 !important;
 		}
 
 		@include max(640) {
@@ -85,7 +98,7 @@
 
 	&-totalamount-wrap {
 		margin-bottom: 70px;
-		color: $contrprimary-color;
+		color: $color-0;
 		text-align: left;
 		text-transform: lowercase;
 
@@ -98,7 +111,7 @@
 	//dopsReminder
 	&-dopsReminder {
 		margin-top: 30px;
-		color: $contrprimary-color;
+		color: $color-0;
 		text-align: left;
 		font-size: $text-font-size;
 		font-family: $text-font;

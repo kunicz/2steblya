@@ -1,5 +1,6 @@
 //скрываем витрину
-[class*="vitrina"] {
+[class*="vitrina"],
+[class*="novinki"] {
 	display: none;
 }
 
