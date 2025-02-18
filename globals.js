@@ -113,26 +113,6 @@ var flowersSeasons = {
  */
 var specialDatesList = [
 	{
-		d: 13,
-		m: 2,
-		'2steblya': {
-			minPrice: 7000,
-			exclude: []
-		},
-		'2steblya_white': {
-			minPrice: 7000,
-			exclude: []
-		},
-		'gvozdisco': {
-			minPrice: 7000,
-			exclude: []
-		},
-		'staytrueflowers': {
-			minPrice: 7000,
-			exclude: []
-		}
-	},
-	{
 		d: 14,
 		m: 2,
 		'2steblya': {
@@ -153,34 +133,6 @@ var specialDatesList = [
 		},
 		'staytrueflowers': {
 			minPrice: 7500,
-			exclude: []
-		}
-	},
-	{
-		d: 6,
-		m: 3,
-		'2steblya': {
-			minPrice: 10000,
-			exclude: [
-				560426289201, //мимоза
-				154316318491, //любюлютики
-				748114270281, //powerbanka
-				969888387731, //лучшей женщине
-				690076603321, //суп
-				652864682431, //пупырка
-				561739979091 //простата
-			],
-		},
-		'2steblya_white': {
-			minPrice: 16000,
-			exclude: []
-		},
-		'gvozdisco': {
-			minPrice: 10000,
-			exclude: []
-		},
-		'staytrueflowers': {
-			minPrice: 10000,
 			exclude: []
 		}
 	},

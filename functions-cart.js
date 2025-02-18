@@ -17,17 +17,19 @@ function cart() {
 	}, 50);
 }
 
+
+
 /**
  * фукнции корзины при инициализации
- */
+*/
 function cartFunctions() {
 	cartIconUponHeader();
 	cartOpen();
 	cartClose();
 	cartInputContainersClasses();
+	cartExpandCartOnSpecialDate();
 	cartPromocode();
 	cartDelivery();
-	cartDeliveryZazhopinsk();
 	cartZakazchikNoTelegramNick();
 	cartZakazchikPoluchatel();
 	cartFormValidationTexts();
@@ -56,10 +58,27 @@ function cartDynamicFunctions() {
 	cartProductOptionsInOneLine();
 	cartOtsluniavit();
 	cartOnlyOneTovar();
-	cartPayedDeliveryForOnlyDops();
+	cartOnlyDopnik();
 	cartDonat();
 	cartPromocodeTovars();
 	cartShow();
+}
+
+function cartExpandCartOnSpecialDate() {
+	const $dateSector = $('.t706 [name="dostavka-date"]');
+	$dateSector.on('change', function () {
+		const p = $(this).val().split('-');
+		const selectedDate = new Date(+p[0], p[1] - 1, +p[2]);
+		const specialDate = specialDatesList.find(date => date.d === selectedDate.getDate() && date.m === selectedDate.getMonth() + 1);
+
+		if (!specialDate) return;
+
+		cartExpanded[site] = true;
+		cartHerZnaetPoluchatelya();
+		cartRequiredFields();
+		$('.unimportantField').removeClass('unimportantField');
+		$('#unimportantTrigger').remove();
+	});
 }
 
 /**
@@ -483,177 +502,382 @@ function cartDelivery() {
 	 */
 	function deliveryInterval() {
 		const $block = $('#dostavka-interval');
+		const $blockZone = $('#dostavka_zone');
 		const $blockSpecialDates = $('#dostavka_interval_specialDates');
-		const initialIntervalOptions = {
-			common: $block.find('label'),
-			special: $blockSpecialDates.find('label'),
-		}
+		const initialOptions = getInitialOptions();
 		const today = new Date();
 		const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1); tomorrow.setHours(0, 0, 0, 0);
 		const nowHour = today.getHours();
+		let dateType;
 		let specialDate;
 		let selectedDate;
-		let $intervalOptions;
 		let isToday;
 		let isTomorrow;
 
-		$block.hide();
-		$blockSpecialDates.hide();
+		$.fn.swapToSelect = function () {
+			const $block = $(this);
+			const $inputsContainer = $block.find('.t-radio__wrapper');
+			const $selectContainer = $('<div class="t-select__wrapper" />');
+			const $inputs = getInputsFrom($block);
+			const req = $inputs.filter('[data-tilda-req="1"]').length;
+			const $select = $(`<select class="t-select js-tilda-rule" data-type=""></select>`);
 
+			$inputsContainer.hide().after($selectContainer);
+			if (req) $select.attr('data-tilda-req', "1").attr('aria-required', "true");
+			$select.html(getSelectOptionsFrom($inputs));
+			$select.prependTo($selectContainer);
+			$select.on('change', () => {
+				const id = $selectContainer.find('option:selected').attr('id');
+				$inputsContainer.find(`#${id}`).trigger('click');
+			});
+
+			return this;
+		};
+
+		$.fn.inOneRow = function (className) {
+			const $block = $(this);
+			$block.addClass(`t-input-group_inonerow t-input-group_widthdef t-input-group_inrow-last t-input-group_width50 t-input-group_inrow-${className}`);
+			setInterval(() => $block.removeClass('t-input-group_width100'), 2000);
+			return this;
+		}
+
+		$blockSpecialDates.remove(); // удаляем блок со specialDates. Все что надо было уже в initialOptions
+		idsForZoneInputs(); // добавляем у инпутам идентификаторы, так как getSelectOptionsFrom зависит от идентификаторов на инпутах
+
+		let oldVal;
 		dateField.on('change', function () {
 			const val = $(this).val();
+			if (val === oldVal) return;
+
+			oldVal = val;
 			if (val) {
 				const p = dateField.val().split('-');
 				selectedDate = new Date(+p[0], p[1] - 1, +p[2]);
-				onChange();
+				onDateChange();
 				$block.show();
+				$blockZone.show();
 			} else {
 				selectedDate = null;
 				$block.hide();
+				$blockZone.hide();
 			}
 		});
-		$block.find('input').on('change', function () {
-			onChange();
-		});
+		$block.swapToSelect().inOneRow('withsibling').on('change', 'input', onIntervalChange);
+		$blockZone.swapToSelect().inOneRow('last').on('change', 'input', onZoneChange);
 
 		/**
-		 * получает корректный набор опций интервалов для выбранной даты c идентификаторами
-		 * @returns {jquery} - набор labels c инпутами
+		 * возвращает коллекцию инпутов из необходимого смыслового блока
+		 * @param {*} $block - смысловой блок (зона, интервалы) из которого запрашиваются инпуты
+		 * @returns {jquery}
 		 */
-		function getIntervalOptions() {
-			const $options = initialIntervalOptions[specialDate ? 'special' : 'common'];
-			setOptionsIds();
-			return $options;
+		function getInputsFrom($block) {
+			return $block.find('input');
+		}
+
+		/**
+		 * возвращает в виде строки html-опции для селекта, которые подменяет собой функционал инпутов
+		 * @param {jquery} $inputs - коллекция инпутов, на основе которых делаются зеркалящие их опции для селекта 
+		 * @returns {string}
+		 */
+		function getSelectOptionsFrom($inputs) {
+			const options = [];
+			$inputs.each((_, input) => {
+				const $input = $(input);
+				const val = $input.val();
+				const id = $input.attr('id');
+				const text = $input.val().split('=')[0].trim();
+				const selected = $input.is('checked') ? ' selected="true"' : '';
+				options.push(`<option id="${id}" value="${val}"${selected}>${text}</option>`);
+			});
+			return options.join('');
+		}
+
+		/**
+		 * присваивает id инпутам блока "зона"
+		 * идетификаторы необходимы для корректного функционирования getSelectOptionsFrom
+		 */
+		function idsForZoneInputs() {
+			const $inputs = getInputsFrom($blockZone);
+			$inputs.each((_, input) => {
+				const $input = $(input);
+				const id = hash($input.val());
+				$input.attr('id', `i${id}`);
+			});
+
+			function hash(str) {
+				let hash = 0;
+				for (let i = 0; i < str.length; i++) {
+					hash = (hash << 5) - hash + str.charCodeAt(i);
+					hash |= 0; // Преобразуем в 32-битное число
+				}
+				return Math.abs(hash).toString(36); // Делаем строку короче
+			}
+		}
+
+		/**
+		 * получает изначальные коллекции опций интервалов для обычных и праздничных дат
+		 * @returns {object}
+		*/
+		function getInitialOptions() {
+			const options = {
+				common: { $inputs: getInputsFrom($block), prices: {} },
+				special: { $inputs: getInputsFrom($blockSpecialDates), prices: {} }
+			}
+
+			Object.keys(options).forEach(type => {
+				options[type]['$inputs'].each((_, input) => {
+					const $input = $(input);
+					const id = getId($input.val());
+					$input.attr('id', id); // назначаем идентификатор
+					options[type]['prices'][id] = parseInt($input.attr('data-delivery-price') || 0); // сохраняем изначальную цену
+				});
+			});
+
+			return options;
 
 			/**
 			 * добавляет id опциям интервалов
 			 */
-			function setOptionsIds() {
-				$options.each((_, o) => {
-					const $o = $(o);
-					const val = $o.children('input').val();
-
-					if (val.startsWith('к точному времени')) {
-						$o.attr('id', 'precise');
-						return;
-					}
-					if (val.startsWith('как можно скорее')) {
-						$o.attr('id', 'asap');
-						return;
-					}
-					const match = val.match(/^с (\d{2}):(\d{2}) до (\d{2}):(\d{2})/);
-					if (match) {
-						const from = match[1]; // Часы начала
-						const to = match[3];   // Часы конца
-						$o.attr('id', `interval${from}-${to}`);
-					}
-				});
+			function getId(val) {
+				if (val.startsWith('к точному времени')) {
+					return 'precise';
+				}
+				if (val.startsWith('как можно скорее')) {
+					return 'asap';
+				}
+				const match = val.match(/^с (\d{2}):(\d{2}) до (\d{2}):(\d{2})/);
+				if (match) {
+					const from = match[1]; // Часы начала
+					const to = match[3];   // Часы конца
+					return `interval${from}-${to}`;
+				}
 			}
 		}
 
-		function onChange() {
-			if (!selectedDate) return;
+		/**
+		 * основная логика, когда меняется зона
+		 * читай описания функций
+		 */
+		function onZoneChange() {
+			const $input = $(this);
+			if (!$input.is(':checked')) return;
 
+			recalculatePrice();
+			summary();
+		}
+
+		/**
+		 * основная логика, когда меняется зона
+		 * читай описания функций
+		 */
+		function onIntervalChange() {
+			const $input = $(this);
+			if (!$input.is(':checked')) return;
+
+			summary();
+		}
+
+		/**
+		 * основная логика, когда меняется выбранная дата
+		 * читай описания функций
+		 */
+		function onDateChange() {
 			specialDate = specialDatesList.find(date => date.d === selectedDate.getDate() && date.m === selectedDate.getMonth() + 1);
+			dateType = specialDate ? 'special' : 'common';
 			isToday = selectedDate.toDateString() === today.toDateString();
 			isTomorrow = selectedDate.toDateString() === tomorrow.toDateString();
-			$intervalOptions = getIntervalOptions();
 
-			$intervalOptions.each((_, o) => {
-				const $o = $(o);
-				toggleEnable($o, true); // изначально сключаем все
-				toggleAsap($o); // показываем / не показываем asap
-				todayIntervalOptions($o); // отключаем для сегодня
-				tomorrowIntervalOptions($o); // отключаем для завтра
+			const $select = $block.find('select');
+			const selectType = $select.data('type');
+			const $inputs = initialOptions[dateType]['$inputs'];
+
+			refreshSelect();
+			$inputs.each((_, input) => {
+				const $input = $(input);
+				toggleOption($input, true);
+				todayOptions($input);
+				tomorrowOptions($input);
 			});
-			ifNoSelection();
-			$block.find('.t-radio__wrapper-delivery').html('').append($intervalOptions);
+			toggleAsapOption();
+			noOptionSelected();
 
+			$block.find('.t-radio__wrapper-delivery').html('').append($inputs);
+			$select.val($inputs.filter(':checked').val());
+			if (selectType != dateType) recalculatePrice();
 
-			function toggleAsap($o) {
-				if ($o.is('#asap')) {
-					$o.css('display', isToday ? 'table' : 'none');
-				}
+			summary();
+
+			/**
+			 * определяем вариант по умолчанию, если ничего не выбрано
+			 */
+			function noOptionSelected() {
+				//если был выбран вариант asap, но заказ не на сегодня
+				if (!isToday && $('input#asap').is(':checked')) $('input#interval16-20').trigger('click');
 			}
 
-			function ifNoSelection() {
-				if (!isToday && $('#asap input').is(':checked')) $('#interval16-20 input').trigger('click');
+			/**
+			 * полностью переписывает опции в селекте, если сменился тип даты
+			 */
+			function refreshSelect() {
+				if (selectType === dateType) return;
+				const options = getSelectOptionsFrom($inputs);
+				$select.html(options).attr('data-type', dateType);
 			}
 
-			function todayIntervalOptions($o) {
+			/**
+			 * скрываем пункт asap (как можно быстрее) если заказ не на сегодня
+			 */
+			function toggleAsapOption() {
+				$('input#asap').css('display', isToday ? 'table' : 'none');
+				$('option#asap').toggle(isToday);
+			}
+
+			/**
+			 * определяем и отключаем варианты если заказ на сегодня
+			 * @param {jquery} $input - $(input)
+			 */
+			function todayOptions($input) {
 				if (!isToday) return;
+
+				//отключаем asap
+				if ((nowHour < 10 || nowHour > 21) && $input.is('#asap')) {
+					toggleOption($input, false);
+				}
+
+				const hours = getHours($input);
+				if (!hours) return; // Пропускаем, если время не найдено
 
 				const hoursToProduce = 1.5;
 				const hoursToDeliver = 1.5;
-				const hours = getHours($o);
-
-				if (!hours) return; // Пропускаем, если время не найдено
-
 				const [startHour, endHour] = hours;
 
 				// Если текущее время < 10:00, отключаем все интервалы, которые начинаются до 12:00
 				if (nowHour < 10 && startHour < 12) {
-					toggleEnable($o, false);
+					toggleOption($input, false);
 				}
 
 				// Отключаем варианты, если уже поздно начинать готовку и доставку
 				if (nowHour >= (endHour - hoursToProduce - hoursToDeliver)) {
-					toggleEnable($o, false);
-				}
-
-				//отключаем asap
-				if (nowHour > 22 && $o.is('#asap')) {
-					toggleEnable($o, false);
+					toggleOption($input, false);
 				}
 			}
 
-			function tomorrowIntervalOptions($o) {
+			/**
+			 * определяем и отключаем варианты если заказ на завтра
+			 * @param {jquery} $input - $(input)
+			 */
+			function tomorrowOptions($input) {
 				if (!isTomorrow) return;
-
-				const hours = getHours($o);
-
-				if (!hours) return; // Пропускаем, если время не найдено
 				if (nowHour <= 19) return; // Если текущее время 19:00 или раньше — ничего не отключаем
+
+				const hours = getHours($input);
+				if (!hours) return; // Пропускаем, если время не найдено
 
 				const [startHour] = hours;
 
 				// Отключаем интервалы, которые начинаются до 12:00
 				if (startHour < 12) {
-					toggleEnable($o, false);
+					toggleOption($input, false);
 				}
 			}
 
 			/**
 			 * Извлекает часы начала и конца из строки значения инпута
-			 * @param {jquery} $o - $(label)
+			 * @param {jquery} $input - $(input)
 			 * @returns {number[]|null} [startHour, endHour] или null, если формат неправильный
 			 */
-			function getHours($o) {
-				const id = $o.attr('id');
+			function getHours($input) {
+				const id = $input.attr('id');
 				if (!id) return null;
 				const match = id.match(/^interval(\d+)-(\d+)$/);
 				return match ? [parseInt(match[1], 10), parseInt(match[2], 10)] : null;
 			}
+
+			/**
+			 * делает доступной/недоступной опуию интервала
+			 * если опция отключается, переводит выбор на другоую опцию
+			 * @param {string} $input - чекбокс интервала
+			 * @param {bool} toggle
+			 */
+			function toggleOption($input, toggle) {
+				const id = $input.attr('id');
+				const $option = $block.find(`option#${id}`);
+
+				$input.prop('disabled', !toggle);
+				$option.prop('disabled', !toggle);
+				if (toggle) return;
+
+				if ($input.is(':checked')) {
+					$inputs.filter(':not(:checked):not([disabled]):not(#asap)').first().trigger('click');
+				};
+			}
 		}
 
 		/**
-		 * делает доступной/недоступной опуию интервала
-		 * если опция отключается, переводит выбор на другоую опцию
-		 * @param {jquery} $input - чекбокс интервала
-		 * @param {bool} toggle
+		 * пересчитывает и переназначает стоимость доплаты
+		 * так как в тильде доплату можно назначить на единственное поле в форме (интервал доставки),
+		 * то все дополнительный кастомные доплаты надо суммировать к изначальному значению data-delivery-price инпутов интервалов доставки
 		 */
-		function toggleEnable($option, toggle) {
-			const $input = $option.children('input');
-			$input.prop('disabled', !toggle);
-			$option.css('opacity', toggle ? 1 : .3);
-			if (toggle) return;
-
-			if ($input.is(':checked')) {
-				const $next = $option.closest('label').next().find('input');
-				if ($next.length) {
-					$next.trigger('click');
-				}
+		function recalculatePrice() {
+			const additionalPrices = {
+				zone: getPriceZone(), // доплата за зону (замкадье)
+				onlyDopnik: getPriceOnlyDopnik() // доплата, если нет транспортирочоного
 			}
+			const additional = Object.values(additionalPrices).reduce((sum, price) => sum + price, 0);
+			const $inputsInterval = getInputsFrom($block);
+			calculate();
+			reclick();
+
+			/**
+			 * заменяет добавочную стоимость у интервала по формуле: его родная + стомость зоны
+			 */
+			function calculate() {
+				$inputsInterval.each((_, input) => {
+					const $input = $(input);
+					const initial = initialOptions[dateType]['prices'][$input.attr('id')];
+					$input.attr('data-delivery-price', initial + additional);
+				});
+			}
+
+			/**
+			 * для активыции выполняется реактивация (клик по невыбранному, а потом по выбранному обратно)
+			 */
+			function reclick() {
+				const $checked = $inputsInterval.filter(':checked');
+				$inputsInterval.filter(':not(:checked):not([disabled])').first().trigger('click');
+				$checked.trigger('click');
+			}
+
+			/**
+			 * получаем доплату за замкадье
+			 * @returns {number}
+			 */
+			function getPriceZone() {
+				const zone = Number($blockZone.find('input:checked').attr('data-delivery-price'));
+				return Number.isNaN(zone) ? 0 : zone;
+			}
+
+			/**
+			 * получаем доплату за отсутвие транспортировочного (только допники)
+			 */
+			function getPriceOnlyDopnik() {
+				const deliveryPrice = +$('.t706 [name="dostavka-price"]').val() || 0;
+				return $('.t706').is('[data-only-dopnik]') ? deliveryPrice : 0;
+			}
+		}
+
+		/**
+		 * добавляет в сводку заказа приписку о замкадье 
+		 */
+		function summary() {
+			setTimeout(() => {
+				const $labels = $('.t706__cartwin-totalamount-info_label');
+				if ($labels.length !== 2) return;
+
+				const interval = $block.find('input:checked').val().split(' (')[0];
+				const zone = $blockZone.find('input:checked').data('delivery-price') ? ' за МКАД:' : ':';
+				$labels.eq(1).text(interval + zone);
+			}, 150);
 		}
 	}
 
@@ -672,16 +896,6 @@ function cartDelivery() {
 		var html = descr.text().replace(data[site][0], '<a href="' + data[site][1] + '">' + data[site][0] + '</a>');
 		descr.html(html);
 	}
-}
-
-/**
- * обрабатываем галочку для доставки в зажопинск
- */
-function cartDeliveryZazhopinsk() {
-	$('#adres-zazhopinsk').wrap('<div id="adres-zazhopinsk__cont"></div>');
-	$('#adres-zazhopinsk input').on('change', function () {
-		deliveryPriceInterval(!$(this).is(':checked')); //для зажопинцев доставка беслпатно на сайте (отдельно в переписке будет обозначена менеджером)
-	});
 }
 
 /**
@@ -738,7 +952,7 @@ function cartDonat() {
 function cartZakazchikNoTelegramNick() {
 	var input = $('[name="messenger-zakazchika"]');
 	var a = $('<div id="messenger-zakazchika-no-telegram">нет никнейма</div>');
-	a.insertBefore(input);
+	a.appendTo($('#messenger-zakazchika'));
 	a.on('click', a.selector, function () {
 		input.val($('[name="name-zakazchika"]').val() || 'нет никнейма');
 	});
@@ -748,36 +962,44 @@ function cartZakazchikNoTelegramNick() {
  * если заказчик - это получатель
  */
 function cartZakazchikPoluchatel() {
-	var namePoluchatelya = $('.t706 [name="name-poluchatelya"]');
-	var phonePoluchatelya = $('.t706 [name="phone-poluchatelya"]');
-	$('#name-poluchatelya,#phone-poluchatelya,#phone-poluchatelya + div').wrapAll('<div />').wrapAll('<div id="poluchatelData" />');
-	var nameZakazchika = $('.t706 [name="name-zakazchika"]');
-	var phoneZakazchika = $('.t706 [name="phone-zakazchika"]');
-	var parts = [
-		'<div class="t-input-group t-input-group_cb unimportant">',
-		'<label class="t-checkbox__control t-text t-text_xs">',
-		'<input type="checkbox" class="t-checkbox js-tilda-rule">',
-		'<div class="t-checkbox__indicator"></div>',
-		'получать буду я',
-		'</label>',
-		'</div>'
-	];
-	var ZPButton = $(parts.join(''));
-	var ZPInt;
-	ZPButton.insertBefore('#poluchatelData');
-	ZPButton.on('change', 'input', function () {
-		$('#poluchatelData').toggle(!$(this).is(':checked'));
-		if ($(this).is(':checked')) {
-			ZPInt = setInterval(function () {
-				namePoluchatelya.val(nameZakazchika.val());
-				phonePoluchatelya.val(phoneZakazchika.val());
-			}, 50);
-		} else {
-			namePoluchatelya.val('');
-			phonePoluchatelya.val('');
-			clearInterval(ZPInt);
+	const person = {
+		poluchatel: {
+			name: $('.t706 [name="name-poluchatelya"]'),
+			phone: $('.t706 [name="phone-poluchatelya"]')
+		},
+		zakazchik: {
+			name: $('.t706 [name="name-zakazchika"]'),
+			phone: $('.t706 [name="phone-zakazchika"]')
 		}
-	});
+	}
+	let int;
+
+	$(`
+		<div class="t-input-group t-input-group_cb unimportant">
+			<label class="t-checkbox__control t-text t-text_xs">
+				<input type="checkbox" class="t-checkbox js-tilda-rule">
+				<div class="t-checkbox__indicator"></div>
+				получать буду я
+			</label>
+		</div>'
+	`)
+		.insertBefore('#name-poluchatelya')
+		.on('change', 'input', function () {
+			const isChecked = $(this).is(':checked');
+			if (isChecked) {
+				int = setInterval(function () {
+					person.poluchatel.name.val(person.zakazchik.name.val());
+					person.poluchatel.phone.val(person.zakazchik.phone.val());
+				}, 200);
+			} else {
+				clearInterval(int);
+				person.poluchatel.name.val('');
+				person.poluchatel.phone.val('');
+			}
+
+			const $poluchatelGroup = person.poluchatel.name.add(person.poluchatel.phone).parents('.t-input-group');
+			$poluchatelGroup.toggle(!isChecked);
+		});
 }
 
 /**
@@ -807,7 +1029,7 @@ function cartImportantFields() {
 			'указать дополнительные данные'
 		]
 	}
-	var lastImportant = $('#dostavka-interval');
+	var lastImportant = $('#dostavka_zone');
 	lastImportant.nextAll().not(':last').addClass('unimportantField');
 	var parts = [
 		'<div class="t-input-group t-input-group_cb" id="unimportantTrigger">',
@@ -845,10 +1067,10 @@ function cartLovixlube() {
 /**
  * платная доставка, если в корзине только эти товары
  */
-function cartPayedDeliveryForOnlyDops() {
+function cartOnlyDopnik() {
 	if (!tovarsFromDB['888'].length) return;
-	var onlyDops = false;
-	var tovars = $('.t706__product');
+	let onlyDops = false;
+	const tovars = $('.t706__product');
 	if (!tovars.length) return;
 
 	tovars.each(function () {
@@ -856,21 +1078,10 @@ function cartPayedDeliveryForOnlyDops() {
 		if (!onlyDops) return false;
 	});
 
-	const $dostavkaInterval = $('#dostavka-interval');
+	if (!onlyDops) return;
 
-	if (!onlyDops) {
-		$('#adres-zazhopinsk input').prop('checked', false);
-		$('#adres-zazhopinsk').hide();
-
-		// Откатываем цену только если раньше был режим "только допники"
-		if ($dostavkaInterval.hasClass('onlyDops')) {
-			deliveryPriceInterval(false); // Откатываем цены
-			$dostavkaInterval.removeClass('onlyDops'); // Убираем класс
-		}
-	} else {
-		$dostavkaInterval.addClass('onlyDops'); // Устанавливаем класс, если только допники
-		deliveryPriceInterval(true);
-	}
+	$('.t706').attr('data-only-dopnik', '1');
+	recalculatePrice();
 }
 
 /**

@@ -1,17 +1,17 @@
-window.BUILD_VERSION = '1.0.0';
+window.BUNDLE_VERSION = '1.0.1';
 
 // Все ресурсы в одном объекте (порядок важен!)
 var resources = {
-	'css': `https://php.2steblya.ru/jscss/tilda_frontend/${site}.min.css?1`,
+	'css': `https://php.2steblya.ru/jscss/tilda_frontend/${site}.min.css?v${window.BUNDLE_VERSION}`,
 	'js.cookie': 'https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js',
 	'crypto': 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js',
 	'owl.carousel': 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js',
 	'moment': 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js',
 	'moment-tz': 'https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.45/moment-timezone.min.js',
-	'globals': 'https://php.2steblya.ru/jscss/tilda_frontend/globals.min.js?2',
-	'product': 'https://php.2steblya.ru/jscss/tilda_frontend/functions-product.min.js?1',
-	'cart': 'https://php.2steblya.ru/jscss/tilda_frontend/functions-cart.min.js?3',
-	'functions': 'https://php.2steblya.ru/jscss/tilda_frontend/functions.min.js?1',
+	'globals': `https://php.2steblya.ru/jscss/tilda_frontend/globals.min.js?v${window.BUNDLE_VERSION}`,
+	'product': `https://php.2steblya.ru/jscss/tilda_frontend/functions-product.min.js?v${window.BUNDLE_VERSION}`,
+	'cart': `https://php.2steblya.ru/jscss/tilda_frontend/functions-cart.min.js?v${window.BUNDLE_VERSION}`,
+	'functions': `https://php.2steblya.ru/jscss/tilda_frontend/functions.min.js?v${window.BUNDLE_VERSION}`,
 };
 
 // Группы ресурсов

@@ -80,12 +80,17 @@ $cartIncompleteCheck: (
 		}
 	}
 
+	#dostavka-interval,
+	#dostavka_zone {
+		display: none;
+	}
+
 	//вспомнить из куки
 	.cartUseCookieBtn {
 		font-family: $card-font;
 		color: $color-2 !important;
 		position: absolute;
-		top: 0;
+		top: 4px;
 		right: 0;
 		cursor: pointer;
 	}
@@ -98,9 +103,6 @@ $cartIncompleteCheck: (
 
 		&-no-telegram {
 			@extend .cartUseCookieBtn;
-			top: 16px;
-			z-index: 2;
-			right: 20px;
 		}
 	}
 

@@ -917,7 +917,7 @@ function owlCatalog(catalog, className) {
 	 * удаляем все ненужное, возвращаем товары
 	 */
 	async function owlCatalogRemoveJunk() {
-		await new Promise(resolve => setTimeout(resolve, 1000));
+		await new Promise(resolve => setTimeout(resolve, 2000));
 		//удаляем сепараторы
 		catalog.find('.t-store__grid-separator').remove();
 		tovars.each(function () {

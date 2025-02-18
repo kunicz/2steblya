@@ -1,1 +1,8 @@
+.vscode/
 css/
+globals.min.js
+functions-cart.min.js
+functions-product.min.js
+functions.min.js
+*.css
+*.map

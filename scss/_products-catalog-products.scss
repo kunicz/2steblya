@@ -152,15 +152,16 @@
 			display: none;
 		}
 	}
+
+	//soldOut
+	&__sold-out-msg {
+		color: $color-0;
+		opacity: .4;
+		font-weight: 600;
+	}
 }
 
 
-//soldOut
-&__sold-out-msg {
-	color: $color-2;
-	font-weight: 600;
-	text-transform: uppercase !important;
-}
 
 &__btn {
 	margin: 0;
